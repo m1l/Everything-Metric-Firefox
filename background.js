@@ -13,27 +13,31 @@ var matchIn;
 function updateIcon() {
     if (metricIsEnabled===true)
 	{
-		chrome.browserAction.setIcon({
+		browser.browserAction.setIcon({
 			path: {
-				16: "icons/everything-metric-16.png",
-				32: "icons/everything-metric-32.png",
-				48: "icons/everything-metric-48.png",
-				128: "icons/everything-metric-128.png"
+                "16": "icons/everything-metric-16.png",
+                "19": "icons/everything-metric-19.png",
+                "32": "icons/everything-metric-32.png",
+                "38": "icons/everything-metric-38.png",
+                "48": "icons/everything-metric-48.png",
+                "96": "icons/everything-metric-96.png",
 			}
 		});        
-		chrome.browserAction.setTitle({title: "Automatic Metric/SI conversion is ON"});            
+		browser.browserAction.setTitle({title: "Automatic Metric/SI conversion is ON"});            
 	}
     else
 	{
-		chrome.browserAction.setIcon({
+		browser.browserAction.setIcon({
 			path: {
-				16: "icons/everything-metric-16-off.png",
-				32: "icons/everything-metric-32-off.png",
-				48: "icons/everything-metric-48-off.png",
-				128: "icons/everything-metric-128-off.png"
+                "16": "icons/everything-metric-16-off.png",
+                "19": "icons/everything-metric-19-off.png",
+                "32": "icons/everything-metric-32-off.png",
+                "38": "icons/everything-metric-38-off.png",
+                "48": "icons/everything-metric-48-off.png",
+                "96": "icons/everything-metric-96-off.png",
 			}
 		});
-		chrome.browserAction.setTitle({title: "Automatic Metric/SI conversion is OFF"});           
+		browser.browserAction.setTitle({title: "Automatic Metric/SI conversion is OFF"});           
 	}
 }  
 
@@ -47,7 +51,7 @@ function toggleMetric() {
 	}
 	updateIcon();    
     
-    chrome.storage.sync.set({
+    browser.storage.sync.set({
         enableOnStart: metricIsEnabled
 	}, function() {		
 	});
@@ -56,7 +60,7 @@ function toggleMetric() {
 
 
 
-chrome.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {   
         
         if (request.message==="Is metric enabled")
@@ -86,7 +90,7 @@ chrome.runtime.onMessage.addListener(
 );
 
 function restore_options() {
-	chrome.storage.sync.get({
+	browser.storage.sync.get({
 		useComma:true,
 		useMM:false,
 		useRounding:true,
@@ -119,18 +123,19 @@ function restore_options() {
 		{
 			console.log("firstrun");
 			try {
-				chrome.storage.sync.set({ isFirstRun: false });
-				
-                //chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
-                 var optionsUrl = chrome.extension.getURL('options.html');
+				browser.storage.sync.set({ isFirstRun: false });
+                var openingPage = browser.runtime.openOptionsPage();
+				/*
 
-                    chrome.tabs.query({url: optionsUrl}, function(tabs) {
+                 var optionsUrl = browser.extension.getURL('options.html');
+
+                    browser.tabs.query({url: optionsUrl}, function(tabs) {
                         if (tabs.length) {
-                            chrome.tabs.update(tabs[0].id, {active: true});
+                            browser.tabs.update(tabs[0].id, {active: true});
                         } else {
-                            chrome.tabs.create({url: optionsUrl});
+                            browser.tabs.create({url: optionsUrl});
                         }
-                    });
+                    });*/
 			} catch(err) {}
 		}
         
@@ -139,17 +144,17 @@ function restore_options() {
 }
 restore_options();
 
-chrome.browserAction.onClicked.addListener(function(tab){
+browser.browserAction.onClicked.addListener(function(tab){
     toggleMetric();
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.reload(tabs[0].id);
+    browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        browser.tabs.reload(tabs[0].id);
     });    
 });
 
-chrome.commands.onCommand.addListener( function(command) {
+browser.commands.onCommand.addListener( function(command) {
     if(command === "parse_page_now"){
-       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {command: "parse_page_now"}, function(response) {
+       browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          browser.tabs.sendMessage(tabs[0].id, {command: "parse_page_now"}, function(response) {
 
           });
         });

@@ -4,9 +4,14 @@
   "author":"Milos Paripovic",
   "manifest_version": 2,
   "name": "Everything Metric - Auto Unit Converter",
-  "version": "3.0",
+  "version": "3.1",
   "icons": {
+    "16": "icons/everything-metric-16.png",
+    "19": "icons/everything-metric-19.png",
+    "32": "icons/everything-metric-32.png",
+    "38": "icons/everything-metric-38.png",
     "48": "icons/everything-metric-48.png",
+    "96": "icons/everything-metric-96.png",
     "128": "icons/everything-metric-128.png"
   },
   "permissions": [
@@ -21,6 +26,7 @@
     "32": "icons/everything-metric-32.png",
     "38": "icons/everything-metric-38.png",
     "48": "icons/everything-metric-48.png",
+    "96": "icons/everything-metric-96.png",
     "128": "icons/everything-metric-128.png"
   },
   "default_title": "Automatic Metric/SI conversion"
@@ -41,8 +47,8 @@
    "options_ui": {
     "page": "options.html",
     "chrome_style": true
-  },
-    "commands": {         
+  },  
+"commands": {         
           "parse_page_now": {
             "suggested_key": {
               "default": "Alt+M",
@@ -50,5 +56,11 @@
             },
       "description": "Force convert all to Metric"
           }
-        }
+        },    
+    "applications": {
+  "gecko": {
+    "id": "{ffd50a6d-1702-4d87-83c3-ec468f67de6a}",
+    "strict_min_version": "42.0"
+      }
+    }
 }

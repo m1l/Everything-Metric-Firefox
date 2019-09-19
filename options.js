@@ -13,7 +13,7 @@ function save_options() {
     var convertBracketed = document.getElementById('convertBracketed').checked;
     var matchIn = document.getElementById('matchIn').checked;
     
-	chrome.storage.sync.set({
+	browser.storage.sync.set({
 		useComma: useComma,
 		useMM: useMM,
 		useRounding: useRounding,
@@ -32,7 +32,7 @@ function save_options() {
 		var status = document.getElementById('status');
 		status.textContent = 'Saved. Refresh individual pages to see changes.';
         
-		chrome.runtime.sendMessage(
+		browser.runtime.sendMessage(
 			"reload settings",
 			function(response) {
 
@@ -49,7 +49,7 @@ function save_options() {
 
 function restore_options() {
 	try {
-		chrome.storage.sync.get({
+		browser.storage.sync.get({
 			useComma: true,
 			useMM: false,
 			useRounding: true,

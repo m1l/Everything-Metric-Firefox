@@ -212,6 +212,7 @@ function procNode(textNode) {
 			skips = 0;
 		}
 	}
+    
     text = AxAqq(text);
 	text = feetInch(text);
 	text = AxAxAin(text);
@@ -658,14 +659,16 @@ function AxAxAin(text) {
 
 function AxAqq(text) {//ikea US
 
-
-	let regex = new RegExp('((?<!\/)(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x|\*|×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
+//Firefox does not support negative lookbehind so this like is changed from Chrome version
+	let regex = new RegExp('([\/]?(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x|\*|×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
 //new ((([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$)))
 	let matches;
 
 
 	while ((matches = regex.exec(text)) !== null) {
 		try {
+            if (matches[0].charAt(0) === '/')
+                continue;
 /*
 			for (var i=0; i<matches.length; i++)
 			    console.log("matches " + i + " " + matches[i])*/
@@ -1066,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		return;
 	}
 
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 			message: "Is metric enabled"
 		},
 		function(response) {
@@ -1108,7 +1111,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
 }, false);
 /*
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.args === "parse_page_now") {
         alert('asdf');
         walk(document.body);
@@ -1120,7 +1123,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 */
         
         
-chrome.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     
     if (request.command == "parse_page_now") {
