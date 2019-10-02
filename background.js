@@ -1,4 +1,4 @@
-var metricIsEnabled = true;
+var metricIsEnabled;
 var useComma;
 var useMM;
 var useRounding;
@@ -9,11 +9,13 @@ var useKelvin;
 var convertBracketed;
 var enableOnStart;
 var matchIn;
+var includeQuotes;
+var includeImproperSymbols;
 
 function updateIcon() {
     if (metricIsEnabled===true)
 	{
-		browser.browserAction.setIcon({
+		chrome.browserAction.setIcon({
 			path: {
                 "16": "icons/everything-metric-16.png",
                 "19": "icons/everything-metric-19.png",
@@ -21,23 +23,24 @@ function updateIcon() {
                 "38": "icons/everything-metric-38.png",
                 "48": "icons/everything-metric-48.png",
                 "96": "icons/everything-metric-96.png",
+                "128": "icons/everything-metric-128.png"
 			}
 		});        
-		browser.browserAction.setTitle({title: "Automatic Metric/SI conversion is ON"});            
+		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗡.\nYou can customize it in 𝗔𝗱𝗱-𝗼𝗻 𝗢𝗽𝘁𝗶𝗼𝗻𝘀"}); 
 	}
     else
 	{
-		browser.browserAction.setIcon({
+		chrome.browserAction.setIcon({
 			path: {
                 "16": "icons/everything-metric-16-off.png",
                 "19": "icons/everything-metric-19-off.png",
                 "32": "icons/everything-metric-32-off.png",
                 "38": "icons/everything-metric-38-off.png",
                 "48": "icons/everything-metric-48-off.png",
-                "96": "icons/everything-metric-96-off.png",
+                "96": "icons/everything-metric-96-off.png"
 			}
 		});
-		browser.browserAction.setTitle({title: "Automatic Metric/SI conversion is OFF"});           
+		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});            
 	}
 }  
 
@@ -51,8 +54,8 @@ function toggleMetric() {
 	}
 	updateIcon();    
     
-    browser.storage.sync.set({
-        enableOnStart: metricIsEnabled
+    chrome.storage.sync.set({
+        metricIsEnabled: metricIsEnabled
 	}, function() {		
 	});
 }
@@ -60,7 +63,7 @@ function toggleMetric() {
 
 
 
-browser.runtime.onMessage.addListener(
+chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {   
         
         if (request.message==="Is metric enabled")
@@ -80,17 +83,21 @@ browser.runtime.onMessage.addListener(
             response.convertBracketed=convertBracketed;
             response.enableOnStart=enableOnStart;
             response.matchIn=matchIn;
+            response.includeQuotes=includeQuotes;
+            response.includeImproperSymbols=includeImproperSymbols;
 			sendResponse(response);
 		}
         else { //request to reload
             restore_options();
             sendResponse("ok");
         }
+        updateIcon();   
     }
 );
 
 function restore_options() {
-	browser.storage.sync.get({
+	chrome.storage.sync.get({
+        metricIsEnabled:true,
 		useComma:true,
 		useMM:false,
 		useRounding:true,
@@ -102,10 +109,13 @@ function restore_options() {
         useBold: false,
         useBrackets: true,
         useMetricOnly: false,
-        convertBracketed: false,
+        convertBracketed: true,
         enableOnStart: true,
-        matchIn: false
-	}, function(items) {    
+        matchIn: false,
+        includeQuotes: true,
+        includeImproperSymbols: true
+	}, function(items) {   
+        metricIsEnabled = items.metricIsEnabled;
 		useComma = items.useComma;
 		useMM = items.useMM;
 		useRounding = items.useRounding; 
@@ -119,23 +129,24 @@ function restore_options() {
         convertBracketed = items.convertBracketed;
         enableOnStart = items.enableOnStart;
         matchIn = items.matchIn;
+        includeQuotes = items.includeQuotes;
+        includeImproperSymbols = items.includeImproperSymbols;
 		if (items.isFirstRun===true) 
 		{
 			console.log("firstrun");
 			try {
-				browser.storage.sync.set({ isFirstRun: false });
-                var openingPage = browser.runtime.openOptionsPage();
-				/*
+				chrome.storage.sync.set({ isFirstRun: false });
+				
+                //chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+                 var optionsUrl = chrome.extension.getURL('options.html');
 
-                 var optionsUrl = browser.extension.getURL('options.html');
-
-                    browser.tabs.query({url: optionsUrl}, function(tabs) {
+                    chrome.tabs.query({url: optionsUrl}, function(tabs) {
                         if (tabs.length) {
-                            browser.tabs.update(tabs[0].id, {active: true});
+                            chrome.tabs.update(tabs[0].id, {active: true});
                         } else {
-                            browser.tabs.create({url: optionsUrl});
+                            chrome.tabs.create({url: optionsUrl});
                         }
-                    });*/
+                    });
 			} catch(err) {}
 		}
         
@@ -144,17 +155,17 @@ function restore_options() {
 }
 restore_options();
 
-browser.browserAction.onClicked.addListener(function(tab){
+chrome.browserAction.onClicked.addListener(function(tab){
     toggleMetric();
-    browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        browser.tabs.reload(tabs[0].id);
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.reload(tabs[0].id);
     });    
 });
 
-browser.commands.onCommand.addListener( function(command) {
+chrome.commands.onCommand.addListener( function(command) {
     if(command === "parse_page_now"){
-       browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          browser.tabs.sendMessage(tabs[0].id, {command: "parse_page_now"}, function(response) {
+       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {command: "parse_page_now"}, function(response) {
 
           });
         });
