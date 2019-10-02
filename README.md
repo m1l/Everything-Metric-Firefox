@@ -5,8 +5,9 @@ Automatically translates all sites from American and Imperial units to Internati
 Example: 10 feet (3 m)˜
 
 Extension published here
-https://chrome.google.com/webstore/detail/everything-metric-auto-un/hknjpaididhfgeocegbacehlnkofjoni
-(Firefox extension different fork)
+https://addons.mozilla.org/en-US/firefox/addon/everything-metric-converter/
+
+Chrome version is available here https://github.com/m1l/Everything-Metric
 
 Starting code based on https://github.com/esprimo/imperial-to-metric-chrome-extension
 
