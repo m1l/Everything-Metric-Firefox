@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "name": "Everything Metric - Auto Unit Converter",
   "short_name": "Everything Metric",
-  "version": "3.4",
+  "version": "3.5",
   "icons": {
     "16": "icons/everything-metric-16.png",
     "19": "icons/everything-metric-19.png",

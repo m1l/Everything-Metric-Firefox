@@ -144,6 +144,20 @@ const units = [{
 	forceround: true,
 	multiplierimp: 284.131
 }, {
+	regexUnit: new RegExp(skipempty + '(tbsp|tablespoon)s?'+skipbrackets + regend, 'ig'),
+	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tbsp|tablespoon)s?' + unitSuffix + ')', 'ig'),
+	unit: 'mL',
+	multiplier: 14.7867648,
+	forceround: true,
+	multiplierimp: 0.832674
+}, {
+	regexUnit: new RegExp(skipempty + '(tsp|teaspoon)s?'+skipbrackets + regend, 'ig'),
+	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tsp|teaspoon)s?' + unitSuffix + ')', 'ig'),
+	unit: 'mL',
+	multiplier: 4.92892159,
+	forceround: true,
+	multiplierimp: 0.832674
+}, {
 	regexUnit: new RegExp(skipempty + '(qt|quarts?)' + skipbrackets + regend, 'ig'),
 	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(qt|quarts?)' + unitSuffix + ')', 'ig'),
 	unit: 'L',
