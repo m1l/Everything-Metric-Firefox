@@ -161,6 +161,20 @@ const units = [{
 	regex: new RegExp(regstart + intOrFloat + '[ \u00A0]?horsepower?' + unitSuffix + ')', 'ig'),
 	unit: 'kW',
 	multiplier: 0.745699872
+}, {
+	regexUnit: new RegExp(skipempty + 'teaspoons?'+skipbrackets + regend, 'ig'),
+	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?teaspoons?' + unitSuffix + ')', 'ig'),
+	unit: 'mL',
+	multiplier: 4.92892,
+	forceround: true,
+	multiplierimp: 5.91939
+}, {
+	regexUnit: new RegExp(skipempty + 'tablespoons?'+skipbrackets + regend, 'ig'),
+	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?tablespoons?' + unitSuffix + ')', 'ig'),
+	unit: 'mL',
+	multiplier: 14.7868,
+	forceround: true,
+	multiplierimp: 17.7582
 }];
 
 
@@ -242,7 +256,7 @@ function procNode(textNode) {
 
 function Fahrenheit(text) {
 
-	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?)|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
+	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees?)?)[ \u00A0]?F(ahrenheits?)?)|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
 
 	if (text.search(regex) !== -1) {
 		let matches;
