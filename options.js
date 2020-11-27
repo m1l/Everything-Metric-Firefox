@@ -13,6 +13,8 @@ function save_options() {
     var convertBracketed = document.getElementById('convertBracketed').checked;
     var matchIn = document.getElementById('matchIn').checked;
     var includeQuotes = document.getElementById('includeQuotes').checked;
+    var convertTablespoon = document.getElementById('convertTablespoon').checked;
+    var convertTeaspoon = document.getElementById('convertTeaspoon').checked;
     var includeImproperSymbols = document.getElementById('includeImproperSymbols').checked;
     
 	browser.storage.sync.set({
@@ -29,6 +31,8 @@ function save_options() {
 		useMetricOnly: useMetricOnly,
         convertBracketed: convertBracketed,
         matchIn: matchIn,
+        convertTablespoon: convertTablespoon,
+        convertTeaspoon: convertTeaspoon,
         includeQuotes: includeQuotes,
         includeImproperSymbols: includeImproperSymbols
 	}, function() {
@@ -67,6 +71,8 @@ function restore_options() {
 			useMetricOnly: false,
             convertBracketed: true,
             matchIn: false,
+            convertTablespoon: false,
+            convertTeaspoon: false,
             includeQuotes: true,
             includeImproperSymbols: true
 		}, function(items) {
@@ -82,6 +88,8 @@ function restore_options() {
 			document.getElementById('useMetricOnly').checked = items.useMetricOnly;
             document.getElementById('convertBracketed').checked = items.convertBracketed;
             document.getElementById('matchIn').checked = items.matchIn;
+            document.getElementById('convertTablespoon').checked = items.convertTablespoon;
+            document.getElementById('convertTeaspoon').checked = items.convertTeaspoon;
             document.getElementById('includeQuotes').checked = items.includeQuotes;
             document.getElementById('includeImproperSymbols').checked = items.includeImproperSymbols;
 		});
@@ -103,6 +111,8 @@ document.getElementById('useBrackets').addEventListener('click', save_options);
 document.getElementById('useMetricOnly').addEventListener('click', save_options);
 document.getElementById('convertBracketed').addEventListener('click', save_options);
 document.getElementById('matchIn').addEventListener('click', save_options);
+document.getElementById('convertTablespoon').addEventListener('click', save_options);
+document.getElementById('convertTeaspoon').addEventListener('click', save_options);
 document.getElementById('includeQuotes').addEventListener('click', save_options);
 document.getElementById('includeImproperSymbols').addEventListener('click', save_options);
 var _selector = document.querySelector('input');

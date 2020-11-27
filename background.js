@@ -9,6 +9,8 @@ var useKelvin;
 var convertBracketed;
 var enableOnStart;
 var matchIn;
+var convertTablespoon;
+var convertTeaspoon;
 var includeQuotes;
 var includeImproperSymbols;
 
@@ -83,6 +85,8 @@ chrome.runtime.onMessage.addListener(
             response.convertBracketed=convertBracketed;
             response.enableOnStart=enableOnStart;
             response.matchIn=matchIn;
+            response.convertTablespoon=convertTablespoon;
+            response.convertTeaspoon=convertTeaspoon;
             response.includeQuotes=includeQuotes;
             response.includeImproperSymbols=includeImproperSymbols;
 			sendResponse(response);
@@ -112,6 +116,8 @@ function restore_options() {
         convertBracketed: true,
         enableOnStart: true,
         matchIn: false,
+        convertTablespoon: false,
+        convertTeaspoon: false,
         includeQuotes: true,
         includeImproperSymbols: true
 	}, function(items) {   
@@ -129,6 +135,8 @@ function restore_options() {
         convertBracketed = items.convertBracketed;
         enableOnStart = items.enableOnStart;
         matchIn = items.matchIn;
+        convertTablespoon = items.convertTablespoon;
+        convertTeaspoon = items.convertTeaspoon;
         includeQuotes = items.includeQuotes;
         includeImproperSymbols = items.includeImproperSymbols;
 		if (items.isFirstRun===true) 

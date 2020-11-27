@@ -16,6 +16,8 @@ var useMetricOnly;
 var totalConversions;
 var convertBracketed;
 var matchIn;
+var convertTablespoon=false;
+var convertTeaspoon=false;
 var includeQuotes;
 var isparsing=false;
 var includeImproperSymbols;
@@ -58,7 +60,7 @@ const sq = '([\-− \u00A0]?(sq\.?|square))?';
 const skipempty = '^(?:[ \n\t]+)?';
 var feetInchRegex;
 
-const units = [{
+var units = [{
     regexUnit: new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig'),	
 	unit: '°C',
 	multiplier: 1
@@ -161,22 +163,25 @@ const units = [{
 	regex: new RegExp(regstart + intOrFloat + '[ \u00A0]?horsepower?' + unitSuffix + ')', 'ig'),
 	unit: 'kW',
 	multiplier: 0.745699872
-}, {
-	regexUnit: new RegExp(skipempty + 'teaspoons?'+skipbrackets + regend, 'ig'),
-	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?teaspoons?' + unitSuffix + ')', 'ig'),
-	unit: 'mL',
-	multiplier: 4.92892,
-	forceround: true,
-	multiplierimp: 5.91939
-}, {
-	regexUnit: new RegExp(skipempty + 'tablespoons?'+skipbrackets + regend, 'ig'),
-	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?tablespoons?' + unitSuffix + ')', 'ig'),
+}];
+
+const unitsTablespoon = {
+	regexUnit: new RegExp(skipempty + '(tbsp|tablespoons?)'+skipbrackets + regend, 'ig'),
+    regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tbsp|tablespoons?)' + unitSuffix + ')', 'ig'),
 	unit: 'mL',
 	multiplier: 14.7868,
 	forceround: true,
 	multiplierimp: 17.7582
-}];
+};
 
+const unitsTeaspoon = {
+	regexUnit: new RegExp(skipempty + '(tsp|teaspoons?)'+skipbrackets + regend, 'ig'),
+	regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tsp|teaspoons?)' + unitSuffix + ')', 'ig'),
+	unit: 'mL',
+	multiplier: 4.92892,
+	forceround: true,
+	multiplierimp: 5.91939
+};
 
 function walk(node) {
 	if (hasEditableNode(node)) return;
@@ -256,7 +261,7 @@ function procNode(textNode) {
 
 function Fahrenheit(text) {
 
-	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees?)?)[ \u00A0]?F(ahrenheits?)?)|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
+	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?)|(Fahrenheits?)|(deg(rees)?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
 
 	if (text.search(regex) !== -1) {
 		let matches;
@@ -1265,6 +1270,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			message: "Is metric enabled"
 		},
 		function(response) {
+            console.log(response);
             metricIsEnabled = response.metricIsEnabled;
 			useComma = response.useComma;
 			useMM = response.useMM;
@@ -1278,9 +1284,15 @@ document.addEventListener('DOMContentLoaded', function() {
 			useMetricOnly = response.useMetricOnly;
             convertBracketed = response.convertBracketed;
             matchIn = response.matchIn;
+            convertTablespoon = response.convertTablespoon;
+            convertTeaspoon = response.convertTeaspoon;
             includeQuotes = response.includeQuotes;
             includeImproperSymbols = response.includeImproperSymbols;
             InitRegex();
+            console.log("convertTablespoon", convertTablespoon,"convertTeaspoon",convertTeaspoon);
+            if (convertTablespoon) units.push(unitsTablespoon);
+            if (convertTeaspoon) units.push(unitsTeaspoon);
+
 			if (response.metricIsEnabled === true) {
                 
 				let isamazon = false;
