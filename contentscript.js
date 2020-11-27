@@ -1270,7 +1270,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			message: "Is metric enabled"
 		},
 		function(response) {
-            console.log(response);
             metricIsEnabled = response.metricIsEnabled;
 			useComma = response.useComma;
 			useMM = response.useMM;
@@ -1289,7 +1288,6 @@ document.addEventListener('DOMContentLoaded', function() {
             includeQuotes = response.includeQuotes;
             includeImproperSymbols = response.includeImproperSymbols;
             InitRegex();
-            console.log("convertTablespoon", convertTablespoon,"convertTeaspoon",convertTeaspoon);
             if (convertTablespoon) units.push(unitsTablespoon);
             if (convertTeaspoon) units.push(unitsTeaspoon);
 
