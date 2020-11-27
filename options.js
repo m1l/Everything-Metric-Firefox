@@ -7,6 +7,7 @@ function save_options() {
 	var useGiga = document.getElementById('useGiga').checked;
 	var useSpaces = document.getElementById('useSpaces').checked;
 	var useKelvin = document.getElementById('useKelvin').checked;
+	var degWithoutFahrenheit = document.getElementById('degWithoutFahrenheit').checked;
 	var useBold = document.getElementById('useBold').checked;
 	var useBrackets = document.getElementById('useBrackets').checked;
 	var useMetricOnly = document.getElementById('useMetricOnly').checked;
@@ -26,6 +27,7 @@ function save_options() {
 		useGiga: useGiga,
 		useSpaces: useSpaces,
 		useKelvin: useKelvin,
+		degWithoutFahrenheit: degWithoutFahrenheit,
 		useBold: useBold,
 		useBrackets: useBrackets,
 		useMetricOnly: useMetricOnly,
@@ -66,6 +68,7 @@ function restore_options() {
 			useGiga: false,
 			useSpaces: true,
 			useKelvin: false,
+			degWithoutFahrenheit: false,
 			useBold: false,
 			useBrackets: true,
 			useMetricOnly: false,
@@ -83,6 +86,7 @@ function restore_options() {
 			document.getElementById('useGiga').checked = items.useGiga;
 			document.getElementById('useSpaces').checked = items.useSpaces;
 			document.getElementById('useKelvin').checked = items.useKelvin;
+			document.getElementById('degWithoutFahrenheit').checked = items.degWithoutFahrenheit;
 			document.getElementById('useBold').checked = items.useBold;
 			document.getElementById('useBrackets').checked = items.useBrackets;
 			document.getElementById('useMetricOnly').checked = items.useMetricOnly;
@@ -106,6 +110,7 @@ document.getElementById('useRounding').addEventListener('click', save_options);
 document.getElementById('useGiga').addEventListener('click', save_options);
 document.getElementById('useSpaces').addEventListener('click', save_options);
 document.getElementById('useKelvin').addEventListener('click', save_options);
+document.getElementById('degWithoutFahrenheit').addEventListener('click', save_options);
 document.getElementById('useBold').addEventListener('click', save_options);
 document.getElementById('useBrackets').addEventListener('click', save_options);
 document.getElementById('useMetricOnly').addEventListener('click', save_options);

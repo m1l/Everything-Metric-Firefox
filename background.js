@@ -6,6 +6,7 @@ var useMO;
 var useGiga;
 var useSpaces;
 var useKelvin;
+var degWithoutFahrenheit;
 var convertBracketed;
 var enableOnStart;
 var matchIn;
@@ -79,6 +80,7 @@ chrome.runtime.onMessage.addListener(
 			response.useGiga = useGiga;
 			response.useSpaces = useSpaces;
             response.useKelvin = useKelvin;
+            response.degWithoutFahrenheit = degWithoutFahrenheit;
 			response.useBold=useBold;
             response.useBrackets=useBrackets;
             response.useMetricOnly=useMetricOnly;
@@ -110,6 +112,7 @@ function restore_options() {
 		useGiga:false,
 		useSpaces:true,
         useKelvin:false,
+        degWithoutFahrenheit:false,
         useBold: false,
         useBrackets: true,
         useMetricOnly: false,
@@ -129,6 +132,7 @@ function restore_options() {
 		useGiga = items.useGiga;
 		useSpaces = items.useSpaces;
         useKelvin = items.useKelvin;
+        degWithoutFahrenheit = items.degWithoutFahrenheit;
         useBold= items.useBold;
         useBrackets= items.useBrackets;
         useMetricOnly= items.useBold;

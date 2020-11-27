@@ -7,6 +7,7 @@ var useMO;
 var useGiga;
 var useSpaces;
 var useKelvin;
+var degWithoutFahrenheit;
 var isUK = false;
 var lastquantity = 0;
 var skips = 0;
@@ -261,7 +262,7 @@ function procNode(textNode) {
 
 function Fahrenheit(text) {
 
-	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?)|(Fahrenheits?)|(deg(rees)?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
+	let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?' + ( degWithoutFahrenheit ? '': 'F(ahrenheits?)?' ) + ')|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
 
 	if (text.search(regex) !== -1) {
 		let matches;
@@ -1248,7 +1249,14 @@ function InitRegex(){
         
         //only for foot
         units[2].regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
-    }   
+    }
+
+    if (convertTablespoon) units.push(unitsTablespoon);
+    if (convertTeaspoon) units.push(unitsTeaspoon);
+    
+    if(degWithoutFahrenheit) {
+        units[0].regex = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig')
+    }
 }        
 
 
@@ -1278,6 +1286,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			useGiga = response.useGiga;
 			useSpaces = response.useSpaces;
 			useKelvin = response.useKelvin;
+			degWithoutFahrenheit = response.degWithoutFahrenheit;
 			useBold = response.useBold;
 			useBrackets = response.useBrackets;
 			useMetricOnly = response.useMetricOnly;
@@ -1288,8 +1297,6 @@ document.addEventListener('DOMContentLoaded', function() {
             includeQuotes = response.includeQuotes;
             includeImproperSymbols = response.includeImproperSymbols;
             InitRegex();
-            if (convertTablespoon) units.push(unitsTablespoon);
-            if (convertTeaspoon) units.push(unitsTeaspoon);
 
 			if (response.metricIsEnabled === true) {
                 
