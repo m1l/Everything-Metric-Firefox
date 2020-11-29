@@ -6,9 +6,12 @@ var useMO;
 var useGiga;
 var useSpaces;
 var useKelvin;
+var degWithoutFahrenheit;
 var convertBracketed;
 var enableOnStart;
 var matchIn;
+var convertTablespoon;
+var convertTeaspoon;
 var includeQuotes;
 var includeImproperSymbols;
 
@@ -77,12 +80,15 @@ chrome.runtime.onMessage.addListener(
 			response.useGiga = useGiga;
 			response.useSpaces = useSpaces;
             response.useKelvin = useKelvin;
+            response.degWithoutFahrenheit = degWithoutFahrenheit;
 			response.useBold=useBold;
             response.useBrackets=useBrackets;
             response.useMetricOnly=useMetricOnly;
             response.convertBracketed=convertBracketed;
             response.enableOnStart=enableOnStart;
             response.matchIn=matchIn;
+            response.convertTablespoon=convertTablespoon;
+            response.convertTeaspoon=convertTeaspoon;
             response.includeQuotes=includeQuotes;
             response.includeImproperSymbols=includeImproperSymbols;
 			sendResponse(response);
@@ -106,12 +112,15 @@ function restore_options() {
 		useGiga:false,
 		useSpaces:true,
         useKelvin:false,
+        degWithoutFahrenheit:false,
         useBold: false,
         useBrackets: true,
         useMetricOnly: false,
         convertBracketed: true,
         enableOnStart: true,
         matchIn: false,
+        convertTablespoon: false,
+        convertTeaspoon: false,
         includeQuotes: true,
         includeImproperSymbols: true
 	}, function(items) {   
@@ -123,12 +132,15 @@ function restore_options() {
 		useGiga = items.useGiga;
 		useSpaces = items.useSpaces;
         useKelvin = items.useKelvin;
+        degWithoutFahrenheit = items.degWithoutFahrenheit;
         useBold= items.useBold;
         useBrackets= items.useBrackets;
         useMetricOnly= items.useBold;
         convertBracketed = items.convertBracketed;
         enableOnStart = items.enableOnStart;
         matchIn = items.matchIn;
+        convertTablespoon = items.convertTablespoon;
+        convertTeaspoon = items.convertTeaspoon;
         includeQuotes = items.includeQuotes;
         includeImproperSymbols = items.includeImproperSymbols;
 		if (items.isFirstRun===true) 

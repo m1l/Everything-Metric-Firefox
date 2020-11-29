@@ -7,12 +7,15 @@ function save_options() {
 	var useGiga = document.getElementById('useGiga').checked;
 	var useSpaces = document.getElementById('useSpaces').checked;
 	var useKelvin = document.getElementById('useKelvin').checked;
+	var degWithoutFahrenheit = document.getElementById('degWithoutFahrenheit').checked;
 	var useBold = document.getElementById('useBold').checked;
 	var useBrackets = document.getElementById('useBrackets').checked;
 	var useMetricOnly = document.getElementById('useMetricOnly').checked;
     var convertBracketed = document.getElementById('convertBracketed').checked;
     var matchIn = document.getElementById('matchIn').checked;
     var includeQuotes = document.getElementById('includeQuotes').checked;
+    var convertTablespoon = document.getElementById('convertTablespoon').checked;
+    var convertTeaspoon = document.getElementById('convertTeaspoon').checked;
     var includeImproperSymbols = document.getElementById('includeImproperSymbols').checked;
     
 	browser.storage.sync.set({
@@ -24,11 +27,14 @@ function save_options() {
 		useGiga: useGiga,
 		useSpaces: useSpaces,
 		useKelvin: useKelvin,
+		degWithoutFahrenheit: degWithoutFahrenheit,
 		useBold: useBold,
 		useBrackets: useBrackets,
 		useMetricOnly: useMetricOnly,
         convertBracketed: convertBracketed,
         matchIn: matchIn,
+        convertTablespoon: convertTablespoon,
+        convertTeaspoon: convertTeaspoon,
         includeQuotes: includeQuotes,
         includeImproperSymbols: includeImproperSymbols
 	}, function() {
@@ -62,11 +68,14 @@ function restore_options() {
 			useGiga: false,
 			useSpaces: true,
 			useKelvin: false,
+			degWithoutFahrenheit: false,
 			useBold: false,
 			useBrackets: true,
 			useMetricOnly: false,
             convertBracketed: true,
             matchIn: false,
+            convertTablespoon: false,
+            convertTeaspoon: false,
             includeQuotes: true,
             includeImproperSymbols: true
 		}, function(items) {
@@ -77,11 +86,14 @@ function restore_options() {
 			document.getElementById('useGiga').checked = items.useGiga;
 			document.getElementById('useSpaces').checked = items.useSpaces;
 			document.getElementById('useKelvin').checked = items.useKelvin;
+			document.getElementById('degWithoutFahrenheit').checked = items.degWithoutFahrenheit;
 			document.getElementById('useBold').checked = items.useBold;
 			document.getElementById('useBrackets').checked = items.useBrackets;
 			document.getElementById('useMetricOnly').checked = items.useMetricOnly;
             document.getElementById('convertBracketed').checked = items.convertBracketed;
             document.getElementById('matchIn').checked = items.matchIn;
+            document.getElementById('convertTablespoon').checked = items.convertTablespoon;
+            document.getElementById('convertTeaspoon').checked = items.convertTeaspoon;
             document.getElementById('includeQuotes').checked = items.includeQuotes;
             document.getElementById('includeImproperSymbols').checked = items.includeImproperSymbols;
 		});
@@ -98,11 +110,14 @@ document.getElementById('useRounding').addEventListener('click', save_options);
 document.getElementById('useGiga').addEventListener('click', save_options);
 document.getElementById('useSpaces').addEventListener('click', save_options);
 document.getElementById('useKelvin').addEventListener('click', save_options);
+document.getElementById('degWithoutFahrenheit').addEventListener('click', save_options);
 document.getElementById('useBold').addEventListener('click', save_options);
 document.getElementById('useBrackets').addEventListener('click', save_options);
 document.getElementById('useMetricOnly').addEventListener('click', save_options);
 document.getElementById('convertBracketed').addEventListener('click', save_options);
 document.getElementById('matchIn').addEventListener('click', save_options);
+document.getElementById('convertTablespoon').addEventListener('click', save_options);
+document.getElementById('convertTeaspoon').addEventListener('click', save_options);
 document.getElementById('includeQuotes').addEventListener('click', save_options);
 document.getElementById('includeImproperSymbols').addEventListener('click', save_options);
 var _selector = document.querySelector('input');
