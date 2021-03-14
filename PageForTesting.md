@@ -503,4 +503,4 @@ should not convert 1964 in Germany
 
 draft 01 indeed <- bug
 
-one-half to 1½ inches
+one-half to 1½ inches in diameter
