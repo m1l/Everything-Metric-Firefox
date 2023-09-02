@@ -61,7 +61,7 @@ const sq = '([\-− \u00A0]?(sq\.?|square))?';
 const skipempty = '^(?:[ \n\t]+)?';
 var feetInchRegex;
 
-var units = [{
+const units = [{
     regexUnit: new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig'),
     unit: '°C',
     multiplier: 1
