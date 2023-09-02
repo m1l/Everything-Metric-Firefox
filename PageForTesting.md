@@ -1,4 +1,4 @@
-This page is for testing if the extension is working correctly. 
+This page is for tesing if the extension is working correctly.
 
 
 
@@ -301,7 +301,7 @@ There are also measurements of Teaspoon and Tablespoon, but each country assumes
 
 
 
-Cups are different depending on a country: Australia and Canada (250 mL), U.K. (284.13 mL), U.S. (236.59 mL). Even in the U.S., there is a difference in volume between a US tablespoon (14.79 mL) and a US tablespoon used by the FDA (15 mL). The same difference within the U.S. exists also for Teaspoons and Cups. 
+Cups are different depending on a country: Australia and Canada (250 mL), U.K. (284.13 mL), U.S. (236.59 mL). Even in the U.S., there is a difference in volume between a US tablespoon (14.79 mL) and a US tablespoon used by the FDA (15 mL). The same difference within the U.S. exists also for Teaspoons and Cups.
 
 1 Cup
 
@@ -369,7 +369,7 @@ Temperature
 
 82ºF
 
-100 - 200 F. 
+100 - 200 F.
 
 range -10-32ºF x
 
@@ -473,7 +473,7 @@ The measurements for this rug are: 7 feet wide by 10 feet long.
 
 34 pounds (View shipping rates and policies)
 
-Rugs Area Rugs 2' x 3' Area Rugs 
+Rugs Area Rugs 2' x 3' Area Rugs
 
 Rectangle 6'7" x 9'
 
@@ -493,9 +493,9 @@ cushions: 31 1/8 "
 
 1/2.3" sensor
 
-should not convert 1964 in Germany 
+should not convert 1964 in Germany
 
-1964in German 
+1964in German
 
 1/8-1/2"
 

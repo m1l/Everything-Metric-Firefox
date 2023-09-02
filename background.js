@@ -28,8 +28,8 @@ function updateIcon() {
                 "96": "icons/everything-metric-96.png",
                 "128": "icons/everything-metric-128.png"
 			}
-		});        
-		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗡.\nYou can customize it in 𝗔𝗱𝗱-𝗼𝗻 𝗢𝗽𝘁𝗶𝗼𝗻𝘀"}); 
+		});
+		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗡.\nYou can customize it in 𝗔𝗱𝗱-𝗼𝗻 𝗢𝗽𝘁𝗶𝗼𝗻𝘀"});
 	}
     else
 	{
@@ -43,9 +43,9 @@ function updateIcon() {
                 "96": "icons/everything-metric-96-off.png"
 			}
 		});
-		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});            
+		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});
 	}
-}  
+}
 
 
 
@@ -55,11 +55,11 @@ function toggleMetric() {
 	} else {
 		metricIsEnabled=true;
 	}
-	updateIcon();    
-    
+	updateIcon();
+
     chrome.storage.sync.set({
         metricIsEnabled: metricIsEnabled
-	}, function() {		
+	}, function() {
 	});
 }
 
@@ -67,8 +67,8 @@ function toggleMetric() {
 
 
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {   
-        
+    function(request, sender, sendResponse) {
+
         if (request.message==="Is metric enabled")
 		{
 			var response = {};
@@ -97,7 +97,7 @@ chrome.runtime.onMessage.addListener(
             restore_options();
             sendResponse("ok");
         }
-        updateIcon();   
+        updateIcon();
     }
 );
 
@@ -123,11 +123,11 @@ function restore_options() {
         convertTeaspoon: false,
         includeQuotes: true,
         includeImproperSymbols: true
-	}, function(items) {   
+	}, function(items) {
         metricIsEnabled = items.metricIsEnabled;
 		useComma = items.useComma;
 		useMM = items.useMM;
-		useRounding = items.useRounding; 
+		useRounding = items.useRounding;
 		useMO = items.useMO;
 		useGiga = items.useGiga;
 		useSpaces = items.useSpaces;
@@ -143,12 +143,12 @@ function restore_options() {
         convertTeaspoon = items.convertTeaspoon;
         includeQuotes = items.includeQuotes;
         includeImproperSymbols = items.includeImproperSymbols;
-		if (items.isFirstRun===true) 
+		if (items.isFirstRun===true)
 		{
 			console.log("firstrun");
 			try {
 				chrome.storage.sync.set({ isFirstRun: false });
-				
+
                 //chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
                  var optionsUrl = chrome.extension.getURL('options.html');
 
@@ -161,9 +161,9 @@ function restore_options() {
                     });
 			} catch(err) {}
 		}
-        
-       
-	}); 
+
+
+	});
 }
 restore_options();
 
@@ -171,7 +171,7 @@ chrome.browserAction.onClicked.addListener(function(tab){
     toggleMetric();
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.reload(tabs[0].id);
-    });    
+    });
 });
 
 chrome.commands.onCommand.addListener( function(command) {
@@ -183,4 +183,4 @@ chrome.commands.onCommand.addListener( function(command) {
         });
      }
 });
-    
+

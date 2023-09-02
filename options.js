@@ -17,7 +17,7 @@ function save_options() {
     var convertTablespoon = document.getElementById('convertTablespoon').checked;
     var convertTeaspoon = document.getElementById('convertTeaspoon').checked;
     var includeImproperSymbols = document.getElementById('includeImproperSymbols').checked;
-    
+
 	browser.storage.sync.set({
 		useComma: useComma,
 		useMM: useMM,
@@ -41,7 +41,7 @@ function save_options() {
 		// Update status to let user know options were saved.
 		var status = document.getElementById('status');
 		status.textContent = 'Saved. Refresh individual pages to see changes.';
-        
+
 		browser.runtime.sendMessage(
 			"reload settings",
 			function(response) {
@@ -99,7 +99,7 @@ function restore_options() {
 		});
 	} catch (err) {
 		console.log(err.message);
-	}	
+	}
 }
 restore_options();
 document.addEventListener("DOMContentLoaded", restore_options);
