@@ -1,4 +1,4 @@
-This page is for tesing if the extension is working correctly. 
+This page is for testing if the extension is working correctly. 
 
 
 
