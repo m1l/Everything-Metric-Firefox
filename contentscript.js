@@ -23,7 +23,7 @@ var includeQuotes;
 var isparsing=false;
 var includeImproperSymbols;
 
-var fractions = {
+const fractions = {
     '¼': 0.25,
     '½': 0.5,
     '¾': 0.75,
