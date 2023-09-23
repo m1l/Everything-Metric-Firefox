@@ -1,3 +1,7 @@
+/** Evaluate text that looks like a fraction
+ *  @param {string} frac - The fraction-like text
+ *  @return {number} - The value of the fraction (0 if evaluation fails)
+*/
 function evaluateFraction(frac) {
     if (fractions[frac] === undefined) {
         try {
