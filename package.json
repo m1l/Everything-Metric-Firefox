@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "eslint": "^8.50.0",
+    "jshint": "^2.13.6",
+    "typescript": "^5.2.2"
+  }
+}

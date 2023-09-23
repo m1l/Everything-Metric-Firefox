@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": true,
+        "target": "ES2015",
+        "lib": [
+            "dom",
+            "ES2015"
+        ],
+        "noEmit": true,
+        "strict": true
+    },
+    "files": [
+        "lib.js"
+    ]
+}
