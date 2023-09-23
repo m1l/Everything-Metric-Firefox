@@ -40,6 +40,11 @@ function evaluateFraction(frac) {
     return fractions[frac];
 }
 
+/** If the value if smaller than 1, or larger than 10,000, use a more convenient SI prefix
+ *  @param {number} met - The value
+ *  @param {string} unit - The unit being used
+ *  @return {import("./types").ValueWithUnit} - The scaled unit with the appropriate unit
+ */
 function stepUpOrDown(met, unit) {
     if (met < 1) {
         switch (unit) {
@@ -167,6 +172,5 @@ function stepUpOrDown(met, unit) {
         unit: unit
     };
 }
-
 
 module.exports = { evaluateFraction, stepUpOrDown };
