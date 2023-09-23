@@ -39,3 +39,5 @@ function evaluateFraction(frac) {
     }
     return fractions[frac];
 }
+
+module.exports = { evaluateFraction };
