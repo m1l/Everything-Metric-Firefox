@@ -42,6 +42,7 @@
         "https://*/*"
       ],
       "js": [
+        "lib.js",
         "contentscript.js"
       ],
       "run_at": "document_start",

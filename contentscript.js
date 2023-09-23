@@ -494,7 +494,7 @@ function processAll(text) {
 
                     if (matches[3] === '/') continue; // 2,438/sqft
                     if (matches[3] !== undefined)
-                        imp += addFraction(matches[3]);
+                        imp += evaluateFraction(matches[3]);
                     //console.log("imp " + imp);
 
                     if (imp === 0 || isNaN(imp)) continue;
@@ -525,7 +525,7 @@ function processAll(text) {
     return text;
 }
 
-function addFraction(frac) {
+function evaluateFraction(frac) {
     if (fractions[frac] === undefined) {
         try {
             if (/[a-zA-Z,\?\!]/.test(frac))
@@ -812,14 +812,14 @@ function AxAqq(text) {//ikea US
             if (isNaN(inches1)) inches1 = 0;
 
             let frac1 = (matches[4]);
-            frac1 = addFraction(frac1);
+            frac1 = evaluateFraction(frac1);
             if (isNaN(frac1)) continue;
 
             let inches2 = parseFloat(matches[6]);
             if (isNaN(inches2)) inches2 = 0;
 
             let frac2 = (matches[7]);
-            frac2 = addFraction(frac2);
+            frac2 = evaluateFraction(frac2);
             if (isNaN(frac2)) continue;
 
             //console.log( inches1 + " " + frac1 + " " + inches2 + " " + frac2);
@@ -1028,7 +1028,7 @@ function feetInch(text) {
             //}
 
             if (matches[8] !== undefined)
-                inches += addFraction(matches[8]);
+                inches += evaluateFraction(matches[8]);
 
 
             if (inches === 0 || isNaN(inches)) continue;
@@ -1139,7 +1139,7 @@ function StringToNumber(text) {
                 imp = 0;
 
             if (matches[2] !== undefined)
-                imp += addFraction(matches[2]);
+                imp += evaluateFraction(matches[2]);
             //console.log("imp2 " + imp);
 
             if (imp === 0 || isNaN(imp)) continue;
