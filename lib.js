@@ -212,7 +212,7 @@ function shouldConvert(text, convertBracketed) {
  *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
  *  @return {number} - The value in Celsius
 */
-function convertToC(f, useKelvin) {
+function fahrenheitToCelsius(f, useKelvin) {
     let met = (5 / 9) * (f - 32);
     if (useKelvin)
        return met;
@@ -220,4 +220,4 @@ function convertToC(f, useKelvin) {
        return Math.round(met);
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, convertToC };
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius };
