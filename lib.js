@@ -518,4 +518,40 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume };
+function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+
+    let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?in(ch|ches|\.)?)' + unitSuffix, 'ig');
+
+    if (text.search(regex) !== -1) {
+        let matches;
+
+        while ((matches = regex.exec(text)) !== null) {
+            try {
+
+                const fullMatch = matches[1];
+                if (/[0-9][Xx\*×][ \u00A0][0-9]/.test(fullMatch))
+                    continue; //it is 2x 2in something so no conversion
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
+
+                let scale = 2.54;
+                let unit = spc + "cm";
+                if (useMM === true) {
+                    scale = 25.4;
+                    unit = spc + "mm"
+                }
+                let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+                let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+
+                const metStr = formatConvertedValue(cm1 + spc + "x" + spc + cm2, spc + unit, useBold, useBrackets); //+ behind bracket
+
+                //text = text.replace(matches[0], metStr);
+                text = replaceMaybeKeepLastChar(text, matches[0], metStr);
+            } catch (err) {
+                //console.log(err.message);
+            }
+        }
+    }
+    return text;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches };

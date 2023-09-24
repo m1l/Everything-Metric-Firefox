@@ -230,7 +230,7 @@ function procNode(textNode) {
         if (includeQuotes)
             text = replaceFeetAndInchesSymbol(text);
         text = replaceVolume(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-        text = replaceSurfaceInInches(text);
+        text = replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceSurfaceInFeet(text);
         text = replaceFeetAndInches(text);
         text = replacePoundsAndOunces(text);
@@ -498,43 +498,6 @@ function replaceIkeaSurface(text) {//ikea US
     return text;
 
 
-}
-
-// 1 x 2 in
-function replaceSurfaceInInches(text) {
-
-    let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?in(ch|ches|\.)?)' + unitSuffix, 'ig');
-
-    if (text.search(regex) !== -1) {
-        let matches;
-
-        while ((matches = regex.exec(text)) !== null) {
-            try {
-
-                const fullMatch = matches[1];
-                if (/[0-9][Xx\*×][ \u00A0][0-9]/.test(fullMatch))
-                    continue; //it is 2x 2in something so no conversion
-                if (!shouldConvert(matches[0], convertBracketed)) continue;
-
-                let scale = 2.54;
-                let unit = spc + "cm";
-                if (useMM === true) {
-                    scale = 25.4;
-                    unit = spc + "mm"
-                }
-                let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
-                let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
-
-                const metStr = formatConvertedValue(cm1 + spc + "x" + spc + cm2, spc + unit, useBold, useBrackets); //+ behind bracket
-
-                //text = text.replace(matches[0], metStr);
-                text = replaceMaybeKeepLastChar(text, matches[0], metStr);
-            } catch (err) {
-                //console.log(err.message);
-            }
-        }
-    }
-    return text;
 }
 
 // 1 x 2 ft
