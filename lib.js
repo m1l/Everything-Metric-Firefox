@@ -343,71 +343,61 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
 
     let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?' + ( degWithoutFahrenheit ? '': 'F(ahrenheits?)?' ) + ')|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
 
-    if (text.search(regex) !== -1) {
-        let matches;
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+        if (!shouldConvert(match[0], convertBracketed)) continue;
+        const fullMatch = match[1];
 
-        while ((matches = regex.exec(text)) !== null) {
-            try {
-                //console.log(matches[0]);
-                if (!shouldConvert(matches[0], convertBracketed)) continue;
-                const fullMatch = matches[1];
-
-                //for (var i=0; i<matches.length; i++)
-                //console.log("matches " + i + " " + matches[i])
-                var imp1 = matches[4];
-                var imp2 = matches[6];
-                var unit = '°C';
-                var met1='';
-                var met2=0;
-                if (imp1!==undefined) { //is range
-                    if (matches[2]!==undefined)
-                        met1 = fahrenheitToCelsius(-imp1, useKelvin);
-                    else
-                        met1 = fahrenheitToCelsius(imp1, useKelvin);
+        var imp1 = match[4];
+        var imp2 = match[6];
+        var unit = '°C';
+        var met1='';
+        var met2=0;
+        if (imp1!==undefined) { //is range
+            if (match[2]!==undefined)
+                met1 = fahrenheitToCelsius(-imp1, useKelvin);
+            else
+                met1 = fahrenheitToCelsius(imp1, useKelvin);
 
 
-                    if (useKelvin) {
-                        met1 += 273.15;
-                        met1 = roundNicely(met1, useRounding);
-                    }
-
-                    met1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-                }
-
-                if ((/[\-−]/.test(imp2.charAt(0))) ||
-                    (imp1===undefined && matches[2]!==undefined)){
-                    met2 = fahrenheitToCelsius(-imp2, useKelvin);
-                 } else
-                     met2 = fahrenheitToCelsius(imp2, useKelvin);
-
-                /*if (matches[3]!==undefined) { //is range
-                    if (matches[2]!==undefined)
-                        met1 = -fahrenheitToCelsius(imp, useKelvin);
-                    else
-                        met1 = fahrenheitToCelsius(imp, useKelvin);
-                }*/
-
-
-                if (useKelvin) {
-                    met2 += 273.15;
-                    unit = 'K';
-                    met2 = roundNicely(met2, useRounding);
-                }
-
-                met2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-
-                var met='';
-                if (imp1!==undefined)
-                    met = met1 + ' to ';
-                met += met2;
-
-                const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
-                const metStr = formatConvertedValue(met, unit, useBold, useBrackets);
-                text = insertAt(text, metStr, insertIndex);
-            } catch (err) {
-                console.log(err.message);
+            if (useKelvin) {
+                met1 += 273.15;
+                met1 = roundNicely(met1, useRounding);
             }
+
+            met1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         }
+
+        if ((/[\-−]/.test(imp2.charAt(0))) ||
+            (imp1===undefined && match[2]!==undefined)){
+            met2 = fahrenheitToCelsius(-imp2, useKelvin);
+         } else
+             met2 = fahrenheitToCelsius(imp2, useKelvin);
+
+        /*if (match[3]!==undefined) { //is range
+            if (match[2]!==undefined)
+                met1 = -fahrenheitToCelsius(imp, useKelvin);
+            else
+                met1 = fahrenheitToCelsius(imp, useKelvin);
+        }*/
+
+
+        if (useKelvin) {
+            met2 += 273.15;
+            unit = 'K';
+            met2 = roundNicely(met2, useRounding);
+        }
+
+        met2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+
+        var met='';
+        if (imp1!==undefined)
+            met = met1 + ' to ';
+        met += met2;
+
+        const insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
+        const metStr = formatConvertedValue(met, unit, useBold, useBrackets);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
