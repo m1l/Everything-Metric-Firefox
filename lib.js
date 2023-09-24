@@ -933,7 +933,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '[\-− \u00A0]?', // optional separator
                     ')?',
                     // mixed numeral
-                    '(',
+                    '(?:',
                         // integer
                         '(',
                             '([\.,0-9]+)', // number
@@ -982,7 +982,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '[\-− \u00A0]?', // optional separator
                     ')?',
                     // mixed numeral
-                    '(',
+                    '(?:',
                         // integer
                         '(',
                             '([\.,0-9]+)', // number
@@ -1051,7 +1051,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[7] !== undefined && match[7]==='\n') {
+            if (match[6] !== undefined && match[6]==='\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
@@ -1079,7 +1079,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             feet = 0;
         }
 
-        let inches = match[4];
+        let inches = match[3];
         if (inches !== undefined && inches.length<5) {//someone used , instead of . for decimals
             inches = inches.replace(',', '.');
         }
@@ -1088,8 +1088,8 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             inches = 0;
         }
 
-        if (match[5] !== undefined) {
-            inches += evaluateFraction(match[5]);
+        if (match[4] !== undefined) {
+            inches += evaluateFraction(match[4]);
         }
 
         if (inches === 0 || isNaN(inches)) {
