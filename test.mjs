@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -81,6 +81,12 @@ function testReplaceFahrenheit() {
     assert.equal(replaceFahrenheit('100--212 °F', false, false, false, false, false, false, false, false), '100--212 °F (38 to 100°C)˜');
     assert.equal(replaceFahrenheit('-100-212 °F', false, false, false, false, false, false, false, false), '-100-212 °F (-73 to 100°C)˜');
     assert.equal(replaceFahrenheit('-100--212 °F', false, false, false, false, false, false, false, false), '-100--212 °F (-73 to 100°C)˜');
+}
+
+function testReplaceFeetAndInches() {
+    // TODO: the original value should not be removed
+    assert.equal(replaceFeetAndInches('1 ft 2 in', false, false, false, false, false, false), ' (0.36 m)˜');
+    assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false, false), ' (0.97 m)˜');
 }
 
 function testReplaceMaybeKeepLastChar() {
@@ -169,6 +175,7 @@ function main() {
     testInsertAt();
     testParseNumber();
     testReplaceFahrenheit();
+    testReplaceFeetAndInches();
     testReplaceMaybeKeepLastChar();
     testReplaceSurfaceInFeet();
     testReplaceSurfaceInInches();
