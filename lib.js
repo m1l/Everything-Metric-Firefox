@@ -1,3 +1,4 @@
+/** @type{ { [key: string]: number } } */
 const fractions = {
     '¼': 1 / 4,
     '½': 1 / 2,
