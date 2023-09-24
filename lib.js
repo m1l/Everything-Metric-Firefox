@@ -346,21 +346,21 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
             '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
             '([\-−])?', // minus sign
             // optionally, an additional number with a range marker
-            '(',
+            '(?:',
                 '([0-9,\.]+)', // digits
-                '( to | and |[\-−])', // range marker
+                '(?: to | and |[\-−])', // range marker
             ')?',
             '([\-0-9,\.]+)', // digits or minus sign
             '[ \u00A0]?', // space or no-break space
             // degree Fahrenheit marker
-            '(',
-                    '(',
+            '(?:',
+                    '(?:',
                         '(°|º|deg(rees)?)', // degree marker
                         '[ \u00A0]?', // space or no-break space
                         degWithoutFahrenheit ? '': 'F(ahrenheits?)?', // Fahrenheit marker
                     ')',
                 '|',
-                    '(Fahrenheits?)', // as a full word
+                    '(?:Fahrenheits?)', // as a full word
                 '|',
                     '[\u2109]', // Unicode ℉  (DEGREE FAHRENHEIT)
             ')',
@@ -374,7 +374,7 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
                     '\u200B', // ZERO WIDTH SPACE
                     '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
             ')',
-            '([^a-z]|$)', // look for a separator
+            '(?:[^a-z]|$)', // look for a separator
         ].join(''),
         'ig'
     );
@@ -384,8 +384,8 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
         if (!shouldConvert(match[0], convertBracketed)) continue;
         const fullMatch = match[0];
 
-        var imp1 = match[3];
-        var imp2 = match[5];
+        var imp1 = match[2];
+        var imp2 = match[3];
         var unit = '°C';
         var met1='';
         var met2=0;
@@ -410,12 +410,12 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
          } else
              met2 = fahrenheitToCelsius(imp2, useKelvin);
 
-        /*if (match[2]!==undefined) { //is range
-            if (match[1]!==undefined)
+        /*
+            if (match[1]!==undefined) //is range
                 met1 = -fahrenheitToCelsius(imp, useKelvin);
             else
                 met1 = fahrenheitToCelsius(imp, useKelvin);
-        }*/
+        */
 
 
         if (useKelvin) {
