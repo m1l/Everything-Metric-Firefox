@@ -60,6 +60,9 @@ function testReplaceFahrenheit() {
     assert.equal(replaceFahrenheit('(212 °)', true, true, false, false, false, false, false, false), '(212 °) (100°C)˜');
     assert.equal(replaceFahrenheit('(212 °)', true, true, true, false, false, false, false, false), '(212 °) (373.15K)˜');
 
+    // returns '1,203 °F (NaN°C)˜' instead of '1,203 °F (651°C)˜'
+    // assert.equal(replaceFahrenheit('1,203 °F', false, false, false, false, false, false, false, false), '1,203 °F (651°C)˜');
+
     assert.equal(replaceFahrenheit('212 °F', false, false, false, false, false, false, false, false), '212 °F (100°C)˜');
     assert.equal(replaceFahrenheit('212 degrees F', false, false, false, false, false, false, false, false), '212 degrees F (100°C)˜');
     assert.equal(replaceFahrenheit('212 Fahrenheits', false, false, false, false, false, false, false, false), '212 Fahrenheits (100°C)˜');
