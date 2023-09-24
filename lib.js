@@ -588,7 +588,26 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
  *  @return {string} - A new string with metric surfaces
 */
 function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[\'′’]?[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?(feet|foot|ft|[\'′’]))(?![0-9])' + unitSuffix, 'ig');
+    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+    const regex = new RegExp(
+        [
+            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '(',
+                '([0-9]+(\.[0-9]+)?)', // number
+                '[\'′’]?',  // allow feet symbol on first number
+                '[-− \u00A0]?', // space or no-break space
+                '[x\*×]', // multiplication sign
+                '[-− \u00A0]?', // space or no-break space
+                '([0-9]+(\.[0-9]+)?)', // number
+                '[-− \u00A0]?', // space or no-break space
+                '(feet|foot|ft|[\'′’])', // unit
+            ')
+            '(?![0-9])', // maybe to avoid matching feet2 for feet²?
+            // check for already present conversion to metric
+            unitSuffix
+        ].join(''),
+        'ig',
+    );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
