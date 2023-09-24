@@ -201,13 +201,13 @@ function StringToNumber(text) {
 
 function ParseUnitsOnly(text) {
     //console.log("now trying " + text);
-    const len = units.length;
+    const len = conversions.length;
     for (let i = 0; i < len; i++) {
-        if (units[i].regexUnit === undefined)
+        if (conversions[i].regexUnit === undefined)
             continue;
         let matches;
 
-        while ((matches = units[i].regexUnit.exec(text)) !== null) {
+        while ((matches = conversions[i].regexUnit.exec(text)) !== null) {
             try {
 
                 const metStr = convAndForm(lastquantity, i, "", isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
@@ -263,14 +263,14 @@ function FlashMessage() {
 function InitRegex(){
     if (!includeImproperSymbols) {
         //only for foot
-        units[2].regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
+        conversions[2].regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
     }
 
-    if (convertTablespoon) units.push(unitsTablespoon);
-    if (convertTeaspoon) units.push(unitsTeaspoon);
+    if (convertTablespoon) conversions.push(unitsTablespoon);
+    if (convertTeaspoon) conversions.push(unitsTeaspoon);
 
     if(degWithoutFahrenheit) {
-        units[0].regex = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig')
+        conversions[0].regex = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig')
     }
 }
 

@@ -1,4 +1,4 @@
-export type Unit = {
+export type Conversion = {
     regexUnit?: RegExp,
     regex?: RegExp,
     unit: string,

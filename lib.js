@@ -39,8 +39,8 @@ const fractions = {
     '⅞': 7 / 8
 };
 
-/** @type{ import("./types").Unit[] } */
-const units = [
+/** @type{ import("./types").Conversion[] } */
+const conversions = [
     {
         regexUnit: new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig'),
         unit: '°C',
@@ -163,7 +163,7 @@ const units = [
     },
 ];
 
-/** @type{ import("./types").Unit } */
+/** @type{ import("./types").Conversion } */
 const unitsTablespoon = {
     regexUnit: new RegExp(skipempty + '(tbsp|tablespoons?)'+skipbrackets + regend, 'ig'),
     regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tbsp|tablespoons?)' + unitSuffix + ')', 'ig'),
@@ -173,7 +173,7 @@ const unitsTablespoon = {
     multiplierimp: 17.7582
 };
 
-/** @type{ import("./types").Unit } */
+/** @type{ import("./types").Conversion } */
 const unitsTeaspoon = {
     regexUnit: new RegExp(skipempty + '(tsp|teaspoons?)'+skipbrackets + regend, 'ig'),
     regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tsp|teaspoons?)' + unitSuffix + ')', 'ig'),
@@ -858,7 +858,7 @@ function roundMaybeNicely(met, forceRounding, useRounding) {
  *  @return {string} - The converted and formatted value
 */
 function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const conversion = units[unitIndex];
+    const conversion = conversions[unitIndex];
     if (conversion === undefined) {
         return ''; // TODO
     }
@@ -1211,13 +1211,13 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
 */
 function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
 
-    const len = units.length;
+    const len = conversions.length;
     for (let i = 0; i < len; i++) {
-        if (units[i].regex===undefined) continue;
-        if (text.search(units[i].regex) !== -1) {
+        if (conversions[i].regex===undefined) continue;
+        if (text.search(conversions[i].regex) !== -1) {
             let matches;
 
-            while ((matches = units[i].regex.exec(text)) !== null) {
+            while ((matches = conversions[i].regex.exec(text)) !== null) {
                 try {
                     if (!shouldConvert(matches[0], convertBracketed)) continue;
 
