@@ -980,15 +980,6 @@ function ParseUnitsOnly(text) {
     return text;
 }
 
-function bold(text) {
-    let out = text.replace(/\d/g, (c) => String.fromCodePoint(0x1D7EC - 48 + c.charCodeAt(0)));
-    out = out.replace(/[a-z]/g, (c) => String.fromCodePoint(0x1D5EE - 97 + c.charCodeAt(0)));
-    out = out.replace(/[A-Z]/g, (c) => String.fromCodePoint(0x1D5D4 - 65 + c.charCodeAt(0)));
-    //out = out.replace(/[,]/g, '\uff0c,');
-
-    return out;
-}
-
 function addBrackets(text) {
     if (useBrackets)
         return "\u200B\u3010" + text + "\u3011"; //\200B is zero breaking space, so the unit is not in the next line
