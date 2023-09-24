@@ -232,7 +232,7 @@ function procNode(textNode) {
         text = replaceVolume(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-        text = replaceFeetAndInches(text);
+        text = replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replacePoundsAndOunces(text);
         text = replaceOtherUnits(text);
         text = replaceMilesPerGallon(text);
@@ -620,38 +620,6 @@ function replaceFeetAndInchesSymbol(text) {
 
         } catch (err) {
             console.log(err.message);
-        }
-    }
-    return text;
-}
-
-//1 ft 2 in
-function replaceFeetAndInches(text) {
-    let regex = new RegExp('(([0-9]{0,3}).?(ft|yd|foot|feet).?([0-9]+(\.[0-9]+)?).?in(ch|ches)?)', 'g');
-    if (text.search(regex) !== -1) {
-        let matches;
-
-        while ((matches = regex.exec(text)) !== null) {
-            try {
-                const original = matches[0];
-                let ydft = matches[2];
-                ydft = parseFloat(ydft);
-                let inches = matches[4];
-                inches = parseFloat(inches);
-
-                let total = 0;
-                var isyd = new RegExp('yd', 'i');
-                if (isyd.test(matches[3])) ydft *= 3;
-
-                total = ydft * 12 + inches;
-
-                let meter = formatConvertedValue(roundNicely(total * 0.0254, useRounding), spc + 'm', useBold, useBrackets);
-
-                //text = text.replace(matches[0], meter);
-                text = replaceMaybeKeepLastChar(text, matches[0], meter);
-            } catch (err) {
-                // console.log(err.message);
-            }
         }
     }
     return text;
