@@ -14,7 +14,6 @@ var skips = 0;
 var useBold;
 var useBrackets;
 var useMetricOnly;
-var totalConversions;
 var convertBracketed;
 var matchIn;
 var convertTablespoon=false;
@@ -1000,7 +999,6 @@ function addBrackets(text) {
 }
 
 function formatConvertedValue(number, rest, commaReplaced) {
-    totalConversions++;
     if (commaReplaced === false)
         number = formatNumber(number, useComma, useSpaces)
     if (rest === undefined)
