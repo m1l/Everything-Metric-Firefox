@@ -1044,14 +1044,12 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
     let lastQuoteOpen = false;
     let match;
     while ((match = feetInchRegex.exec(text)) !== null) {
-        const fullMatch = match[0];
-
         if (includeImproperSymbols) {
             if (lastQuoteOpen) {
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[4] !== undefined && match[4]==='\n') {
+            if (match[4] === '\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
@@ -1065,13 +1063,12 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             continue;
         }
 
-        if (/[°º]/.test(fullMatch.charAt(0))) {
+        if (/[°º]/.test(match[0].charAt(0))) {
             continue;
         }
-        if (/[a-z]/i.test(fullMatch.charAt(0)) && !/[x]/i.test(fullMatch.charAt(0))) {
-            //if (!/x/i.test(fullMatch.charAt(0))) //maybe we don't care
+        if (/[a-wy-z]/i.test(match[0].charAt(0))) {
             lastQuoteOpen = !lastQuoteOpen;
-                continue;
+            continue;
         }
 
         let feet = parseFloat(match[1]);
@@ -1106,7 +1103,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             // inches
             metStr = convAndForm(feet * 12 + inches, 1, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
         }
-        const insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
     }
     return text;
