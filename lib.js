@@ -616,12 +616,18 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
             continue;
         }
 
+        const dim1 = match[1];
+        const dim2 = match[2];
+        if (!dim1 || !dim2) {
+            continue;
+        }
+
         let scale = 0.3048;
         let unit = spc + "m";
         // TODO: use useMM
 
-        const m1 = formatNumber(roundNicely(match[1] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const m2 = formatNumber(roundNicely(match[2] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${m1} × ${m2}`, ` ${unit}`, useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], metStr);
     }
