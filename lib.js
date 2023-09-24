@@ -1127,29 +1127,16 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
  *  @return {string} - A new string with metric weights
 */
 function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    let regex = new RegExp('(([0-9]{0,3}).?(lbs?).?([0-9]+(\.[0-9]+)?).?oz)', 'g');
-    if (text.search(regex) !== -1) {
-        let matches;
+    const regex = new RegExp('(([0-9]{0,3}).?(lbs?).?([0-9]+(\.[0-9]+)?).?oz)', 'g');
 
-        while ((matches = regex.exec(text)) !== null) {
-            try {
-                const original = matches[0];
-                let lb = matches[2];
-                lb = parseFloat(lb);
-                let oz = matches[4];
-                oz = parseFloat(oz);
-
-                let total = 0;
-
-                total = lb * 16 + oz;
-
-                let kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), spc + 'kg', useBold, useBrackets);
-                //text = text.replace(matches[0], kg);
-                text = replaceMaybeKeepLastChar(text, matches[0], kg);
-            } catch (err) {
-                // console.log(err.message);
-            }
-        }
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+        const original = match[0];
+        const pounds = parseFloat(match[2]);
+        const ounces = parseFloat(match[4]);
+        const total = pounds * 16 + ounces;
+        const kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), ' kg', useBold, useBrackets);
+        text = replaceMaybeKeepLastChar(text, match[0], kg);
     }
     return text;
 }
