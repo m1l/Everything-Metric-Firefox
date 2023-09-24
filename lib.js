@@ -634,6 +634,17 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
     return text;
 }
 
+/** Return a new string where all occurrences of lengths in feet and inches (“1 ft 2 in”) have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric lengths
+*/
 function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     let regex = new RegExp('(([0-9]{0,3}).?(ft|yd|foot|feet).?([0-9]+(\.[0-9]+)?).?in(ch|ches)?)', 'g');
     if (text.search(regex) !== -1) {
