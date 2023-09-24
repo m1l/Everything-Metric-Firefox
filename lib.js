@@ -352,12 +352,12 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     let regex = new RegExp(
         [
             '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            // optionally, an additional number with a range marker
-            '(?:',
-                '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
-                '(?: to | and |[\-−]+)', // range marker
-            ')?',
             '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
+            // optionally, an additional number after a range marker
+            '(?:',
+                '(?: to | and |[\-−]+)', // range marker
+                '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
+            ')?',
             '[ \u00A0]?', // space or no-break space
             // degree Fahrenheit marker
             '(?:',
@@ -388,37 +388,34 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        if (!shouldConvert(match[0], convertBracketed)) continue;
-        const fullMatch = match[0];
-
-        var imp1 = match[1];
-        var imp2 = match[2];
-        var unit = '°C';
-        var met1='';
-        var met2=0;
-        if (imp1!==undefined) { //is range
-            met1 = fahrenheitToCelsius(parseNumber(imp1), useKelvin);
-            if (useKelvin) {
-                met1 += 273.15;
-                met1 = roundNicely(met1, useRounding);
-            }
-            met1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        if (!shouldConvert(match[0], convertBracketed)) {
+            continue;
         }
 
-        met2 = fahrenheitToCelsius(parseNumber(imp2), useKelvin);
+        // upper-bound of the range, or single value
+        let met1 = fahrenheitToCelsius(parseNumber(match[1]), useKelvin);
         if (useKelvin) {
-            met2 += 273.15;
-            unit = 'K';
-            met2 = roundNicely(met2, useRounding);
+            met1 += 273.15;
+            met1 = roundNicely(met1, useRounding);
         }
-        met2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        met1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
-        var met='';
-        if (imp1!==undefined)
-            met = met1 + ' to ';
-        met += met2;
+        let met = met1;
 
-        const insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
+        // lower-bound of the range
+        if (match[2]) {
+            let met2 = fahrenheitToCelsius(parseNumber(match[2]), useKelvin);
+            if (useKelvin) {
+                met2 += 273.15;
+                met2 = roundNicely(met2, useRounding);
+            }
+            met2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+
+            met += ' to ' + met2;
+        }
+
+        const unit = useKelvin ? 'K' : '°C';
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         const metStr = formatConvertedValue(met, unit, useBold, useBrackets);
         text = insertAt(text, metStr, insertIndex);
     }
