@@ -247,6 +247,12 @@ function roundNicely(v, useRounding) {
     return Math.round(v * 100) / 100;
 }
 
+/** Format a number using user preferences for thousand separator and decimal separator
+ *  @param {number} mystring - The number to format
+ *  @param {boolean} useComma - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpaces - Whether to use spaces thousand separator
+ *  @return {string} - The formatted number
+*/
 function formatNumber(mystring, useComma, useSpaces) {
     if (useComma === false) {
         if (useSpaces === true)
