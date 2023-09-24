@@ -919,10 +919,106 @@ function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, 
  *  @param {boolean} includeImproperSymbols} - Whether to support unofficial symbols for feet and inches
 */
 function setIncludeImproperSymbols(includeImproperSymbols) {
+    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     if (includeImproperSymbols) {
-        feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(\"|″|”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
+        feetInchRegex = new RegExp(
+            [
+                '(',
+                    '(',
+                        '[°º]?', // optional degree marker, TODO: don't know why
+                        // feet
+                        '(',
+                            '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
+                            '([0-9]{1,3})',  // number
+                            '[\'’′]', // feet marker (NOTE: with improper symbols)
+                            '[\-− \u00A0]?', // optional separator
+                        ')?',
+                        // mixed numeral
+                        '(',
+                            // integer
+                            '(',
+                                '([\.,0-9]+)', // number
+                                '(?!\/)', // check that this is not part of a fraction
+                                '(?:[\-− \u00A0]?)', // optional separator
+                            ')?',
+                            // proper fraction
+                            '(',
+                                    '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
+                                '|',
+                                // fraction written more conventionally
+                                    '[0-9]+', // number
+                                    '[\/⁄]', // fraction bar
+                                    '[0-9\.]+', // number, TODO: why allow decimal point here?
+                            ')?',
+                        ')?',
+                        '[ \u00A0]?', // optional separator
+                        '(\"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
+                    ')',
+                    // TODO: it looks like this could actually be a mistake
+                    '|',
+                    '(["″”“\n])',
+                ')',
+                // check for already present conversion to metric
+                '(?!', // negative look-ahead
+                        ' ', // non-optional space
+                        '[\(]',  // opening parenthesis
+                        '[0-9]',  // some digit
+                    '|',
+                        ' ?', // optional space
+                        '\u200B', // ZERO WIDTH SPACE
+                        '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
+                ')',
+            ].join(''),
+            'gi',
+        );
     } else {
-        feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(″|′′)))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
+        feetInchRegex = new RegExp(
+            [
+                '(',
+                    '(',
+                        '[°º]?', // optional degree marker, TODO: don't know why
+                        // feet
+                        '(',
+                            '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
+                            '([0-9]{1,3})',  // number
+                            '[′]', // feet marker (NOTE: without improper symbols)
+                            '[\-− \u00A0]?', // optional separator
+                        ')?',
+                        // mixed numeral
+                        '(',
+                            // integer
+                            '(',
+                                '([\.,0-9]+)', // number
+                                '(?!\/)', // check that this is not part of a fraction
+                                '(?:[\-− \u00A0]?)', // optional separator
+                            ')?',
+                            // proper fraction
+                            '(',
+                                    '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
+                                '|',
+                                // fraction written more conventionally
+                                    '[0-9]+', // number
+                                    '[\/⁄]', // fraction bar
+                                    '[0-9\.]+', // number, TODO: why allow decimal point here?
+                            ')?',
+                        ')?',
+                        '[ \u00A0]?', // optional separator
+                        '(″|′′)', // inches marker (NOTE: without improper symbols)
+                    ')',
+                ')',
+                // check for already present conversion to metric
+                '(?!', // negative look-ahead
+                        ' ', // non-optional space
+                        '[\(]',  // opening parenthesis
+                        '[0-9]',  // some digit
+                    '|',
+                        ' ?', // optional space
+                        '\u200B', // ZERO WIDTH SPACE
+                        '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
+                ')',
+            ].join(''),
+            'gi',
+        );
     }
 }
 
