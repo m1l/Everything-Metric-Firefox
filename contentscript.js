@@ -252,12 +252,12 @@ function procNode(textNode) {
         text = lboz2kg(text);
         text = processAll(text);
         text = mpg2Lper100km(text);
-        text = Fahrenheit(text);
+        text = replaceFahrenheit(text);
         textNode.nodeValue = text;
     }
 }
 
-function Fahrenheit(text) {
+function replaceFahrenheit(text) {
 
     let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?' + ( degWithoutFahrenheit ? '': 'F(ahrenheits?)?' ) + ')|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
 
