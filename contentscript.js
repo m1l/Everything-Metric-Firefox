@@ -581,11 +581,6 @@ function convertToC(f) {
        return Math.round(met);
 }
 
-
-function insertAt(target, toInsert, index) {
-    return target.substr(0, index) + toInsert + target.substr(index);
-}
-
 //1 x 2 x 3
 function AxAxAin(text) {
 

@@ -176,4 +176,8 @@ function stepUpOrDown(met, unit, useMM, useGiga) {
     };
 }
 
-module.exports = { evaluateFraction, stepUpOrDown };
+function insertAt(target, toInsert, index) {
+    return target.substr(0, index) + toInsert + target.substr(index);
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt };
