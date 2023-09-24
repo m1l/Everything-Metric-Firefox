@@ -1178,16 +1178,13 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
             continue;
         }
 
-        let imp = match[2];
-        if (imp !== undefined) {
-            imp = imp.replace(',', '');
-        }
-
-        imp = parseFloat(imp);
-        if (imp === 0 || isNaN(imp)) {
+        let impPart = match[2];
+        if (!impPart) {
             continue;
         }
+        impPart = impPart.replace(',', '');
 
+        const imp = parseFloat(impPart);
         const l = 235.214583 / imp; // 100 * 3.785411784 / 1.609344 * imp;
         const met = roundNicely(l, useRounding);
         const formattedMet = formatNumber(met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
