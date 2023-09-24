@@ -286,6 +286,10 @@ function convertedValueInsertionOffset(fullMatch) {
     }
 }
 
+/** Translate text to bold Unicode code-points
+ *  @param {string} text - The text to enbolden
+ *  @return {string} - The enboldenned text
+*/
 function bold(text) {
     let out = text.replace(/\d/g, (c) => String.fromCodePoint(0x1D7EC - 48 + c.charCodeAt(0)));
     out = out.replace(/[a-z]/g, (c) => String.fromCodePoint(0x1D5EE - 97 + c.charCodeAt(0)));
