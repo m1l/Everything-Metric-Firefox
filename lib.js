@@ -1196,4 +1196,107 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon };
+function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+
+    const len = units.length;
+    for (let i = 0; i < len; i++) {
+        if (units[i].regex===undefined) continue;
+        if (text.search(units[i].regex) !== -1) {
+            let matches;
+
+            while ((matches = units[i].regex.exec(text)) !== null) {
+                try {
+                    if (!shouldConvert(matches[0], convertBracketed)) continue;
+
+                    if ((matches[2] !== undefined) && (/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(matches[2]) === false)) continue;
+
+                    let subtract = 0;
+                    if (i == 1) { //in
+                        //if (/[a-z#$€£]/i.test(matches[1].substring(0,1)))
+                        if (/^[a-z#$€£]/i.test(matches[0]))
+                            continue;
+                        if (/^in /i.test(matches[0])) //born in 1948 in ...
+                            continue;
+                        if (!matchIn && / in /i.test(matches[0])) //born in 1948 in ...
+                            continue;
+                        if (matches[8] !== undefined) {
+                            if (hasNumber(matches[7])) continue; //for 1 in 2 somethings
+                            if (matches[8] == ' a') continue;
+                            if (matches[8] == ' an') continue;
+                            if (matches[8] == ' the') continue;
+                            if (matches[8] == ' my') continue;
+                            if (matches[8] == ' his') continue;
+                            if (matches[8] == '-') continue;
+                            if (/ her/.test(matches[8])) continue;
+                            if (/ their/.test(matches[8])) continue;
+                            if (/ our/.test(matches[8])) continue;
+                            if (/ your/.test(matches[8])) continue;
+                            subtract = matches[8].length;
+                        }
+                    }
+                    if (i == 2) { //ft
+                        if (/[°º]/.test(matches[1])) continue;
+                        if (/\d/ig.test(matches[5])) continue; //avoid 3' 5"
+                    }
+                    /*if (i== 1)
+                    for (var it=0; it<matches.length; it++)
+                     console.log("matches " + it + " " + matches[it]);
+                     */
+                    let suffix = '';
+
+                    //if (/[\(\)]/.test(matches[0])) continue;
+
+                    const fullMatch = matches[1];
+                    var imp = matches[2];
+
+                    if (matches[2] !== undefined) {
+                        imp = imp.replace(',', '');
+
+                        if (/[⁄]/.test(matches[2])) { //improvisation, but otherwise 1⁄2 with register 1 as in
+                            matches[3] = matches[2];
+                            imp = 0;
+                        } else {
+                            imp = parseFloat(imp);
+                        }
+                    }
+                    //console.log("imp " + imp);
+                    if (isNaN(imp))
+                        imp = 0;
+
+                    if (i == 1 && / in /i.test(matches[0]) && imp > 1000)
+                            continue; //prevents 1960 in Germany
+
+                    if (matches[3] === '/') continue; // 2,438/sqft
+                    if (matches[3] !== undefined)
+                        imp += evaluateFraction(matches[3]);
+                    //console.log("imp " + imp);
+
+                    if (imp === 0 || isNaN(imp)) continue;
+
+                    if (/²/.test(matches[1]))
+                        suffix = '²';
+                    else if (/³/.test(matches[1]))
+                        suffix = '³';
+                    else if (((typeof(matches[5]) !== 'undefined') && matches[5].toLowerCase().indexOf('sq') !== -1))
+                        suffix = '²';
+                    else if (((typeof(matches[5]) !== 'undefined') && matches[5].toLowerCase().indexOf('cu') !== -1))
+                        suffix = '³';
+
+
+                    const metStr = convAndForm(imp, i, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+
+                    let insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
+                    insertIndex = insertIndex - subtract; //subtracts behind bracket
+                    text = insertAt(text, metStr, insertIndex);
+
+                } catch (err) {
+                    //console.log(err.message);
+                }
+            }
+        }
+    }
+
+    return text;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceOtherUnits };
