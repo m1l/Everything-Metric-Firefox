@@ -271,6 +271,11 @@ function formatNumber(v, useCommaAsDecimalSeparator, useSpacesAsThousandSeparato
     }
 }
 
+/** Decide exactly where the metric-converted value should be inserted in fullMatch
+ *  @param {number} index - The location of fullMatch within the main string
+ *  @param {string} fullMatch - The text containing the non-metric value to convert
+ *  @return {number} - The location where the metric-converted value should be inserted
+*/
 function whereToInsertConvertedValue(index, fullMatch) {
     let insertIndex = index + fullMatch.length;
     let lastchar = fullMatch[fullMatch.length -1];
