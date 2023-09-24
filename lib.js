@@ -951,7 +951,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         ')?',
                     ')?',
                     '[ \u00A0]?', // optional separator
-                    '(\"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
+                    '(?:\"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
                 ')',
                 // TODO: it looks like this could actually be a mistake
                 '|',
@@ -1000,7 +1000,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         ')?',
                     ')?',
                     '[ \u00A0]?', // optional separator
-                    '(″|′′)', // inches marker (NOTE: without improper symbols)
+                    '(?:″|′′)', // inches marker (NOTE: without improper symbols)
                 ')',
                 // check for already present conversion to metric
                 '(?!', // negative look-ahead
@@ -1051,7 +1051,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[5] !== undefined && match[5]==='\n') {
+            if (match[4] !== undefined && match[4]==='\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
