@@ -570,7 +570,6 @@ function AxAxAin(text) {
                 let cm3 = formatNumber(roundNicely(matches[6] * scale, useRounding), useComma, useSpaces);
 
 
-                const insertIndex = GetIndexPos(matches.index, fullMatch);
                 const metStr = prepareForOutput(cm1 + spc + "×" + spc + cm2 + spc + "×" + spc + cm3, spc + unit, true);
 
                 //text = text.replace(matches[0], metStr);
@@ -632,7 +631,6 @@ function AxAqq(text) {//ikea US
             let cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useComma, useSpaces);
 
 
-            const insertIndex = GetIndexPos(matches.index, fullMatch);
             const metStr = prepareForOutput(cm1 + spc + "×" + spc + cm2, spc + unit, true);
 
             //text = text.replace(matches[0], metStr);
@@ -671,7 +669,6 @@ function AxAin(text) {
                 let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
                 let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
 
-                const insertIndex = GetIndexPos(matches.index, fullMatch);
                 const metStr = prepareForOutput(cm1 + spc + "x" + spc + cm2, spc + unit, true); //+ behind bracket
 
                 //text = text.replace(matches[0], metStr);
@@ -706,7 +703,6 @@ function AxAft(text) {
                 let m1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
                 let m2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
 
-                const insertIndex = GetIndexPos(matches.index, fullMatch);
                 const metStr = prepareForOutput(m1 + spc + "×" + spc + m2, spc + unit, true);
 
                 //text = text.replace(matches[0], metStr);
