@@ -286,7 +286,7 @@ function replaceFahrenheit(text) {
 
                     if (useKelvin) {
                         met1 += 273.15;
-                        met1 = roundNicely(met1);
+                        met1 = roundNicely(met1, useRounding);
                     }
 
                     met1 = replaceWithComma(met1);
@@ -309,7 +309,7 @@ function replaceFahrenheit(text) {
                 if (useKelvin) {
                     met2 += 273.15;
                     unit = 'K';
-                    met2 = roundNicely(met2);
+                    met2 = roundNicely(met2, useRounding);
                 }
 
                 met2 = replaceWithComma(met2);
@@ -509,7 +509,7 @@ function convAndForm(imp, unitIndex, suffix) {
         met = convertToC(imp, useKelvin);
         if (useKelvin) {
             met += 273.15;
-            met = roundNicely(met);
+            met = roundNicely(met, useRounding);
             unit = 'K';
         }
     } else*/
@@ -523,7 +523,7 @@ function convAndForm(imp, unitIndex, suffix) {
         met = convert(imp, multiplier, round);
         let r = stepUpOrDown(met, unit, useMM, useGiga);
 
-        met = roundNicely(r.met);
+        met = roundNicely(r.met, useRounding);
         unit = r.unit;
     }
 
@@ -543,24 +543,8 @@ function convert(imp, multiplier, round) {
     let met = imp * multiplier;
     if (round === true)
         return Math.round(met);
-    return roundNicely(met);
+    return roundNicely(met, useRounding);
 }
-
-function roundNicely(v) {
-    if (useRounding === false)
-        return Math.round(v * 100) / 100;
-
-    var dec0 = Math.round(v);
-
-    if (Math.abs((1 - (v / dec0)) * 100) < 3) return dec0;
-    var dec1 = Math.round(v * 10) / 10;
-
-    if (Math.abs((1 - (v / dec1)) * 100) < 1.6) return dec1;
-    var dec2 = Math.round(v * 100) / 100;
-
-    return dec2;
-}
-
 
 //1 x 2 x 3
 function AxAxAin(text) {
@@ -581,9 +565,9 @@ function AxAxAin(text) {
                     scale = 25.4;
                     unit = spc + "mm"
                 }
-                let cm1 = replaceWithComma(roundNicely(matches[2] * scale));
-                let cm2 = replaceWithComma(roundNicely(matches[4] * scale));
-                let cm3 = replaceWithComma(roundNicely(matches[6] * scale));
+                let cm1 = replaceWithComma(roundNicely(matches[2] * scale, useRounding));
+                let cm2 = replaceWithComma(roundNicely(matches[4] * scale, useRounding));
+                let cm3 = replaceWithComma(roundNicely(matches[6] * scale, useRounding));
 
 
                 const insertIndex = GetIndexPos(matches.index, fullMatch);
@@ -644,8 +628,8 @@ function AxAqq(text) {//ikea US
                 unit = spc + "mm"
             }
 
-            let cm1 = replaceWithComma(roundNicely(inches1 * scale));
-            let cm2 = replaceWithComma(roundNicely(inches2 * scale));
+            let cm1 = replaceWithComma(roundNicely(inches1 * scale, useRounding));
+            let cm2 = replaceWithComma(roundNicely(inches2 * scale, useRounding));
 
 
             const insertIndex = GetIndexPos(matches.index, fullMatch);
@@ -684,8 +668,8 @@ function AxAin(text) {
                     scale = 25.4;
                     unit = spc + "mm"
                 }
-                let cm1 = replaceWithComma(roundNicely(matches[2] * scale));
-                let cm2 = replaceWithComma(roundNicely(matches[4] * scale));
+                let cm1 = replaceWithComma(roundNicely(matches[2] * scale, useRounding));
+                let cm2 = replaceWithComma(roundNicely(matches[4] * scale, useRounding));
 
                 const insertIndex = GetIndexPos(matches.index, fullMatch);
                 const metStr = prepareForOutput(cm1 + spc + "x" + spc + cm2, spc + unit, true); //+ behind bracket
@@ -719,8 +703,8 @@ function AxAft(text) {
                 let scale = 0.3048;
                 let unit = spc + "m";
 
-                let m1 = replaceWithComma(roundNicely(matches[2] * scale));
-                let m2 = replaceWithComma(roundNicely(matches[4] * scale));
+                let m1 = replaceWithComma(roundNicely(matches[2] * scale, useRounding));
+                let m2 = replaceWithComma(roundNicely(matches[4] * scale, useRounding));
 
                 const insertIndex = GetIndexPos(matches.index, fullMatch);
                 const metStr = prepareForOutput(m1 + spc + "×" + spc + m2, spc + unit, true);
@@ -881,7 +865,7 @@ function ftin2m(text) {
 
                 total = ydft * 12 + inches;
 
-                let meter = prepareForOutput(roundNicely(total * 0.0254), spc + 'm', true);
+                let meter = prepareForOutput(roundNicely(total * 0.0254, useRounding), spc + 'm', true);
 
                 //text = text.replace(matches[0], meter);
                 text = CleanReplace(text, matches[0], meter);
@@ -911,7 +895,7 @@ function lboz2kg(text) {
 
                 total = lb * 16 + oz;
 
-                let kg = prepareForOutput(roundNicely(total * 0.0283495), spc + 'kg', true);
+                let kg = prepareForOutput(roundNicely(total * 0.0283495, useRounding), spc + 'kg', true);
                 //text = text.replace(matches[0], kg);
                 text = CleanReplace(text, matches[0], kg);
             } catch (err) {
@@ -998,7 +982,7 @@ function ParseUnitsOnly(text) {
                 if (useKelvin) {
                     met += 273.15;
                     unit = 'K';
-                    met = roundNicely(met);
+                    met = roundNicely(met, useRounding);
                 }
 
             met = replaceWithComma(met);

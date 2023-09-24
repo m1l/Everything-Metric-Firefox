@@ -220,4 +220,19 @@ function fahrenheitToCelsius(f, useKelvin) {
        return Math.round(met);
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius };
+function roundNicely(v, useRounding) {
+    if (useRounding === false)
+        return Math.round(v * 100) / 100;
+
+    var dec0 = Math.round(v);
+
+    if (Math.abs((1 - (v / dec0)) * 100) < 3) return dec0;
+    var dec1 = Math.round(v * 10) / 10;
+
+    if (Math.abs((1 - (v / dec1)) * 100) < 1.6) return dec1;
+    var dec2 = Math.round(v * 100) / 100;
+
+    return dec2;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely };
