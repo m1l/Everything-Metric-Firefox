@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, evaluateFraction, fahrenheitToCelsius, formatNumber, insertAt, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -26,6 +26,13 @@ function testFahrenHeitToCelsius() {
     assert.equal(fahrenheitToCelsius(32, true), 0);
     assert.equal(fahrenheitToCelsius(100, true), 37.77777777777778);
     assert.equal(fahrenheitToCelsius(212, true), 100);
+}
+
+function testFormatConvertedValue() {
+    assert.equal(formatConvertedValue('123,456.789', ' m', false, false), ' (123,456.789 m)˜');
+    assert.equal(formatConvertedValue('123,456.789', ' m', false, true), '\u200B【123,456.789 m】');
+    assert.equal(formatConvertedValue('123,456.789', ' m', true, false), ' (123,456.789 m)˜');
+    assert.equal(formatConvertedValue('123,456.789', ' m', true, true), '\u200B【𝟭𝟮𝟯,𝟰𝟱𝟲.𝟳𝟴𝟵 𝗺】');
 }
 
 function testFormatNumber() {
@@ -102,6 +109,7 @@ function main() {
     testBold();
     testEvaluateFraction();
     testFahrenHeitToCelsius();
+    testFormatConvertedValue();
     testFormatNumber();
     testInsertAt();
     testRoundNicely();
