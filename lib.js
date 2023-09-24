@@ -459,4 +459,39 @@ function replaceMaybeKeepLastChar(haystack, needle, replacement) {
     }
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar };
+function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+
+    let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[ \u00A0]?[x\*×][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?[x\*×][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?in(ch|ches|.)?)' + unitSuffix, 'ig');
+
+    if (text.search(regex) !== -1) {
+        let matches;
+
+        while ((matches = regex.exec(text)) !== null) {
+            try {
+                const fullMatch = matches[1];
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
+
+                let scale = 2.54;
+                let unit = spc + "cm";
+                if (useMM === true) {
+                    scale = 25.4;
+                    unit = spc + "mm"
+                }
+                let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+                let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+                let cm3 = formatNumber(roundNicely(matches[6] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+
+
+                const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2 + spc + "×" + spc + cm3, spc + unit, useBold, useBrackets);
+
+                //text = text.replace(matches[0], metStr);
+                text = replaceMaybeKeepLastChar(text, matches[0], metStr);
+            } catch (err) {
+                //console.log(err.message);
+            }
+        }
+    }
+    return text;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume };
