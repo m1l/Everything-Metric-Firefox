@@ -646,7 +646,21 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
  *  @return {string} - A new string with metric lengths
 */
 function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp('(([0-9]{0,3}).?(ft|yd|foot|feet).?([0-9]+(\.[0-9]+)?).?in(ch|ches)?)', 'g');
+    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+    const regex = new RegExp(
+        [
+            '(',
+                '([0-9]{0,3})', // number
+                '.?', // separator
+                '(ft|yd|foot|feet)', // larger unit
+                '.?', // separator
+                '([0-9]+(\.[0-9]+)?)', // number
+                '.?', // separator
+                'in(ch|ches)?', // smaller unit
+            ')',
+        ].join(''),
+        'g',
+    );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
