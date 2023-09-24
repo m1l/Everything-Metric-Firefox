@@ -1159,6 +1159,16 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
     return text;
 }
 
+/** Return a new string where all occurrences of miles-per-gallon (“12 mpg”) have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric equivalent to mpg
+*/
 function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
 
     let regex = new RegExp(regstart + intOrFloat + '[ \u00A0]?mpgs?' + unitSuffix + ')', 'ig');
