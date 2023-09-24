@@ -248,24 +248,27 @@ function roundNicely(v, useRounding) {
 }
 
 /** Format a number using user preferences for thousand separator and decimal separator
- *  @param {number} mystring - The number to format
- *  @param {boolean} useComma - Whether to use a comma as decimal separator
- *  @param {boolean} useSpaces - Whether to use spaces thousand separator
+ *  @param {number} v - The number to format
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @return {string} - The formatted number
 */
-function formatNumber(mystring, useComma, useSpaces) {
-    if (useComma === false) {
-        if (useSpaces === true)
-            return mystring.toLocaleString('us-EN').replace(',', '\u00A0');
-        else
-            return mystring.toLocaleString('us-EN');
+function formatNumber(v, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator) {
+    if (useCommaAsDecimalSeparator) {
+        const withThousandSeparator = v.toLocaleString('de-DE');
+        if (useSpacesAsThousandSeparator) {
+            return withThousandSeparator.replace('.', '\u00A0');
+        } else {
+            return withThousandSeparator;
+        }
+    } else {
+        const withThousandSeparator = v.toLocaleString('en-US');
+        if (useSpacesAsThousandSeparator) {
+            return withThousandSeparator.replace(',', '\u00A0');
+        } else {
+            return withThousandSeparator;
+        }
     }
-
-    if (useSpaces === true)
-        return mystring.toLocaleString('de-DE').replace('.', '\u00A0');
-    else
-        return mystring.toLocaleString('de-DE');
-
 }
 
 module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber };
