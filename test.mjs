@@ -1,5 +1,11 @@
 import assert from 'node:assert/strict';
-import { evaluateFraction, fahrenheitToCelsius, formatNumber, insertAt, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, evaluateFraction, fahrenheitToCelsius, formatNumber, insertAt, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+
+function testBold() {
+    assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
+    assert.equal(bold('42 is an integer'), '𝟰𝟮 𝗶𝘀 𝗮𝗻 𝗶𝗻𝘁𝗲𝗴𝗲𝗿');
+    assert.equal(bold('3.14 is not an integer'), '𝟯.𝟭𝟰 𝗶𝘀 𝗻𝗼𝘁 𝗮𝗻 𝗶𝗻𝘁𝗲𝗴𝗲𝗿');
+}
 
 function testEvaluateFraction() {
     assert.equal(evaluateFraction('½'), 0.5);
@@ -93,6 +99,7 @@ function testWhereToInsertConvertedValue() {
 }
 
 function main() {
+    testBold();
     testEvaluateFraction();
     testFahrenHeitToCelsius();
     testFormatNumber();
