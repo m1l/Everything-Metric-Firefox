@@ -319,7 +319,7 @@ function replaceFahrenheit(text) {
                 met += met2;
 
                 const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
-                const metStr = formatConvertedValue(met, unit, true);
+                const metStr = formatConvertedValue(met, unit);
                 text = insertAt(text, metStr, insertIndex);
             } catch (err) {
                 console.log(err.message);
@@ -359,7 +359,7 @@ function mpg2Lper100km(text) {
                 met = formatNumber(met, useComma, useSpaces);
 
                 const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
-                const metStr = formatConvertedValue(met, '\u00A0L\/100\u00A0km', true);
+                const metStr = formatConvertedValue(met, '\u00A0L\/100\u00A0km');
                 text = insertAt(text, metStr, insertIndex);
             } catch (err) {
                 //console.log(err.message);
@@ -528,7 +528,7 @@ function convAndForm(imp, unitIndex, suffix) {
     }
 
     met = formatNumber(met, useComma, useSpaces);
-    return formatConvertedValue(met, spc + unit + suffix, true);
+    return formatConvertedValue(met, spc + unit + suffix);
 }
 
 function convert(imp, multiplier, round) {
@@ -562,7 +562,7 @@ function AxAxAin(text) {
                 let cm3 = formatNumber(roundNicely(matches[6] * scale, useRounding), useComma, useSpaces);
 
 
-                const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2 + spc + "×" + spc + cm3, spc + unit, true);
+                const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2 + spc + "×" + spc + cm3, spc + unit);
 
                 //text = text.replace(matches[0], metStr);
                 text = CleanReplace(text, matches[0], metStr);
@@ -623,7 +623,7 @@ function AxAqq(text) {//ikea US
             let cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useComma, useSpaces);
 
 
-            const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2, spc + unit, true);
+            const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2, spc + unit);
 
             //text = text.replace(matches[0], metStr);
             text = CleanReplace(text, matches[0], metStr);
@@ -661,7 +661,7 @@ function AxAin(text) {
                 let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
                 let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
 
-                const metStr = formatConvertedValue(cm1 + spc + "x" + spc + cm2, spc + unit, true); //+ behind bracket
+                const metStr = formatConvertedValue(cm1 + spc + "x" + spc + cm2, spc + unit); //+ behind bracket
 
                 //text = text.replace(matches[0], metStr);
                 text = CleanReplace(text, matches[0], metStr);
@@ -695,7 +695,7 @@ function AxAft(text) {
                 let m1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
                 let m2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
 
-                const metStr = formatConvertedValue(m1 + spc + "×" + spc + m2, spc + unit, true);
+                const metStr = formatConvertedValue(m1 + spc + "×" + spc + m2, spc + unit);
 
                 //text = text.replace(matches[0], metStr);
                 text = CleanReplace(text, matches[0], metStr);
@@ -853,7 +853,7 @@ function ftin2m(text) {
 
                 total = ydft * 12 + inches;
 
-                let meter = formatConvertedValue(roundNicely(total * 0.0254, useRounding), spc + 'm', true);
+                let meter = formatConvertedValue(roundNicely(total * 0.0254, useRounding), spc + 'm');
 
                 //text = text.replace(matches[0], meter);
                 text = CleanReplace(text, matches[0], meter);
@@ -883,7 +883,7 @@ function lboz2kg(text) {
 
                 total = lb * 16 + oz;
 
-                let kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), spc + 'kg', true);
+                let kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), spc + 'kg');
                 //text = text.replace(matches[0], kg);
                 text = CleanReplace(text, matches[0], kg);
             } catch (err) {
@@ -974,7 +974,7 @@ function ParseUnitsOnly(text) {
                 }
 
             met = formatNumber(met, useComma, useSpaces);
-            const metStr = formatConvertedValue(met, unit, true);
+            const metStr = formatConvertedValue(met, unit);
             text = insertAt(text, metStr, 1);
 
         }
@@ -982,9 +982,7 @@ function ParseUnitsOnly(text) {
 }
 
 
-function formatConvertedValue(number, rest, numberIsFormatted) {
-    if (numberIsFormatted === false)
-        number = formatNumber(number, useComma, useSpaces)
+function formatConvertedValue(number, rest) {
     if (rest === undefined)
         rest = '';
     let fullstring = number + rest;
