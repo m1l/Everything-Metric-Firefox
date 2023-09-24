@@ -90,7 +90,7 @@ function testReplaceMaybeKeepLastChar() {
 
 function testReplaceSurfaceInInches() {
     // TODO: the original value should not be removed
-    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false), 'S =  (2.54 x 5.08  cm)˜');
+    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false), 'S =  (2.54 × 5.08  cm)˜');
 }
 
 function testReplaceVolume() {
