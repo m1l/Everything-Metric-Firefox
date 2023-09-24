@@ -1241,23 +1241,23 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        let inches1 = parseFloat(match[1]);
+        let inches1 = parseFloat(match[1] || '0');
         if (isNaN(inches1)) {
             inches1 = 0;
         }
 
-        const frac1 = evaluateFraction(match[2]);
+        const frac1 = evaluateFraction(match[2] || '0');
         if (isNaN(frac1)) {
             continue;
         }
         inches1 += frac1;
 
-        let inches2 = parseFloat(match[3]);
+        let inches2 = parseFloat(match[3] || '0');
         if (isNaN(inches2)) {
             inches2 = 0;
         }
 
-        const frac2 = evaluateFraction(match[4]);
+        const frac2 = evaluateFraction(match[4] || '0');
         if (isNaN(frac2)) {
             continue;
         }
