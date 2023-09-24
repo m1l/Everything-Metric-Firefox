@@ -1132,7 +1132,7 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
         [
             '([0-9]{0,3})', // number
             '.?', // separator
-            '(lbs?)', // pounds unit
+            '(?:lbs?)', // pounds unit
             '.?', // separator
             '([0-9]+(\.[0-9]+)?)', // number
             '.?', // separator
@@ -1145,7 +1145,7 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
     while ((match = regex.exec(text)) !== null) {
         const original = match[0];
         const pounds = parseFloat(match[1]);
-        const ounces = parseFloat(match[3]);
+        const ounces = parseFloat(match[2]);
         const total = pounds * 16 + ounces;
         const kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), ' kg', useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], kg);
