@@ -319,7 +319,7 @@ function replaceFahrenheit(text) {
                 met += met2;
 
                 const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
-                const metStr = formatConvertedValue(met, unit, false);
+                const metStr = formatConvertedValue(met, unit, true);
                 text = insertAt(text, metStr, insertIndex);
             } catch (err) {
                 console.log(err.message);
@@ -974,7 +974,7 @@ function ParseUnitsOnly(text) {
                 }
 
             met = formatNumber(met, useComma, useSpaces);
-            const metStr = formatConvertedValue(met, unit, false);
+            const metStr = formatConvertedValue(met, unit, true);
             text = insertAt(text, metStr, 1);
 
         }
