@@ -875,7 +875,7 @@ function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, 
     const forceRounding = (useRounding === false &&
         ((useMM === true && conversion.multiplier2 !== undefined && conversion.fullround) || conversion.forceround === true));
 
-    var met;
+    let met;
     /*if (unitIndex < 2 ) {
         met = fahrenheitToCelsius(imp, useKelvin);
         if (useKelvin) {
