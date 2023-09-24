@@ -922,6 +922,14 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
     }
 }
 
+/** Return whether myString contains a number
+ *  @param {string} myString - The string to test
+ *  @return {boolean} - True when myString contains a number; false otherwise
+*/
+function hasNumber(myString) {
+    return /\d/.test(myString);
+}
+
 /** Return a new string where all occurrences of lengths in feet and inches (“1' 2"”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} includeImproperSymbols - Whether to use unofficial symbols for feet and inches

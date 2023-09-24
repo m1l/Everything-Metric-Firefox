@@ -302,10 +302,6 @@ function replaceIkeaSurface(text) {//ikea US
 
 }
 
-function hasNumber(myString) {
-    return /\d/.test(myString);
-}
-
 // 1 lb 2 oz
 function replacePoundsAndOunces(text) {
     let regex = new RegExp('(([0-9]{0,3}).?(lbs?).?([0-9]+(\.[0-9]+)?).?oz)', 'g');
