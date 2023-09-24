@@ -649,26 +649,24 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '(',
-                '([0-9]{0,3})', // number
-                '.?', // separator
-                '(ft|yd|foot|feet)', // larger unit
-                '.?', // separator
-                '([0-9]+(\.[0-9]+)?)', // number
-                '.?', // separator
-                'in(ch|ches)?', // smaller unit
-            ')',
+            '([0-9]{0,3})', // number
+            '.?', // separator
+            '(ft|yd|foot|feet)', // larger unit
+            '.?', // separator
+            '([0-9]+(\.[0-9]+)?)', // number
+            '.?', // separator
+            'in(ch|ches)?', // smaller unit
         ].join(''),
         'g',
     );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        const yards_or_feet = parseFloat(match[2]);
-        const inches = parseFloat(match[4]);
+        const yards_or_feet = parseFloat(match[1]);
+        const inches = parseFloat(match[3]);
 
         const is_yards = new RegExp('yd', 'i');
-        const feet = is_yards.test(match[3]) ? yards_or_feet * 3 : yards_or_feet;
+        const feet = is_yards.test(match[2]) ? yards_or_feet * 3 : yards_or_feet;
         const total = feet * 12 + inches;
         const meter = formatConvertedValue(roundNicely(total * 0.0254, useRounding), ' m', useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], meter);
