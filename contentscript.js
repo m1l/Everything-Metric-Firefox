@@ -22,9 +22,6 @@ var includeQuotes;
 var isparsing=false;
 var includeImproperSymbols;
 
-var feetInchRegex;
-
-
 function walk(node) {
     if (hasEditableNode(node)) return;
 
@@ -439,13 +436,7 @@ function FlashMessage() {
 }
 
 function InitRegex(){
-
-    if (includeImproperSymbols) {
-        feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(\"|″|”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
-    }
-    else {
-        feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(″|′′)))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
-
+    if (!includeImproperSymbols) {
         //only for foot
         units[2].regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
     }
@@ -496,6 +487,7 @@ document.addEventListener('DOMContentLoaded', function() {
             includeQuotes = response.includeQuotes;
             includeImproperSymbols = response.includeImproperSymbols;
             InitRegex();
+            setIncludeImproperSymbols(response.includeImproperSymbols);
 
             if (response.metricIsEnabled === true) {
 

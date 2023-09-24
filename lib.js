@@ -14,6 +14,8 @@ const sqcu = '([\-− \u00A0]?(sq\.?|square|cu\.?|cubic))?';
 const sq = '([\-− \u00A0]?(sq\.?|square))?';
 const skipempty = '^(?:[ \n\t]+)?';
 
+var feetInchRegex;
+
 /** @type{ { [key: string]: number } } */
 const fractions = {
     '¼': 1 / 4,
@@ -911,6 +913,15 @@ function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, 
     return formatConvertedValue(met, spc + unit + suffix, useBold, useBrackets);
 }
 
+// TODO: remove global variable
+function setIncludeImproperSymbols(includeImproperSymbols) {
+    if (includeImproperSymbols) {
+        feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(\"|″|”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
+    } else {
+        feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(″|′′)))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
+    }
+}
+
 /** Return a new string where all occurrences of lengths in feet and inches (“1' 2"”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} includeImproperSymbols - Whether to use unofficial symbols for feet and inches
@@ -1044,4 +1055,4 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, replaceFeetAndInchesSymbol };
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol };

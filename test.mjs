@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -109,6 +109,11 @@ function testReplaceFeetAndInches() {
 }
 
 function testReplaceFeetAndInchesSymbol() {
+    setIncludeImproperSymbols(false);
+    // TODO: the original value should not be removed
+    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false), ' (0.36 m)˜');
+
+    setIncludeImproperSymbols(true);
     // TODO: the original value should not be removed
     assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false), ' (0.36 m)˜');
 }
