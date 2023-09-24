@@ -14,6 +14,7 @@ const sqcu = '([\-− \u00A0]?(sq\.?|square|cu\.?|cubic))?';
 const sq = '([\-− \u00A0]?(sq\.?|square))?';
 const skipempty = '^(?:[ \n\t]+)?';
 
+/** @type{ RegExp } */
 var feetInchRegex;
 
 /** @type{ { [key: string]: number } } */
@@ -914,6 +915,9 @@ function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, 
 }
 
 // TODO: remove global variable
+/** Configure global regex feetInchRegex depending on unofficial symbols should be supported for feet and inches
+ *  @param {boolean} includeImproperSymbols} - Whether to support unofficial symbols for feet and inches
+*/
 function setIncludeImproperSymbols(includeImproperSymbols) {
     if (includeImproperSymbols) {
         feetInchRegex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)?[ \u00A0]?(\"|″|”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');
