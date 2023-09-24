@@ -43,9 +43,11 @@ function evaluateFraction(frac) {
 /** If the value if smaller than 1, or larger than 10,000, use a more convenient SI prefix
  *  @param {number} met - The value
  *  @param {string} unit - The unit being used
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
  *  @return {import("./types").ValueWithUnit} - The scaled unit with the appropriate unit
  */
-function stepUpOrDown(met, unit) {
+function stepUpOrDown(met, unit, useMM, useGiga) {
     if (met < 1) {
         switch (unit) {
             case 'cm':

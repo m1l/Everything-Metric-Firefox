@@ -533,7 +533,7 @@ function convAndForm(imp, unitIndex, suffix) {
         suffix = '';
     } else {
         met = convert(imp, multiplier, round);
-        let r = stepUpOrDown(met, unit);
+        let r = stepUpOrDown(met, unit, useMM, useGiga);
 
         met = roundNicely(r.met);
         unit = r.unit;
