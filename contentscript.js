@@ -266,7 +266,7 @@ function replaceMilesPerGallon(text) {
 
                 if (imp === 0 || isNaN(imp)) continue;
                 var l = 235.214583 / imp; // 100 * 3.785411784 / 1.609344 * imp;
-                var met = convert(l, 1, false);
+                var met = roundNicely(l, useRounding);
                 met = formatNumber(met, useComma, useSpaces);
 
                 const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
