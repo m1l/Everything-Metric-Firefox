@@ -303,4 +303,19 @@ function bold(text) {
     return out;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold };
+function formatConvertedValue(number, rest, useBold, useBrackets) {
+    let fullstring = number + rest;
+    if (useBrackets) {
+        // \200B is ZERO WIDTH SPACE
+        // this avoids line-break between original value and converted value
+        fullstring = "\u200B\u3010" + fullstring + "\u3011";
+    } else {
+        fullstring = " (" + fullstring + ")˜";
+    }
+    if (useBold && useBrackets) {
+        fullstring = bold(fullstring);
+    }
+    return fullstring;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue };
