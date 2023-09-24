@@ -592,16 +592,14 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
     const regex = new RegExp(
         [
             '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '(',
-                '([0-9]+(\.[0-9]+)?)', // number
-                '[\'′’]?',  // allow feet symbol on first number
-                '[-− \u00A0]?', // space or no-break space
-                '[x\*×]', // multiplication sign
-                '[-− \u00A0]?', // space or no-break space
-                '([0-9]+(\.[0-9]+)?)', // number
-                '[-− \u00A0]?', // space or no-break space
-                '(feet|foot|ft|[\'′’])', // unit
-            ')
+            '([0-9]+(\.[0-9]+)?)', // number
+            '[\'′’]?',  // allow feet symbol on first number
+            '[-− \u00A0]?', // space or no-break space
+            '[x\*×]', // multiplication sign
+            '[-− \u00A0]?', // space or no-break space
+            '([0-9]+(\.[0-9]+)?)', // number
+            '[-− \u00A0]?', // space or no-break space
+            '(feet|foot|ft|[\'′’])', // unit
             '(?![0-9])', // maybe to avoid matching feet2 for feet²?
             // check for already present conversion to metric
             unitSuffix
@@ -622,8 +620,8 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
         let unit = spc + "m";
         // TODO: use useMM
 
-        const m1 = formatNumber(roundNicely(match[2] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const m2 = formatNumber(roundNicely(match[4] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m1 = formatNumber(roundNicely(match[1] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m2 = formatNumber(roundNicely(match[3] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${m1} × ${m2}`, ` ${unit}`, useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], metStr);
     }
