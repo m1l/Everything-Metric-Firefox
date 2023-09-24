@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { evaluateFraction, stepUpOrDown } from './lib.js';
+import { evaluateFraction, insertAt, stepUpOrDown } from './lib.js';
 
 async function testEvaluateFraction() {
     assert.equal(evaluateFraction('½'), 0.5);
@@ -36,9 +36,16 @@ async function testStepUpOrDown() {
     // assert.deepEqual(stepUpOrDown(1e8, 'cm', false, false), { met: 1000, unit: 'km' });
 }
 
+async function testInsertAt() {
+    assert.equal(insertAt('hello world', 'everyone in the ', 6), 'hello everyone in the world');
+    assert.equal(insertAt('hello world', 'welcome, and ', 0), 'welcome, and hello world');
+    // TODO: what should happen with index = -1? with index=999?
+}
+
 async function main() {
     testEvaluateFraction();
     testStepUpOrDown();
+    testInsertAt();
 }
 
 main();
