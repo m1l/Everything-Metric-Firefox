@@ -392,7 +392,7 @@ function convAndForm(imp, unitIndex, suffix) {
         unit = units[unitIndex].unit2;
         multiplier = units[unitIndex].multiplier2;
     }
-    const round = (useRounding === false &&
+    const forceRounding = (useRounding === false &&
         ((useMM === true && units[unitIndex].multiplier2 !== undefined && units[unitIndex].fullround) || units[unitIndex].forceround));
 
     var met;
@@ -405,13 +405,13 @@ function convAndForm(imp, unitIndex, suffix) {
         }
     } else*/
     if (suffix === '²')
-        met = convert(imp, Math.pow(multiplier, 2), round);
+        met = convert(imp, Math.pow(multiplier, 2), forceRounding);
     else if (suffix === '³') {
-        met = convert(imp, units[unitIndex].multipliercu, round);
+        met = convert(imp, units[unitIndex].multipliercu, forceRounding);
         unit = 'L';
         suffix = '';
     } else {
-        met = convert(imp, multiplier, round);
+        met = convert(imp, multiplier, forceRounding);
         let r = stepUpOrDown(met, unit, useMM, useGiga);
 
         met = roundNicely(r.met, useRounding);
@@ -431,9 +431,9 @@ function convAndForm(imp, unitIndex, suffix) {
     return formatConvertedValue(met, spc + unit + suffix, useBold, useBrackets);
 }
 
-function convert(imp, multiplier, round) {
+function convert(imp, multiplier, forceRounding) {
     let met = imp * multiplier;
-    if (round === true)
+    if (forceRounding)
         return Math.round(met);
     return roundNicely(met, useRounding);
 }
