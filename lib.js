@@ -189,7 +189,12 @@ function insertAt(target, toInsert, index) {
     return target.substr(0, index) + toInsert + target.substr(index);
 }
 
-function isAlreadyConverted(text, convertBracketed){
+/** Return true when the value does not need to be converted further
+ *  @param {string} text - The text containing a non-metric value
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @return {boolean} - Whether the value should not be converted to metric
+*/
+function isAlreadyConverted(text, convertBracketed) {
     if ((convertBracketed && /[\(]/.test(text.substring(1))) ||
        (!convertBracketed && /[\(\)]/.test(text)) ||
        /\u3010/.test(text))
