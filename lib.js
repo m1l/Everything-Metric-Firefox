@@ -926,7 +926,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                 '(?:',
                     '[°º]?', // optional degree marker, TODO: don't know why
                     // feet
-                    '(',
+                    '(?:',
                         '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
                         '([0-9]{1,3})',  // number
                         '[\'’′]', // feet marker (NOTE: with improper symbols)
@@ -975,7 +975,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                 '(?:',
                     '[°º]?', // optional degree marker, TODO: don't know why
                     // feet
-                    '(',
+                    '(?:',
                         '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
                         '([0-9]{1,3})',  // number
                         '[′]', // feet marker (NOTE: without improper symbols)
@@ -1051,7 +1051,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[8] !== undefined && match[8]==='\n') {
+            if (match[7] !== undefined && match[7]==='\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
@@ -1074,12 +1074,12 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 continue;
         }
 
-        let feet = parseFloat(match[2]);
+        let feet = parseFloat(match[1]);
         if (isNaN(feet)) {
             feet = 0;
         }
 
-        let inches = match[5];
+        let inches = match[4];
         if (inches !== undefined && inches.length<5) {//someone used , instead of . for decimals
             inches = inches.replace(',', '.');
         }
@@ -1088,8 +1088,8 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             inches = 0;
         }
 
-        if (match[6] !== undefined) {
-            inches += evaluateFraction(match[6]);
+        if (match[5] !== undefined) {
+            inches += evaluateFraction(match[5]);
         }
 
         if (inches === 0 || isNaN(inches)) {
