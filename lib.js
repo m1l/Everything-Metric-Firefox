@@ -340,8 +340,46 @@ function formatConvertedValue(number, rest, useBold, useBrackets) {
  *  @return {string} - A new string with metric temperatures
 */
 function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-
-    let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?' + ( degWithoutFahrenheit ? '': 'F(ahrenheits?)?' ) + ')|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
+    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+    let regex = new RegExp(
+        [
+            '(',
+                '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+                '([\-−])?', // minus sign
+                // optionally, an additional number with a range marker
+                '(',
+                    '([0-9,\.]+)', // digits
+                    '( to | and |[\-−])', // range marker
+                ')?',
+                '([\-0-9,\.]+)', // digits or minus sign
+                '[ \u00A0]?', // space or no-break space
+                // degree Fahrenheit marker
+                '(',
+                        '(',
+                            '(°|º|deg(rees)?)', // degree marker
+                            '[ \u00A0]?', // space or no-break space
+                            degWithoutFahrenheit ? '': 'F(ahrenheits?)?', // Fahrenheit marker
+                        ')',
+                    '|',
+                        '(Fahrenheits?)', // as a full word
+                    '|',
+                        '[\u2109]', // Unicode ℉  (DEGREE FAHRENHEIT)
+                ')',
+                // check for already present conversion to Celsius
+                '(?!', // negative look-ahead
+                        ' ?', // optional space
+                        '[\(]',  // opening parenthesis
+                        '[0-9]',  // some digit
+                    '|',
+                        ' ?', // optional space
+                        '\u200B', // ZERO WIDTH SPACE
+                        '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
+                ')',
+                '([^a-z]|$)', // look for a separator
+            ')'
+        ].join(''),
+        'ig'
+    );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
