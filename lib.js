@@ -953,7 +953,8 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                     '[ \u00A0]?', // optional separator
                     '(?:\"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
                 ')',
-                // TODO: it looks like this could actually be a mistake
+                // NOTE: since we include quotes as symbols for inches, we need
+                // to detect when they are used on their to open a quotation
                 '|',
                 '(["″”“\n])',
                 // check for already present conversion to metric
@@ -1002,6 +1003,10 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                     '[ \u00A0]?', // optional separator
                     '(?:″|′′)', // inches marker (NOTE: without improper symbols)
                 ')',
+                // NOTE: since we do not include double quotes as symbols for
+                // inches, there is no need to check whether they are for a
+                // quotation
+                //
                 // check for already present conversion to metric
                 '(?!', // negative look-ahead
                         ' ', // non-optional space
@@ -1041,6 +1046,8 @@ function hasNumber(myString) {
  *  @return {string} - A new string with metric lengths
 */
 function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+    // NOTE: part of the logic is dedicated to detecting things of the form
+    // '"they were 3"' to avoid parsing '3"' as 3 inches
     let lastQuoteOpen = false;
     let match;
     while ((match = feetInchRegex.exec(text)) !== null) {
