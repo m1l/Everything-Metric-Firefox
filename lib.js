@@ -924,40 +924,38 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
         feetInchRegex = new RegExp(
             [
                 '(',
+                    '[°º]?', // optional degree marker, TODO: don't know why
+                    // feet
                     '(',
-                        '[°º]?', // optional degree marker, TODO: don't know why
-                        // feet
+                        '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
+                        '([0-9]{1,3})',  // number
+                        '[\'’′]', // feet marker (NOTE: with improper symbols)
+                        '[\-− \u00A0]?', // optional separator
+                    ')?',
+                    // mixed numeral
+                    '(',
+                        // integer
                         '(',
-                            '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
-                            '([0-9]{1,3})',  // number
-                            '[\'’′]', // feet marker (NOTE: with improper symbols)
-                            '[\-− \u00A0]?', // optional separator
+                            '([\.,0-9]+)', // number
+                            '(?!\/)', // check that this is not part of a fraction
+                            '(?:[\-− \u00A0]?)', // optional separator
                         ')?',
-                        // mixed numeral
+                        // proper fraction
                         '(',
-                            // integer
-                            '(',
-                                '([\.,0-9]+)', // number
-                                '(?!\/)', // check that this is not part of a fraction
-                                '(?:[\-− \u00A0]?)', // optional separator
-                            ')?',
-                            // proper fraction
-                            '(',
-                                    '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
-                                '|',
-                                // fraction written more conventionally
-                                    '[0-9]+', // number
-                                    '[\/⁄]', // fraction bar
-                                    '[0-9\.]+', // number, TODO: why allow decimal point here?
-                            ')?',
+                                '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
+                            '|',
+                            // fraction written more conventionally
+                                '[0-9]+', // number
+                                '[\/⁄]', // fraction bar
+                                '[0-9\.]+', // number, TODO: why allow decimal point here?
                         ')?',
-                        '[ \u00A0]?', // optional separator
-                        '(\"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
-                    ')',
-                    // TODO: it looks like this could actually be a mistake
-                    '|',
-                    '(["″”“\n])',
+                    ')?',
+                    '[ \u00A0]?', // optional separator
+                    '(\"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
                 ')',
+                // TODO: it looks like this could actually be a mistake
+                '|',
+                '(["″”“\n])',
                 // check for already present conversion to metric
                 '(?!', // negative look-ahead
                         ' ', // non-optional space
@@ -975,36 +973,34 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
         feetInchRegex = new RegExp(
             [
                 '(',
+                    '[°º]?', // optional degree marker, TODO: don't know why
+                    // feet
                     '(',
-                        '[°º]?', // optional degree marker, TODO: don't know why
-                        // feet
+                        '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
+                        '([0-9]{1,3})',  // number
+                        '[′]', // feet marker (NOTE: without improper symbols)
+                        '[\-− \u00A0]?', // optional separator
+                    ')?',
+                    // mixed numeral
+                    '(',
+                        // integer
                         '(',
-                            '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
-                            '([0-9]{1,3})',  // number
-                            '[′]', // feet marker (NOTE: without improper symbols)
-                            '[\-− \u00A0]?', // optional separator
+                            '([\.,0-9]+)', // number
+                            '(?!\/)', // check that this is not part of a fraction
+                            '(?:[\-− \u00A0]?)', // optional separator
                         ')?',
-                        // mixed numeral
+                        // proper fraction
                         '(',
-                            // integer
-                            '(',
-                                '([\.,0-9]+)', // number
-                                '(?!\/)', // check that this is not part of a fraction
-                                '(?:[\-− \u00A0]?)', // optional separator
-                            ')?',
-                            // proper fraction
-                            '(',
-                                    '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
-                                '|',
-                                // fraction written more conventionally
-                                    '[0-9]+', // number
-                                    '[\/⁄]', // fraction bar
-                                    '[0-9\.]+', // number, TODO: why allow decimal point here?
-                            ')?',
+                                '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
+                            '|',
+                            // fraction written more conventionally
+                                '[0-9]+', // number
+                                '[\/⁄]', // fraction bar
+                                '[0-9\.]+', // number, TODO: why allow decimal point here?
                         ')?',
-                        '[ \u00A0]?', // optional separator
-                        '(″|′′)', // inches marker (NOTE: without improper symbols)
-                    ')',
+                    ')?',
+                    '[ \u00A0]?', // optional separator
+                    '(″|′′)', // inches marker (NOTE: without improper symbols)
                 ')',
                 // check for already present conversion to metric
                 '(?!', // negative look-ahead
@@ -1048,18 +1044,18 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
     let lastQuoteOpen = false;
     let match;
     while ((match = feetInchRegex.exec(text)) !== null) {
-        const fullMatch = match[1];
+        const fullMatch = match[0];
 
         if (includeImproperSymbols) {
             if (lastQuoteOpen) {
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[10] !== undefined && match[10]==='\n') {
+            if (match[9] !== undefined && match[9]==='\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
-            if (!hasNumber(match[1]) && !/[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(match[1])) {
+            if (!hasNumber(match[0]) && !/[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(match[0])) {
                 lastQuoteOpen = !lastQuoteOpen;
                 continue;
             }
@@ -1078,12 +1074,12 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 continue;
         }
 
-        let feet = parseFloat(match[4]);
+        let feet = parseFloat(match[3]);
         if (isNaN(feet)) {
             feet = 0;
         }
 
-        let inches = match[7];
+        let inches = match[6];
         if (inches !== undefined && inches.length<5) {//someone used , instead of . for decimals
             inches = inches.replace(',', '.');
         }
@@ -1092,8 +1088,8 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             inches = 0;
         }
 
-        if (match[8] !== undefined) {
-            inches += evaluateFraction(match[8]);
+        if (match[7] !== undefined) {
+            inches += evaluateFraction(match[7]);
         }
 
         if (inches === 0 || isNaN(inches)) {
