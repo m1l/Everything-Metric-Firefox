@@ -428,21 +428,19 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     return text;
 }
 
-/** Return a new string where match has been replaced with metStr in text
- *  @param {string} text - Where to search for the pattern
- *  @param {string} match - The pattern to be replaced
- *  @param {string} metStr - The replacement
- *  @return {string} - Text, where match has been replaced with metStr
+/** Return a new string where match has been replaced with replacement in haystack
+ *  @param {string} haystack - Where to search for the pattern
+ *  @param {string} needle - The pattern to be replaced
+ *  @param {string} replacement - The replacement
+ *  @return {string} - Text, where needle has been replaced with replacement
 */
-function replaceMaybeKeepLastChar(text, match, metStr) {
-    let lastchar = match[match.length -1];
-    //console.log("replacing " + match + " with " + metStr + /[^a-z"″”“’'′]/i.test(lastchar));
-
-    //if (/[\s \.,;\)]/.test(lastchar))
-    if (/[^a-z"″”“’'′]/i.test(lastchar))
-        return text.replace(match, metStr + lastchar);
-    else
-        return text.replace(match, metStr);
+function replaceMaybeKeepLastChar(haystack, needle, replacement) {
+    const lastChar = needle[needle.length -1];
+    if (lastChar && /[^a-z"″”“’'′]/i.test(lastChar)) {
+        return haystack.replace(needle, replacement + lastChar);
+    } else {
+        return haystack.replace(needle, replacement);
+    }
 }
 
 module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar };
