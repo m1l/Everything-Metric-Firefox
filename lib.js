@@ -272,16 +272,18 @@ function formatNumber(v, useCommaAsDecimalSeparator, useSpacesAsThousandSeparato
 }
 
 /** Decide exactly where the metric-converted value should be inserted in fullMatch
- *  @param {number} index - The location of fullMatch within the main string
  *  @param {string} fullMatch - The text containing the non-metric value to convert
- *  @return {number} - The location where the metric-converted value should be inserted
+ *  @return {number} - The relative location where the metric-converted value should be inserted
 */
-function whereToInsertConvertedValue(index, fullMatch) {
-    let insertIndex = index + fullMatch.length;
-    let lastchar = fullMatch[fullMatch.length -1];
-    if (/[\s \.,;]/.test(lastchar))
-        insertIndex--;
-    return insertIndex;
+function convertedValueInsertionOffset(fullMatch) {
+    const lastChar = fullMatch[fullMatch.length - 1];
+    if (lastChar === undefined) {
+        return 0;
+    } else if (/[\s \.,;]/.test(lastChar)) {
+        return fullMatch.length - 1;
+    } else {
+        return fullMatch.length;
+    }
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, whereToInsertConvertedValue };
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset };

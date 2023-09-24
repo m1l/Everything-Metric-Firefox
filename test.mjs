@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { evaluateFraction, fahrenheitToCelsius, formatNumber, insertAt, roundNicely, shouldConvert, stepUpOrDown, whereToInsertConvertedValue } from './lib.js';
+import { evaluateFraction, fahrenheitToCelsius, formatNumber, insertAt, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testEvaluateFraction() {
     assert.equal(evaluateFraction('½'), 0.5);
@@ -85,11 +85,11 @@ function testShouldConvert() {
 }
 
 function testWhereToInsertConvertedValue() {
-    assert.equal(whereToInsertConvertedValue(1000, '1 m'), 1003);
-    assert.equal(whereToInsertConvertedValue(1000, '1 m '), 1003);
-    assert.equal(whereToInsertConvertedValue(1000, '1 m.'), 1003);
-    assert.equal(whereToInsertConvertedValue(1000, '1 mm'), 1004);
-    assert.equal(whereToInsertConvertedValue(1000, '1 m)'), 1004);
+    assert.equal(convertedValueInsertionOffset('1 m'), 3);
+    assert.equal(convertedValueInsertionOffset('1 m '), 3);
+    assert.equal(convertedValueInsertionOffset('1 m.'), 3);
+    assert.equal(convertedValueInsertionOffset('1 mm'), 4);
+    assert.equal(convertedValueInsertionOffset('1 m)'), 4);
 }
 
 function main() {
