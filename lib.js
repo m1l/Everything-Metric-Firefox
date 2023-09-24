@@ -845,7 +845,7 @@ function roundMaybeNicely(met, forceRounding, useRounding) {
 
 /** Convert and format an unit from unit at unitIndex into metric
  *  @param {number} imp - The value, possibly in imperial units
- *  @param {number} unitIndex - The index of the unit in the units array
+ *  @param {import("./types").Conversion} conversion - The description of the conversion to apply
  *  @param {string} suffix - Optional '²' or '³'
  *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
@@ -857,12 +857,7 @@ function roundMaybeNicely(met, forceRounding, useRounding) {
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - The converted and formatted value
 */
-function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const conversion = conversions[unitIndex];
-    if (conversion === undefined) {
-        return ''; // TODO
-    }
-
+function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     let multiplier = conversion.multiplier;
     if (isUK === true && conversion.multiplierimp !== undefined) {
         multiplier = conversion.multiplierimp;
@@ -1104,11 +1099,17 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
 
         let metStr = '';
         if (total > 3) {
-            // feet
-            metStr = convAndForm(feet + inches / 12, 2, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            const conversion = conversions[2];  // feet to m
+            if (!conversion) {
+                continue;
+            }
+            metStr = convAndForm(feet + inches / 12, conversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
         } else {
-            // inches
-            metStr = convAndForm(feet * 12 + inches, 1, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            const conversion = conversions[1];  // inches to m
+            if (!conversion) {
+                continue;
+            }
+            metStr = convAndForm(feet * 12 + inches, conversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
         }
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -1299,7 +1300,7 @@ function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRoun
                 suffix = '³';
             }
 
-            const metStr = convAndForm(imp, i, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            const metStr = convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
 
             let insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
             insertIndex = insertIndex - subtract; //subtracts behind bracket
@@ -1310,4 +1311,4 @@ function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRoun
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceOtherUnits };
+module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceOtherUnits };

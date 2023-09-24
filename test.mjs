@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, conversions, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -8,22 +8,30 @@ function testBold() {
 }
 
 function testConvAndForm() {
-    assert.equal(convAndForm(100, 0, '', false, false, false, false, false, false, false, false), ' (100 °C)˜');
+    const fahrenheitToCelsiusConv = conversions[0];
+    assert(fahrenheitToCelsiusConv);
+    assert.equal(convAndForm(100, fahrenheitToCelsiusConv, '', false, false, false, false, false, false, false, false), ' (100 °C)˜');
 
     // useMM and useRounding interact in subtle ways
-    assert.equal(convAndForm(0.123, 1, '', false, false, false, false, false, false, false, false), ' (3.1 mm)˜');
-    assert.equal(convAndForm(0.123, 1, '', false, false, false, true, false, false, false, false), ' (3.1 mm)˜');
-    assert.equal(convAndForm(0.123, 1, '', false, true, false, false, false, false, false, false), ' (3 mm)˜');
-    assert.equal(convAndForm(0.123, 1, '', false, true, false, true, false, false, false, false), ' (3.1 mm)˜');
+    const inchesToCmConv = conversions[1];
+    assert(inchesToCmConv);
+    assert.equal(convAndForm(0.123, inchesToCmConv, '', false, false, false, false, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm(0.123, inchesToCmConv, '', false, false, false, true, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm(0.123, inchesToCmConv, '', false, true, false, false, false, false, false, false), ' (3 mm)˜');
+    assert.equal(convAndForm(0.123, inchesToCmConv, '', false, true, false, true, false, false, false, false), ' (3.1 mm)˜');
 
     // surfaces and volumes
-    assert.equal(convAndForm(100, 3, '', false, false, false, false, false, false, false, false), ' (30.48 m)˜');
-    assert.equal(convAndForm(100, 3, '²', false, false, false, false, false, false, false, false), ' (9.29 m²)˜');
-    assert.equal(convAndForm(100, 3, '³', false, false, false, false, false, false, false, false), ' (2,831.69 L)˜');
+    const feetToMConv = conversions[3];
+    assert(feetToMConv);
+    assert.equal(convAndForm(100, feetToMConv, '', false, false, false, false, false, false, false, false), ' (30.48 m)˜');
+    assert.equal(convAndForm(100, feetToMConv, '²', false, false, false, false, false, false, false, false), ' (9.29 m²)˜');
+    assert.equal(convAndForm(100, feetToMConv, '³', false, false, false, false, false, false, false, false), ' (2,831.69 L)˜');
 
     // US customary units vs imperial units
-    assert.equal(convAndForm(100, 9, '', false, false, false, false, false, false, false, false), ' (2,957 mL)˜');
-    assert.equal(convAndForm(100, 9, '', true, false, false, false, false, false, false, false), ' (2,841 mL)˜');
+    const fluidOncesToMlConv = conversions[9];
+    assert(fluidOncesToMlConv);
+    assert.equal(convAndForm(100, fluidOncesToMlConv, '', false, false, false, false, false, false, false, false), ' (2,957 mL)˜');
+    assert.equal(convAndForm(100, fluidOncesToMlConv, '', true, false, false, false, false, false, false, false), ' (2,841 mL)˜');
 }
 
 function testEvaluateFraction() {
@@ -129,8 +137,8 @@ function testReplaceMilesPerGallon() {
 }
 
 function testReplaceOtherUnits() {
-    assert.equal(replaceOtherUnits('30 miles', false, false, false, false, false, false), '30 miles (48.28 km)˜');
-    assert.equal(replaceOtherUnits('30 miles²', false, false, false, false, false, false), '30 miles² (77.7 km²)˜');
+    assert.equal(replaceOtherUnits('30 miles', false, false, false, false, false, false, false, false, false), '30 miles (48.28 km)˜');
+    assert.equal(replaceOtherUnits('30 miles²', false, false, false, false, false, false, false, false, false), '30 miles² (77.7 km²)˜');
 }
 
 function testReplacePoundsAndOunces() {
