@@ -241,22 +241,22 @@ function procNode(textNode) {
     }
    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) ||
         /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
-        text = AxAqq(text);
+        text = replaceIkeaSurface(text);
         if (includeQuotes)
-            text = feetInch(text);
-        text = AxAxAin(text);
-        text = AxAin(text);
-        text = AxAft(text);
-        text = ftin2m(text);
-        text = lboz2kg(text);
-        text = processAll(text);
-        text = mpg2Lper100km(text);
+            text = replaceFeetAndInchesSymbol(text);
+        text = replaceVolume(text);
+        text = replaceSurfaceInInches(text);
+        text = replaceSurfaceInFeet(text);
+        text = replaceFeetAndInches(text);
+        text = replacePoundsAndOunces(text);
+        text = replaceOtherUnits(text);
+        text = replaceMilesPerGallon(text);
         text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
         textNode.nodeValue = text;
     }
 }
 
-function mpg2Lper100km(text) {
+function replaceMilesPerGallon(text) {
 
     let regex = new RegExp(regstart + intOrFloat + '[ \u00A0]?mpgs?' + unitSuffix + ')', 'ig');
 
@@ -295,7 +295,7 @@ function mpg2Lper100km(text) {
     return text;
 }
 
-function processAll(text) {
+function replaceOtherUnits(text) {
 
     const len = units.length;
     for (let i = 0; i < len; i++) {
@@ -454,7 +454,7 @@ function convert(imp, multiplier, round) {
 }
 
 //1 x 2 x 3
-function AxAxAin(text) {
+function replaceVolume(text) {
 
     let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[ \u00A0]?[x\*×][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?[x\*×][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?in(ch|ches|.)?)' + unitSuffix, 'ig');
 
@@ -489,7 +489,7 @@ function AxAxAin(text) {
     return text;
 }
 
-function AxAqq(text) {//ikea US
+function replaceIkeaSurface(text) {//ikea US
 
 
     //let regex = new RegExp('((?<!\/)(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x\*×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
@@ -552,7 +552,7 @@ function AxAqq(text) {//ikea US
 }
 
 // 1 x 2 in
-function AxAin(text) {
+function replaceSurfaceInInches(text) {
 
     let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?in(ch|ches|\.)?)' + unitSuffix, 'ig');
 
@@ -590,7 +590,7 @@ function AxAin(text) {
 
 // 1 x 2 ft
 // 1' x 2'
-function AxAft(text) {
+function replaceSurfaceInFeet(text) {
 
     let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[\'′’]?[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?(feet|foot|ft|[\'′’]))(?![0-9])' + unitSuffix, 'ig');
 
@@ -629,7 +629,7 @@ function hasNumber(myString) {
 
 
 //1' 2"
-function feetInch(text) {
+function replaceFeetAndInchesSymbol(text) {
 
     /*let regex = new RegExp('([°º]? ?(([0-9]{0,3})[\'’′][\-− \u00A0]?)?(([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]?([^ a-z,\?\.\!\]]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)'+unitSuffix+')|(["″”“\n])', 'g');  from v3.1*/
 
@@ -749,7 +749,7 @@ function feetInch(text) {
 }
 
 //1 ft 2 in
-function ftin2m(text) {
+function replaceFeetAndInches(text) {
     let regex = new RegExp('(([0-9]{0,3}).?(ft|yd|foot|feet).?([0-9]+(\.[0-9]+)?).?in(ch|ches)?)', 'g');
     if (text.search(regex) !== -1) {
         let matches;
@@ -781,7 +781,7 @@ function ftin2m(text) {
 }
 
 // 1 lb 2 oz
-function lboz2kg(text) {
+function replacePoundsAndOunces(text) {
     let regex = new RegExp('(([0-9]{0,3}).?(lbs?).?([0-9]+(\.[0-9]+)?).?oz)', 'g');
     if (text.search(regex) !== -1) {
         let matches;
