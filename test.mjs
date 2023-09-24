@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, replaceFahrenheit, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -46,6 +46,19 @@ function testInsertAt() {
     assert.equal(insertAt('hello world', 'everyone in the ', 6), 'hello everyone in the world');
     assert.equal(insertAt('hello world', 'welcome, and ', 0), 'welcome, and hello world');
     // TODO: what should happen with index = -1? with index=999?
+}
+
+function testReplaceFahrenheit() {
+    assert.equal(replaceFahrenheit('Saying 212 °F is the same as saying 100°C', false, false, false, false, false, false, false, false), 'Saying 212 °F (100°C)˜ is the same as saying 100°C');
+
+    assert.equal(replaceFahrenheit('(212 °)', false, false, false, false, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', false, false, true, false, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', false, true, false, false, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', false, true, true, false, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', true, false, false, false, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', true, false, true, false, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', true, true, false, false, false, false, false, false), '(212 °) (100°C)˜');
+    assert.equal(replaceFahrenheit('(212 °)', true, true, true, false, false, false, false, false), '(212 °) (373.15K)˜');
 }
 
 function testRoundNicely() {
@@ -112,6 +125,7 @@ function main() {
     testFormatConvertedValue();
     testFormatNumber();
     testInsertAt();
+    testReplaceFahrenheit();
     testRoundNicely();
     testStepUpOrDown();
     testShouldConvert();
