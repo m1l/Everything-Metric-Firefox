@@ -497,15 +497,21 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
         if (!shouldConvert(match[0], convertBracketed)) {
             continue;
         }
+        const dim1 = match[1];
+        const dim2 = match[2];
+        const dim3 = match[3];
+        if (!dim1 || !dim2 || !dim3) {
+            continue;
+        }
         let scale = 2.54;
         let unit = spc + "cm";
         if (useMM === true) {
             scale = 25.4;
             unit = spc + "mm"
         }
-        const cm1 = formatNumber(roundNicely(match[1] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(match[2] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm3 = formatNumber(roundNicely(match[3] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm3 = formatNumber(roundNicely(parseNumber(dim3) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2} × ${cm3}`, ` ${unit}`, useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], metStr);
     }
