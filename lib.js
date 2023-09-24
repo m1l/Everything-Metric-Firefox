@@ -475,15 +475,15 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
     const regex = new RegExp(
         [
             '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(\.[0-9]+)?)', // number
+            '([0-9]+(?:\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
             '[x\*×]', // multiplication sign
             '[ \u00A0]?', // space or no-break space
-            '([0-9]+(\.[0-9]+)?)', // number
+            '([0-9]+(?:\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
             '[x\*×]', // multiplication sign
             '[ \u00A0]?', // space or no-break space
-            '([0-9]+(\.[0-9]+)?)', // number
+            '([0-9]+(?:\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
             'in(ch|ches|.)?', // unit
             // check for already present conversion to metric
@@ -504,8 +504,8 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
             unit = spc + "mm"
         }
         const cm1 = formatNumber(roundNicely(match[1] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(match[3] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm3 = formatNumber(roundNicely(match[5] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(match[2] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm3 = formatNumber(roundNicely(match[3] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2} × ${cm3}`, ` ${unit}`, useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], metStr);
     }
