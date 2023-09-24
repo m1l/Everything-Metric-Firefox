@@ -833,6 +833,20 @@ function convert(imp, multiplier, forceRounding, useRounding) {
     return roundNicely(met, useRounding);
 }
 
+/** Convert and format an unit from unit at unitIndex into metric
+ *  @param {number} imp - The value, possibly in imperial units
+ *  @param {number} unitIndex - The index of the unit in the units array
+ *  @param {string} suffix - Optional '²' or '³'
+ *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - The converted and formatted value
+*/
 function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     let multiplier = units[unitIndex].multiplier;
     if (isUK === true && units[unitIndex].multiplierimp !== undefined)
