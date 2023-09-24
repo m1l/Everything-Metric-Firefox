@@ -231,7 +231,7 @@ function procNode(textNode) {
             text = replaceFeetAndInchesSymbol(text);
         text = replaceVolume(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-        text = replaceSurfaceInFeet(text);
+        text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceFeetAndInches(text);
         text = replacePoundsAndOunces(text);
         text = replaceOtherUnits(text);
@@ -499,41 +499,6 @@ function replaceIkeaSurface(text) {//ikea US
 
 
 }
-
-// 1 x 2 ft
-// 1' x 2'
-function replaceSurfaceInFeet(text) {
-
-    let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[\'′’]?[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?(feet|foot|ft|[\'′’]))(?![0-9])' + unitSuffix, 'ig');
-
-    if (text.search(regex) !== -1) {
-        let matches;
-
-        while ((matches = regex.exec(text)) !== null) {
-            try {
-                const fullMatch = matches[1];
-                if (/[0-9][xX\*×][ \u00A0][0-9]/.test(fullMatch))
-                    continue; //it is 2x 2ft something so no conversion
-                if (!shouldConvert(matches[0], convertBracketed)) continue;
-
-                let scale = 0.3048;
-                let unit = spc + "m";
-
-                let m1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
-                let m2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
-
-                const metStr = formatConvertedValue(m1 + spc + "×" + spc + m2, spc + unit, useBold, useBrackets);
-
-                //text = text.replace(matches[0], metStr);
-                text = replaceMaybeKeepLastChar(text, matches[0], metStr);
-            } catch (err) {
-                //console.log(err.message);
-            }
-        }
-    }
-    return text;
-}
-
 
 function hasNumber(myString) {
     return /\d/.test(myString);

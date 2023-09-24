@@ -576,4 +576,36 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches };
+function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+
+    let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[\'′’]?[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?(feet|foot|ft|[\'′’]))(?![0-9])' + unitSuffix, 'ig');
+
+    if (text.search(regex) !== -1) {
+        let matches;
+
+        while ((matches = regex.exec(text)) !== null) {
+            try {
+                const fullMatch = matches[1];
+                if (/[0-9][xX\*×][ \u00A0][0-9]/.test(fullMatch))
+                    continue; //it is 2x 2ft something so no conversion
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
+
+                let scale = 0.3048;
+                let unit = spc + "m";
+
+                let m1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+                let m2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+
+                const metStr = formatConvertedValue(m1 + spc + "×" + spc + m2, spc + unit, useBold, useBrackets);
+
+                //text = text.replace(matches[0], metStr);
+                text = replaceMaybeKeepLastChar(text, matches[0], metStr);
+            } catch (err) {
+                //console.log(err.message);
+            }
+        }
+    }
+    return text;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet };
