@@ -1340,7 +1340,6 @@ function replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga
             }
             let suffix = '';
 
-            const fullMatch = match[1];
             let imp = match[2];
 
             if (match[2] !== undefined) {
@@ -1384,7 +1383,7 @@ function replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga
 
             const metStr = convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
 
-            let insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
+            let insertIndex = match.index + convertedValueInsertionOffset(match[0]);
             insertIndex = insertIndex - subtract; //subtracts behind bracket
             text = insertAt(text, metStr, insertIndex);
         }
