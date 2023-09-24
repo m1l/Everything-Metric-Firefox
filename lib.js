@@ -662,13 +662,21 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        const yards_or_feet = parseFloat(match[1]);
-        const inches = parseFloat(match[3]);
+        const dim1 = match[1];
+        const larger_unit = match[2];
+        const dim2 = match[3];
+        if (!dim1 || !larger_unit ||!dim2) {
+            continue;
+        }
+
+        const yards_or_feet = parseFloat(dim1);
+        const inches = parseFloat(dim2);
 
         const is_yards = new RegExp('yd', 'i');
-        const feet = is_yards.test(match[2]) ? yards_or_feet * 3 : yards_or_feet;
+        const feet = is_yards.test(larger_unit) ? yards_or_feet * 3 : yards_or_feet;
         const total = feet * 12 + inches;
-        const meter = formatConvertedValue(roundNicely(total * 0.0254, useRounding), ' m', useBold, useBrackets);
+        const m = formatNumber(roundNicely(total * 0.0254, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const meter = formatConvertedValue(m, ' m', useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], meter);
     }
     return text;
