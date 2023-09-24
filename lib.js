@@ -207,6 +207,11 @@ function shouldConvert(text, convertBracketed) {
     }
 }
 
+/** Convert a temperature from Fahrenheit to Celsius
+ *  @param {number} f - A value in Fahrenheit
+ *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @return {number} - The value in Celsius
+*/
 function convertToC(f, useKelvin) {
     let met = (5 / 9) * (f - 32);
     if (useKelvin)
