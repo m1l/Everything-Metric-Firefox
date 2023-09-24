@@ -189,4 +189,12 @@ function insertAt(target, toInsert, index) {
     return target.substr(0, index) + toInsert + target.substr(index);
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt };
+function isAlreadyConverted(text, convertBracketed){
+    if ((convertBracketed && /[\(]/.test(text.substring(1))) ||
+       (!convertBracketed && /[\(\)]/.test(text)) ||
+       /\u3010/.test(text))
+        return true;
+    return false;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, isAlreadyConverted };
