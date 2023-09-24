@@ -227,7 +227,7 @@ function replaceOtherUnits(text) {
                         suffix = '³';
 
 
-                    const metStr = convAndForm(imp, i, suffix);
+                    const metStr = convAndForm(imp, i, suffix, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
 
                     let insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
                     insertIndex = insertIndex - subtract; //subtracts behind bracket
@@ -241,61 +241,6 @@ function replaceOtherUnits(text) {
     }
 
     return text;
-}
-
-function convAndForm(imp, unitIndex, suffix) {
-    let multiplier = units[unitIndex].multiplier;
-    if (isUK === true && units[unitIndex].multiplierimp !== undefined)
-        multiplier = units[unitIndex].multiplierimp;
-    let unit = units[unitIndex].unit;
-    if (useMM === true && units[unitIndex].multiplier2 !== undefined) {
-        unit = units[unitIndex].unit2;
-        multiplier = units[unitIndex].multiplier2;
-    }
-    const forceRounding = (useRounding === false &&
-        ((useMM === true && units[unitIndex].multiplier2 !== undefined && units[unitIndex].fullround) || units[unitIndex].forceround));
-
-    var met;
-    /*if (unitIndex < 2 ) {
-        met = fahrenheitToCelsius(imp, useKelvin);
-        if (useKelvin) {
-            met += 273.15;
-            met = roundNicely(met, useRounding);
-            unit = 'K';
-        }
-    } else*/
-    if (suffix === '²')
-        met = convert(imp, Math.pow(multiplier, 2), forceRounding);
-    else if (suffix === '³') {
-        met = convert(imp, units[unitIndex].multipliercu, forceRounding);
-        unit = 'L';
-        suffix = '';
-    } else {
-        met = convert(imp, multiplier, forceRounding);
-        let r = stepUpOrDown(met, unit, useMM, useGiga);
-
-        met = roundNicely(r.met, useRounding);
-        unit = r.unit;
-    }
-
-    if (met === 100 && unit === 'cm' && useMM === false) {
-        met = 1;
-        unit = 'm';
-
-    } else if (met === 1000 && unit === 'mm' && useMM === true) {
-        met = 1;
-        unit = 'm';
-    }
-
-    met = formatNumber(met, useComma, useSpaces);
-    return formatConvertedValue(met, spc + unit + suffix, useBold, useBrackets);
-}
-
-function convert(imp, multiplier, forceRounding) {
-    let met = imp * multiplier;
-    if (forceRounding)
-        return Math.round(met);
-    return roundNicely(met, useRounding);
 }
 
 function replaceIkeaSurface(text) {//ikea US
@@ -471,9 +416,9 @@ function replaceFeetAndInchesSymbol(text) {
 
             let metStr = '';
             if (total > 3)
-                metStr = convAndForm(feet + inches / 12, 2, ''); //2 feet
+                metStr = convAndForm(feet + inches / 12, 2, '', isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets); //2 feet
             else
-                metStr = convAndForm(feet * 12 + inches, 1, ''); //1 inch
+                metStr = convAndForm(feet * 12 + inches, 1, '', isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets); //1 inch
             const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
 
             text = insertAt(text, metStr, insertIndex);
@@ -564,7 +509,7 @@ function ParseUnitsOnly(text) {
         while ((matches = units[i].regexUnit.exec(text)) !== null) {
             try {
 
-                const metStr = convAndForm(lastquantity, i, "");
+                const metStr = convAndForm(lastquantity, i, "", isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
                 const fullMatch = matches[0];
                 const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
 

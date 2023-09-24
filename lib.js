@@ -826,4 +826,59 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches };
+function convert(imp, multiplier, forceRounding, useRounding) {
+    let met = imp * multiplier;
+    if (forceRounding)
+        return Math.round(met);
+    return roundNicely(met, useRounding);
+}
+
+function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+    let multiplier = units[unitIndex].multiplier;
+    if (isUK === true && units[unitIndex].multiplierimp !== undefined)
+        multiplier = units[unitIndex].multiplierimp;
+    let unit = units[unitIndex].unit;
+    if (useMM === true && units[unitIndex].multiplier2 !== undefined) {
+        unit = units[unitIndex].unit2;
+        multiplier = units[unitIndex].multiplier2;
+    }
+    const forceRounding = (useRounding === false &&
+        ((useMM === true && units[unitIndex].multiplier2 !== undefined && units[unitIndex].fullround) || units[unitIndex].forceround));
+
+    var met;
+    /*if (unitIndex < 2 ) {
+        met = fahrenheitToCelsius(imp, useKelvin);
+        if (useKelvin) {
+            met += 273.15;
+            met = roundNicely(met, useRounding);
+            unit = 'K';
+        }
+    } else*/
+    if (suffix === '²')
+        met = convert(imp, Math.pow(multiplier, 2), forceRounding, useRounding);
+    else if (suffix === '³') {
+        met = convert(imp, units[unitIndex].multipliercu, forceRounding, useRounding);
+        unit = 'L';
+        suffix = '';
+    } else {
+        met = convert(imp, multiplier, forceRounding, useRounding);
+        let r = stepUpOrDown(met, unit, useMM, useGiga);
+
+        met = roundNicely(r.met, useRounding);
+        unit = r.unit;
+    }
+
+    if (met === 100 && unit === 'cm' && useMM === false) {
+        met = 1;
+        unit = 'm';
+
+    } else if (met === 1000 && unit === 'mm' && useMM === true) {
+        met = 1;
+        unit = 'm';
+    }
+
+    met = formatNumber(met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+    return formatConvertedValue(met, spc + unit + suffix, useBold, useBrackets);
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm };
