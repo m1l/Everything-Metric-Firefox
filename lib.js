@@ -923,7 +923,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
     if (includeImproperSymbols) {
         feetInchRegex = new RegExp(
             [
-                '(',
+                '(?:',
                     '[°º]?', // optional degree marker, TODO: don't know why
                     // feet
                     '(',
@@ -972,7 +972,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
     } else {
         feetInchRegex = new RegExp(
             [
-                '(',
+                '(?:',
                     '[°º]?', // optional degree marker, TODO: don't know why
                     // feet
                     '(',
@@ -1051,7 +1051,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[9] !== undefined && match[9]==='\n') {
+            if (match[8] !== undefined && match[8]==='\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
@@ -1074,12 +1074,12 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 continue;
         }
 
-        let feet = parseFloat(match[3]);
+        let feet = parseFloat(match[2]);
         if (isNaN(feet)) {
             feet = 0;
         }
 
-        let inches = match[6];
+        let inches = match[5];
         if (inches !== undefined && inches.length<5) {//someone used , instead of . for decimals
             inches = inches.replace(',', '.');
         }
@@ -1088,8 +1088,8 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             inches = 0;
         }
 
-        if (match[7] !== undefined) {
-            inches += evaluateFraction(match[7]);
+        if (match[6] !== undefined) {
+            inches += evaluateFraction(match[6]);
         }
 
         if (inches === 0 || isNaN(inches)) {
