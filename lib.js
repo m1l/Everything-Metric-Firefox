@@ -1078,16 +1078,16 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             continue;
         }
 
-        let feet = parseFloat(match[1]);
+        let feet = parseFloat(match[1] || '0');
         if (isNaN(feet)) {
             feet = 0;
         }
 
-        let inches = match[2];
-        if (inches !== undefined && inches.length<5) {//someone used , instead of . for decimals
-            inches = inches.replace(',', '.');
+        let inchesStr = match[2] || '0';
+        if (inchesStr.length < 5) { // guess when comma use as decimal separator
+            inchesStr = inchesStr.replace(',', '.');
         }
-        inches = parseFloat(inches);
+        let inches = parseFloat(inchesStr);
         if (isNaN(inches)) {
             inches = 0;
         }
