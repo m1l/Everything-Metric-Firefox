@@ -911,4 +911,123 @@ function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, 
     return formatConvertedValue(met, spc + unit + suffix, useBold, useBrackets);
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm };
+function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+
+    /*let regex = new RegExp('([°º]? ?(([0-9]{0,3})[\'’′][\-− \u00A0]?)?(([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]?([^ a-z,\?\.\!\]]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)'+unitSuffix+')|(["″”“\n])', 'g');  from v3.1*/
+
+    //let regex = new RegExp('([°ºa-z]?( {0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?(([\.0-9]+(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)(?! [\(][0-9]| ?\u200B\u3010)([^a-z]|$))|(\d["″”“\n])', 'g');
+    //(\d?["″”“\n]) is here if there is a quote we want to match it but if the number is in front then it was one of the discarded matches from above
+    //in 1' 2-3/4"
+    //1 is g3
+    //2 is g5
+    //3/4 is g6
+    //if (!hasNumber(text))
+    //    return text;
+    //console.log(text);
+    /*let regex;
+    regex = new RegExp('(([°º]?([ \u00A0a-z]{0,1}([0-9]{1,3})[\'’′][\-− \u00A0]?)?((([\.,0-9]+)(?!\/)(?:[\-− \u00A0]?))?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9\.]+)?)? ?(\"|″|\”|“|’’|\'\'|′′))|(["″”“\n]))(?! [\(][0-9]| ?\u200B\u3010)', 'gi');*/
+    //in 1' 2-3/4"
+    //1 is g4
+    //2 is g7
+    //3/4 is g8
+    //" is g9
+    let matches;
+
+    let lastQuoteOpen = false;
+    while ((matches = feetInchRegex.exec(text)) !== null) {
+        try {
+
+            /*console.log(lastQuoteOpen);
+            for (var i=0; i<matches.length; i++)
+                console.log("matches " + i + " " + matches[i]);
+            console.log("------------------");*/
+            const fullMatch = matches[1];
+
+            if (includeImproperSymbols) {
+
+                if (lastQuoteOpen) {
+                    lastQuoteOpen = false;
+                    continue;
+                    }
+
+                if (matches[10]!==undefined && matches[10]==='\n') {
+                    lastQuoteOpen = false; //new line, ignore
+                    continue;
+                }
+
+                if (!hasNumber(matches[1]) && !/[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(matches[1])) {
+                    lastQuoteOpen = !lastQuoteOpen;
+                    continue;
+                }
+            }
+
+
+            if (!shouldConvert(matches[0], convertBracketed)) continue;
+
+            /*if (/“/.test(fullMatch)) {
+                lastQuoteOpen = true;
+                continue;
+            }*/
+
+            /*if (!hasNumber(fullMatch) && !/[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/.test(fullMatch)) {
+                lastQuoteOpen = !lastQuoteOpen;
+                continue;
+            }*/
+            /*if (lastQuoteOpen === true) {
+                lastQuoteOpen = false;
+                continue;
+            }*/
+
+            //if (/[\(]/.test(matches[9])) continue;
+
+            if (/[°º]/.test(fullMatch.charAt(0))) {
+                continue;
+            }
+            if (/[a-z]/i.test(fullMatch.charAt(0)) &&
+               !/[x]/i.test(fullMatch.charAt(0))) {
+                //if (!/x/i.test(fullMatch.charAt(0))) //maybe we don't care
+                lastQuoteOpen = !lastQuoteOpen;
+                    continue;
+            }
+
+            let feet = parseFloat(matches[4]);
+            if (isNaN(feet)) feet = 0;
+
+            let inches = matches[7];
+            if (inches!==undefined && inches.length<5) //someone used , instead of . for decimals
+                inches=inches.replace(',', '.');
+
+
+            /*if (/[⁄]/.test(matches[5])) { //improvisation, but otherwise 1⁄2 with register 1 as in
+                matches[7] = matches[5];
+                inches = 0;
+            } else {*/
+                inches = parseFloat(inches);
+                if (isNaN(inches)) inches = 0;
+            //}
+
+            if (matches[8] !== undefined)
+                inches += evaluateFraction(matches[8]);
+
+
+            if (inches === 0 || isNaN(inches)) continue;
+
+            let total = feet + (inches / 12);
+
+            let metStr = '';
+            if (total > 3)
+                metStr = convAndForm(feet + inches / 12, 2, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets); //2 feet
+            else
+                metStr = convAndForm(feet * 12 + inches, 1, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets); //1 inch
+            const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
+
+            text = insertAt(text, metStr, insertIndex);
+
+        } catch (err) {
+            console.log(err.message);
+        }
+    }
+    return text;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, replaceFeetAndInchesSymbol };
