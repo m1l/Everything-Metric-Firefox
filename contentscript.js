@@ -356,10 +356,10 @@ function mpg2Lper100km(text) {
                 if (imp === 0 || isNaN(imp)) continue;
                 var l = 235.214583 / imp; // 100 * 3.785411784 / 1.609344 * imp;
                 var met = convert(l, 1, false);
-                //met = formatNumber(met, useComma, useSpaces);
+                met = formatNumber(met, useComma, useSpaces);
 
                 const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
-                const metStr = formatConvertedValue(met, '\u00A0L\/100\u00A0km', false);
+                const metStr = formatConvertedValue(met, '\u00A0L\/100\u00A0km', true);
                 text = insertAt(text, metStr, insertIndex);
             } catch (err) {
                 //console.log(err.message);
@@ -527,7 +527,8 @@ function convAndForm(imp, unitIndex, suffix) {
         unit = 'm';
     }
 
-    return formatConvertedValue(met, spc + unit + suffix, false);
+    met = formatNumber(met, useComma, useSpaces);
+    return formatConvertedValue(met, spc + unit + suffix, true);
 }
 
 function convert(imp, multiplier, round) {
