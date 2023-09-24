@@ -459,6 +459,17 @@ function replaceMaybeKeepLastChar(haystack, needle, replacement) {
     }
 }
 
+/** Return a new string where all occurrences of volumes (“L×l×h in”) have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric volumes
+*/
 function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
 
     let regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[ \u00A0]?[x\*×][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?[x\*×][ \u00A0]?([0-9]+(\.[0-9]+)?)[ \u00A0]?in(ch|ches|.)?)' + unitSuffix, 'ig');
