@@ -327,7 +327,19 @@ function formatConvertedValue(number, rest, useBold, useBrackets) {
     return fullstring;
 }
 
-function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets) {
+/** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric temperatures
+*/
+function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
 
     let regex = new RegExp('([\(]?([\-−])?(([0-9,\.]+)( to | and |[\-−]))?([\-0-9,\.]+)[ \u00A0]?(((°|º|deg(rees)?)[ \u00A0]?' + ( degWithoutFahrenheit ? '': 'F(ahrenheits?)?' ) + ')|(Fahrenheits?)|[\u2109])(?! ?[\(][0-9]| ?\u200B\u3010)([^a-z]|$))', 'ig');
 
@@ -359,7 +371,7 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
                         met1 = roundNicely(met1, useRounding);
                     }
 
-                    met1 = formatNumber(met1, useComma, useSpaces);
+                    met1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
                 }
 
                 if ((/[\-−]/.test(imp2.charAt(0))) ||
@@ -382,7 +394,7 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
                     met2 = roundNicely(met2, useRounding);
                 }
 
-                met2 = formatNumber(met2, useComma, useSpaces);
+                met2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
                 var met='';
                 if (imp1!==undefined)
