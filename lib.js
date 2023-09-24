@@ -1159,4 +1159,43 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces };
+function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+
+    let regex = new RegExp(regstart + intOrFloat + '[ \u00A0]?mpgs?' + unitSuffix + ')', 'ig');
+
+    if (text.search(regex) !== -1) {
+        let matches;
+
+        while ((matches = regex.exec(text)) !== null) {
+            try {
+                //console.log(matches[0]);
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
+                const fullMatch = matches[1];
+
+                //for (var i=0; i<matches.length; i++)
+                //console.log("matches " + i + " " + matches[i])
+
+                var imp = matches[2];
+                if (imp !== undefined) {
+                    imp = imp.replace(',', '');
+                }
+
+                imp = parseFloat(imp);
+
+                if (imp === 0 || isNaN(imp)) continue;
+                var l = 235.214583 / imp; // 100 * 3.785411784 / 1.609344 * imp;
+                var met = roundNicely(l, useRounding);
+                met = formatNumber(met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+
+                const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
+                const metStr = formatConvertedValue(met, '\u00A0L\/100\u00A0km', useBold, useBrackets);
+                text = insertAt(text, metStr, insertIndex);
+            } catch (err) {
+                //console.log(err.message);
+            }
+        }
+    }
+    return text;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon };
