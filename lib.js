@@ -428,6 +428,12 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     return text;
 }
 
+/** Return a new string where match has been replaced with metStr in text
+ *  @param {string} text - Where to search for the pattern
+ *  @param {string} match - The pattern to be replaced
+ *  @param {string} metStr - The replacement
+ *  @return {string} - Text, where match has been replaced with metStr
+*/
 function replaceMaybeKeepLastChar(text, match, metStr) {
     let lastchar = match[match.length -1];
     //console.log("replacing " + match + " with " + metStr + /[^a-z"″”“’'′]/i.test(lastchar));
