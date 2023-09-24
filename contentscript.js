@@ -91,7 +91,7 @@ function procNode(textNode) {
         text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replacePoundsAndOunces(text, convertBracketed, useRounding, useComma, useSpaces, useBold, useBrackets);
-        text = replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
+        text = replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceMilesPerGallon(text, convertBracketed, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
         textNode.nodeValue = text;

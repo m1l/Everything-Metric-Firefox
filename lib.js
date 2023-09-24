@@ -1199,6 +1199,7 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
 
 /** Return a new string where all occurrences of other non-metric units have been converted to metric
  *  @param {string} text - The original text
+ *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
@@ -1210,7 +1211,7 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric units
 */
-function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     const len = conversions.length;
     for (let conversionIndex = 0; conversionIndex < len; conversionIndex++) {
         const conversion = conversions[conversionIndex];
