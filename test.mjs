@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -124,6 +124,10 @@ function testReplaceMaybeKeepLastChar() {
     assert.equal(replaceMaybeKeepLastChar('Hello, World!', 'World!', 'Everyone'), 'Hello, Everyone!');
 }
 
+function testReplaceMilesPerGallon() {
+    assert.equal(replaceMilesPerGallon('12 mpg', false, false, false, false, false, false), '12 mpg (19.6 L/100 km)˜');
+}
+
 function testReplacePoundsAndOunces() {
     // TODO: the original value should not be removed
     assert.equal(replacePoundsAndOunces('1 lb 2 oz'), ' (0.51 kg)˜');
@@ -214,6 +218,7 @@ function main() {
     testReplaceFeetAndInches();
     testReplaceFeetAndInchesSymbol();
     testReplaceMaybeKeepLastChar();
+    testReplaceMilesPerGallon();
     testReplacePoundsAndOunces();
     testReplaceSurfaceInFeet();
     testReplaceSurfaceInInches();
