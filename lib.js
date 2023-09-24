@@ -238,8 +238,8 @@ function roundNicely(v, useRounding) {
         // try rounding to 1 decimal place
         const dec1 = Math.round(v * 10) / 10;
         const relative_error1 = Math.abs(1 - (v / dec1));
-        if (relative_error1 < .016) {
-            // relative error is less than 1.6 %, OK
+        if (relative_error1 < .03) {
+            // relative error is less than 3 %, OK
             return dec1;
         }
     }
