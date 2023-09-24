@@ -911,6 +911,20 @@ function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, 
     return formatConvertedValue(met, spc + unit + suffix, useBold, useBrackets);
 }
 
+/** Return a new string where all occurrences of lengths in feet and inches (“1' 2"”) have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {boolean} includeImproperSymbols - Whether to use unofficial symbols for feet and inches
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric lengths
+*/
 function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
 
     /*let regex = new RegExp('([°º]? ?(([0-9]{0,3})[\'’′][\-− \u00A0]?)?(([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]?([^ a-z,\?\.\!\]]|[0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)'+unitSuffix+')|(["″”“\n])', 'g');  from v3.1*/
