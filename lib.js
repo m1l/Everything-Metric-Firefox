@@ -195,11 +195,16 @@ function insertAt(target, toInsert, index) {
  *  @return {boolean} - Whether the value should not be converted to metric
 */
 function shouldConvert(text, convertBracketed) {
-    if ((convertBracketed && /[\(]/.test(text.substring(1))) ||
-       (!convertBracketed && /[\(\)]/.test(text)) ||
-       /\u3010/.test(text))
+    if (/\u3010/.test(text)) { // the text contains 【
         return false;
-    return true;
+    }
+    if (convertBracketed) {
+        // if the value is followed by a parenthesis, it is probably already converted. ex: 1 in (2.54 cm)
+        return !/[\(]/.test(text.substring(1));
+    } else {
+        // if the text has parentheses, it is either within parentheses, or probably already converted
+        return !/[\(\)]/.test(text);
+    }
 }
 
 module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert };

@@ -399,9 +399,6 @@ function processAll(text) {
 
             while ((matches = units[i].regex.exec(text)) !== null) {
                 try {
-
-                    //includes a bracket, it is probably already converted. ex: 1 in (2.54 cm)
-
                     if (!shouldConvert(matches[0], convertBracketed)) continue;
 
                     if ((matches[2] !== undefined) && (/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(matches[2]) === false)) continue;
