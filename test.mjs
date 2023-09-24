@@ -8,22 +8,22 @@ function testBold() {
 }
 
 function testConvAndForm() {
-    assert.equal(convAndForm('100', 0, '', false, false, false, false, false, false, false, false), ' (100 °C)˜');
+    assert.equal(convAndForm(100, 0, '', false, false, false, false, false, false, false, false), ' (100 °C)˜');
 
     // useMM and useRounding interact in subtle ways
-    assert.equal(convAndForm('0.123', 1, '', false, false, false, false, false, false, false, false), ' (3.1 mm)˜');
-    assert.equal(convAndForm('0.123', 1, '', false, false, false, true, false, false, false, false), ' (3.1 mm)˜');
-    assert.equal(convAndForm('0.123', 1, '', false, true, false, false, false, false, false, false), ' (3 mm)˜');
-    assert.equal(convAndForm('0.123', 1, '', false, true, false, true, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm(0.123, 1, '', false, false, false, false, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm(0.123, 1, '', false, false, false, true, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm(0.123, 1, '', false, true, false, false, false, false, false, false), ' (3 mm)˜');
+    assert.equal(convAndForm(0.123, 1, '', false, true, false, true, false, false, false, false), ' (3.1 mm)˜');
 
     // surfaces and volumes
-    assert.equal(convAndForm('100', 3, '', false, false, false, false, false, false, false, false), ' (30.48 m)˜');
-    assert.equal(convAndForm('100', 3, '²', false, false, false, false, false, false, false, false), ' (9.29 m²)˜');
-    assert.equal(convAndForm('100', 3, '³', false, false, false, false, false, false, false, false), ' (2,831.69 L)˜');
+    assert.equal(convAndForm(100, 3, '', false, false, false, false, false, false, false, false), ' (30.48 m)˜');
+    assert.equal(convAndForm(100, 3, '²', false, false, false, false, false, false, false, false), ' (9.29 m²)˜');
+    assert.equal(convAndForm(100, 3, '³', false, false, false, false, false, false, false, false), ' (2,831.69 L)˜');
 
     // US customary units vs imperial units
-    assert.equal(convAndForm('100', 9, '', false, false, false, false, false, false, false, false), ' (2,957 mL)˜');
-    assert.equal(convAndForm('100', 9, '', true, false, false, false, false, false, false, false), ' (2,841 mL)˜');
+    assert.equal(convAndForm(100, 9, '', false, false, false, false, false, false, false, false), ' (2,957 mL)˜');
+    assert.equal(convAndForm(100, 9, '', true, false, false, false, false, false, false, false), ' (2,841 mL)˜');
 }
 
 function testEvaluateFraction() {
@@ -104,19 +104,19 @@ function testReplaceFahrenheit() {
 
 function testReplaceFeetAndInches() {
     // TODO: the original value should not be removed
-    assert.equal(replaceFeetAndInches('1 ft 2 in', false, false, false, false, false, false), ' (0.36 m)˜');
-    assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false, false), ' (0.97 m)˜');
+    assert.equal(replaceFeetAndInches('1 ft 2 in', false, false, false, false, false, false, false), ' (0.36 m)˜');
+    assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false, false, false), ' (0.97 m)˜');
 }
 
 function testReplaceFeetAndInchesSymbol() {
     setIncludeImproperSymbols(false);
-    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false), '1\' 2"');
+    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false, false, false, false, false), '1\' 2"');
 
     setIncludeImproperSymbols(true);
     // TODO: the original value should not be removed
-    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', true, false, false, false, false, false), '1\' 2" (35.56 cm)˜');
-    assert.equal(replaceFeetAndInchesSymbol('3"', true, false, false, false, false, false), '3" (7.62 cm)˜');
-    assert.equal(replaceFeetAndInchesSymbol('"they were 3"', true, false, false, false, false, false), '"they were 3"');
+    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', true, false, false, false, false, false, false, false, false, false), '1\' 2" (35.56 cm)˜');
+    assert.equal(replaceFeetAndInchesSymbol('3"', true, false, false, false, false, false, false, false, false, false), '3" (7.62 cm)˜');
+    assert.equal(replaceFeetAndInchesSymbol('"they were 3"', true, false, false, false, false, false, false, false, false, false), '"they were 3"');
 }
 
 function testReplaceMaybeKeepLastChar() {
@@ -130,22 +130,22 @@ function testReplaceMilesPerGallon() {
 
 function testReplacePoundsAndOunces() {
     // TODO: the original value should not be removed
-    assert.equal(replacePoundsAndOunces('1 lb 2 oz'), ' (0.51 kg)˜');
+    assert.equal(replacePoundsAndOunces('1 lb 2 oz', false, false, false, false, false, false), ' (0.51 kg)˜');
 }
 
 function testReplaceSurfaceInFeet() {
     // TODO: the original value should not be removed
-    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false), 'S =  (0.3 × 0.61  m)˜');
+    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false, false, false), 'S =  (0.3 × 0.61  m)˜');
 }
 
 function testReplaceSurfaceInInches() {
     // TODO: the original value should not be removed
-    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false), 'S =  (2.54 × 5.08  cm)˜');
+    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false, false, false), 'S =  (2.54 × 5.08  cm)˜');
 }
 
 function testReplaceVolume() {
     // TODO: the original value should not be removed
-    assert.equal(replaceVolume('V = 1×2×3 in', false, false, false, false, false), 'V =  (2.54 × 5.08 × 7.62  cm)˜');
+    assert.equal(replaceVolume('V = 1×2×3 in', false, false, false, false, false, false, false), 'V =  (2.54 × 5.08 × 7.62  cm)˜');
 }
 
 function testRoundNicely() {

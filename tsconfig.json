@@ -7,7 +7,9 @@
             "dom",
             "ES2015"
         ],
+        "moduleResolution":"node",
         "noEmit": true,
+        "allowSyntheticDefaultImports": true,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "alwaysStrict": true,
@@ -25,6 +27,7 @@
         "strict": true
     },
     "files": [
-        "lib.js"
+        "lib.js",
+        "test.mjs"
     ]
 }
