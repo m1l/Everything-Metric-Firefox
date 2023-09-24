@@ -655,7 +655,7 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
             '.?', // separator
             '([0-9]+(\.[0-9]+)?)', // number
             '.?', // separator
-            'in(ch|ches)?', // smaller unit
+            'in(?:ch|ches)?', // smaller unit
         ].join(''),
         'g',
     );
