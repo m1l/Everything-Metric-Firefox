@@ -1127,7 +1127,21 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
  *  @return {string} - A new string with metric weights
 */
 function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp('(([0-9]{0,3}).?(lbs?).?([0-9]+(\.[0-9]+)?).?oz)', 'g');
+    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+    const regex = new RegExp(
+        [
+            '(',
+                '([0-9]{0,3})', // number
+                '.?', // separator
+                '(lbs?)', // pounds unit
+                '.?', // separator
+                '([0-9]+(\.[0-9]+)?)', // number
+                '.?', // separator
+                'oz', // ounces unit
+            ')',
+        ].join(''),
+        'g',
+    );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
