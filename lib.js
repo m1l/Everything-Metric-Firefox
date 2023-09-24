@@ -530,7 +530,24 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
  *  @return {string} - A new string with metric surfaces
 */
 function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp('[\(]?(([0-9]+(\.[0-9]+)?)[-− \u00A0]?[x\*×][-− \u00A0]?([0-9]+(\.[0-9]+)?)[-− \u00A0]?in(ch|ches|\.)?)' + unitSuffix, 'ig');
+    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+    const regex = new RegExp(
+        [
+            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '(',
+                '([0-9]+(\.[0-9]+)?)', // number
+                '[-− \u00A0]?', // space or no-break space
+                '[x\*×]',  // multiplication sign
+                '[-− \u00A0]?', // space or no-break space
+                '([0-9]+(\.[0-9]+)?)', // number
+                '[-− \u00A0]?', // space or no-break space
+                'in(ch|ches|\.)?',  // unit
+            ')',
+            // check for already present conversion to metric
+            unitSuffix,
+        ].join(''),
+        'ig',
+    );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
