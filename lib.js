@@ -826,11 +826,12 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
     return text;
 }
 
-function convert(imp, multiplier, forceRounding, useRounding) {
-    let met = imp * multiplier;
-    if (forceRounding)
+function convert(met, forceRounding, useRounding) {
+    if (forceRounding) {
         return Math.round(met);
-    return roundNicely(met, useRounding);
+    } else {
+        return roundNicely(met, useRounding);
+    }
 }
 
 /** Convert and format an unit from unit at unitIndex into metric
@@ -869,13 +870,13 @@ function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, 
         }
     } else*/
     if (suffix === '²')
-        met = convert(imp, Math.pow(multiplier, 2), forceRounding, useRounding);
+        met = convert(imp * Math.pow(multiplier, 2), forceRounding, useRounding);
     else if (suffix === '³') {
-        met = convert(imp, units[unitIndex].multipliercu, forceRounding, useRounding);
+        met = convert(imp * units[unitIndex].multipliercu, forceRounding, useRounding);
         unit = 'L';
         suffix = '';
     } else {
-        met = convert(imp, multiplier, forceRounding, useRounding);
+        met = convert(imp * multiplier, forceRounding, useRounding);
         let r = stepUpOrDown(met, unit, useMM, useGiga);
 
         met = roundNicely(r.met, useRounding);
