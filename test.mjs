@@ -65,6 +65,12 @@ function testReplaceFahrenheit() {
     assert.equal(replaceFahrenheit('212 Fahrenheits', false, false, false, false, false, false, false, false), '212 Fahrenheits (100°C)˜');
     assert.equal(replaceFahrenheit('212 Fahrenheits (100 Celsius)', false, false, false, false, false, false, false, false), '212 Fahrenheits (100 Celsius)');
     assert.equal(replaceFahrenheit('32-212 °F', false, false, false, false, false, false, false, false), '32-212 °F (0 to 100°C)˜');
+
+    assert.equal(replaceFahrenheit('-212 °F', false, false, false, false, false, false, false, false), '-212 °F (-136°C)˜');
+    // NOTE: in ranges, the minus sign of the upper bound is ignore
+    assert.equal(replaceFahrenheit('100--212 °F', false, false, false, false, false, false, false, false), '100--212 °F (38 to 100°C)˜');
+    assert.equal(replaceFahrenheit('-100-212 °F', false, false, false, false, false, false, false, false), '-100-212 °F (-73 to 100°C)˜');
+    assert.equal(replaceFahrenheit('-100--212 °F', false, false, false, false, false, false, false, false), '-100--212 °F (-73 to 100°C)˜');
 }
 
 function testRoundNicely() {
