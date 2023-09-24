@@ -303,10 +303,19 @@ function bold(text) {
     return out;
 }
 
+/** Format a value with its unit for insertion in the text
+ *  @param {string} number - The formatted value
+ *  @param {string} rest - The unit of the value
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - The formatted value along with its unit
+*/
 function formatConvertedValue(number, rest, useBold, useBrackets) {
     let fullstring = number + rest;
     if (useBrackets) {
         // \200B is ZERO WIDTH SPACE
+        // \3010 is 【 (LEFT BLACK LENTICULAR BRACKET)
+        // \3011 is 】 (RIGHT BLACK LENTICULAR BRACKET)
         // this avoids line-break between original value and converted value
         fullstring = "\u200B\u3010" + fullstring + "\u3011";
     } else {
