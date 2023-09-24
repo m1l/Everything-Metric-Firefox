@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { evaluateFraction, fahrenheitToCelsius, insertAt, roundNicely, shouldConvert, stepUpOrDown } from './lib.js';
+import { evaluateFraction, fahrenheitToCelsius, formatNumber, insertAt, roundNicely, shouldConvert, stepUpOrDown } from './lib.js';
 
 function testEvaluateFraction() {
     assert.equal(evaluateFraction('½'), 0.5);
@@ -20,6 +20,13 @@ function testFahrenHeitToCelsius() {
     assert.equal(fahrenheitToCelsius(32, true), 0);
     assert.equal(fahrenheitToCelsius(100, true), 37.77777777777778);
     assert.equal(fahrenheitToCelsius(212, true), 100);
+}
+
+function testFormatNumber() {
+    assert.equal(formatNumber(123456.789, false, false), '123,456.789');
+    assert.equal(formatNumber(123456.789, false, true), '123 456.789');
+    assert.equal(formatNumber(123456.789, true, false), '123.456,789');
+    assert.equal(formatNumber(123456.789, true, true), '123 456,789');
 }
 
 function testInsertAt() {
@@ -80,6 +87,7 @@ function testShouldConvert() {
 function main() {
     testEvaluateFraction();
     testFahrenHeitToCelsius();
+    testFormatNumber();
     testInsertAt();
     testRoundNicely();
     testStepUpOrDown();
