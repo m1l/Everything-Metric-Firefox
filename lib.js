@@ -1116,6 +1116,16 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
     return text;
 }
 
+/** Return a new string where all occurrences of weights (“1 lb 2 oz”) have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric weights
+*/
 function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     let regex = new RegExp('(([0-9]{0,3}).?(lbs?).?([0-9]+(\.[0-9]+)?).?oz)', 'g');
     if (text.search(regex) !== -1) {
