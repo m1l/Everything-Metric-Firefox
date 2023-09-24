@@ -556,14 +556,20 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
             continue;
         }
 
+        const dim1 = match[1];
+        const dim2 = match[2];
+        if (!dim1 || !dim2) {
+            continue;
+        }
+
         let scale = 2.54;
         let unit = spc + "cm";
         if (useMM === true) {
             scale = 25.4;
             unit = spc + "mm"
         }
-        const cm1 = formatNumber(roundNicely(match[1] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(match[2] * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2}`, ` ${unit}`, useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], metStr);
     }
