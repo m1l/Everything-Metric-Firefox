@@ -983,8 +983,6 @@ function ParseUnitsOnly(text) {
 
 
 function formatConvertedValue(number, rest) {
-    if (rest === undefined)
-        rest = '';
     let fullstring = number + rest;
     if (useBrackets) {
         // \200B is ZERO WIDTH SPACE
