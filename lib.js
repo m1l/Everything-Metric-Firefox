@@ -1144,7 +1144,6 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        const original = match[0];
         const poundsPart = match[1];
         const ouncesPart = match[2];
         if (!poundsPart || !ouncesPart) {
