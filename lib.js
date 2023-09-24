@@ -1211,56 +1211,54 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
+            // NOTE: Firefox now supports negative look-behinds, so this version might be usable
+            // check that this is not preceded by a fraction bar
+            (
+                false
+                ? '(?<!\/)' // with look-behind
+                : '[\/]?' // manually, TODO: it looks like the check is not done at all
+            ),
+            // mixed numeral
             '(',
-                // NOTE: Firefox now supports negative look-behinds, so this version might be usable
-                // check that this is not preceded by a fraction bar
-                (
-                    false
-                    ? '(?<!\/)' // with look-behind
-                    : '[\/]?' // manually, TODO: it looks like the check is not done at all
-                ),
-                // mixed numeral
-                '(',
-                    '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
-                    '[\-− \u00A0]', // separator
-                    '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
-                ')',
-                ' ?', // optional space
-                '[x\*×]', // multiplication sign
-                ' ?', // optional space
-                // mixed numeral
-                '(',
-                    '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
-                    '[\-− \u00A0]', // separator
-                    '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
-                ')?',
-                ' ?', // optional space
-                '("|″|”|“|’’|\'\'|′′)', // inches marker
-                '([^a-z]|$)', // look for a separator
+                '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
+                '[\-− \u00A0]', // separator
+                '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
             ')',
+            ' ?', // optional space
+            '[x\*×]', // multiplication sign
+            ' ?', // optional space
+            // mixed numeral
+            '(',
+                '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
+                '[\-− \u00A0]', // separator
+                '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
+            ')?',
+            ' ?', // optional space
+            '("|″|”|“|’’|\'\'|′′)', // inches marker
+            '([^a-z]|$)', // look for a separator
         ].join(''),
         'ig',
     );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        let inches1 = parseFloat(match[3]);
+        let inches1 = parseFloat(match[2]);
         if (isNaN(inches1)) {
             inches1 = 0;
         }
 
-        const frac1 = evaluateFraction(match[4]);
+        const frac1 = evaluateFraction(match[3]);
         if (isNaN(frac1)) {
             continue;
         }
         inches1 += frac1;
 
-        let inches2 = parseFloat(match[6]);
+        let inches2 = parseFloat(match[5]);
         if (isNaN(inches2)) {
             inches2 = 0;
         }
 
-        const frac2 = evaluateFraction(match[7]);
+        const frac2 = evaluateFraction(match[6]);
         if (isNaN(frac2)) {
             continue;
         }
