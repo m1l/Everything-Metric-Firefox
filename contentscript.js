@@ -980,12 +980,6 @@ function ParseUnitsOnly(text) {
     return text;
 }
 
-function addBrackets(text) {
-    if (useBrackets)
-        return "\u200B\u3010" + text + "\u3011"; //\200B is zero breaking space, so the unit is not in the next line
-    else
-        return " (" + text + ")˜";
-}
 
 function formatConvertedValue(number, rest, commaReplaced) {
     if (commaReplaced === false)
@@ -993,7 +987,13 @@ function formatConvertedValue(number, rest, commaReplaced) {
     if (rest === undefined)
         rest = '';
     let fullstring = number + rest;
-    fullstring = addBrackets(fullstring);
+    if (useBrackets) {
+        // \200B is ZERO WIDTH SPACE
+        // this avoids line-break between original value and converted value
+        fullstring = "\u200B\u3010" + fullstring + "\u3011";
+    } else {
+        fullstring = " (" + fullstring + ")˜";
+    }
     if (useBold && useBrackets) {
         fullstring = bold(fullstring);
     }
