@@ -299,9 +299,9 @@ function replaceFahrenheit(text) {
 
                 /*if (matches[3]!==undefined) { //is range
                     if (matches[2]!==undefined)
-                        met1 = -convertToC(imp, useKelvin);
+                        met1 = -fahrenheitToCelsius(imp, useKelvin);
                     else
-                        met1 = convertToC(imp, useKelvin);
+                        met1 = fahrenheitToCelsius(imp, useKelvin);
                 }*/
 
 
@@ -497,7 +497,7 @@ function convAndForm(imp, unitIndex, suffix) {
 
     var met;
     /*if (unitIndex < 2 ) {
-        met = convertToC(imp, useKelvin);
+        met = fahrenheitToCelsius(imp, useKelvin);
         if (useKelvin) {
             met += 273.15;
             met = roundNicely(met, useRounding);
