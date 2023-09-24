@@ -1,10 +1,29 @@
 import assert from 'node:assert/strict';
-import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
     assert.equal(bold('42 is an integer'), '𝟰𝟮 𝗶𝘀 𝗮𝗻 𝗶𝗻𝘁𝗲𝗴𝗲𝗿');
     assert.equal(bold('3.14 is not an integer'), '𝟯.𝟭𝟰 𝗶𝘀 𝗻𝗼𝘁 𝗮𝗻 𝗶𝗻𝘁𝗲𝗴𝗲𝗿');
+}
+
+function testConvAndForm() {
+    assert.equal(convAndForm('100', 0, '', false, false, false, false, false, false, false, false), ' (100 °C)˜');
+
+    // useMM and useRounding interact in subtle ways
+    assert.equal(convAndForm('0.123', 1, '', false, false, false, false, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm('0.123', 1, '', false, false, false, true, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm('0.123', 1, '', false, true, false, false, false, false, false, false), ' (3 mm)˜');
+    assert.equal(convAndForm('0.123', 1, '', false, true, false, true, false, false, false, false), ' (3.1 mm)˜');
+
+    // surfaces and volumes
+    assert.equal(convAndForm('100', 3, '', false, false, false, false, false, false, false, false), ' (30.48 m)˜');
+    assert.equal(convAndForm('100', 3, '²', false, false, false, false, false, false, false, false), ' (9.29 m²)˜');
+    assert.equal(convAndForm('100', 3, '³', false, false, false, false, false, false, false, false), ' (2,831.69 L)˜');
+
+    // US customary units vs imperial units
+    assert.equal(convAndForm('100', 9, '', false, false, false, false, false, false, false, false), ' (2,957 mL)˜');
+    assert.equal(convAndForm('100', 9, '', true, false, false, false, false, false, false, false), ' (2,841 mL)˜');
 }
 
 function testEvaluateFraction() {
@@ -168,6 +187,7 @@ function testWhereToInsertConvertedValue() {
 
 function main() {
     testBold();
+    testConvAndForm();
     testEvaluateFraction();
     testFahrenHeitToCelsius();
     testFormatConvertedValue();
