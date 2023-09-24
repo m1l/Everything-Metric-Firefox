@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -83,6 +83,11 @@ function testReplaceFahrenheit() {
     assert.equal(replaceFahrenheit('-100--212 °F', false, false, false, false, false, false, false, false), '-100--212 °F (-73 to 100°C)˜');
 }
 
+function testReplaceMaybeKeepLastChar() {
+    assert.equal(replaceMaybeKeepLastChar('Hello, World!', 'World', 'Everyone'), 'Hello, Everyone!');
+    assert.equal(replaceMaybeKeepLastChar('Hello, World!', 'World!', 'Everyone'), 'Hello, Everyone!');
+}
+
 function testRoundNicely() {
     assert.equal(roundNicely(1 / 3, false), 0.33);
     assert.equal(roundNicely(1 / 3, true), 0.33);
@@ -149,6 +154,7 @@ function main() {
     testInsertAt();
     testParseNumber();
     testReplaceFahrenheit();
+    testReplaceMaybeKeepLastChar();
     testRoundNicely();
     testStepUpOrDown();
     testShouldConvert();
