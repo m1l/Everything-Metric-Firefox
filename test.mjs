@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -88,6 +88,11 @@ function testReplaceMaybeKeepLastChar() {
     assert.equal(replaceMaybeKeepLastChar('Hello, World!', 'World!', 'Everyone'), 'Hello, Everyone!');
 }
 
+function testReplaceSurfaceInFeet() {
+    // TODO: the original value should not be removed
+    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false), 'S =  (0.3 × 0.61  m)˜');
+}
+
 function testReplaceSurfaceInInches() {
     // TODO: the original value should not be removed
     assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false), 'S =  (2.54 × 5.08  cm)˜');
@@ -165,6 +170,7 @@ function main() {
     testParseNumber();
     testReplaceFahrenheit();
     testReplaceMaybeKeepLastChar();
+    testReplaceSurfaceInFeet();
     testReplaceSurfaceInInches();
     testReplaceVolume();
     testRoundNicely();
