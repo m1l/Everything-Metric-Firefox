@@ -826,7 +826,13 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
     return text;
 }
 
-function convert(met, forceRounding, useRounding) {
+/** Round a value, sometimes force to use 0 decimal places
+ *  @param {number} met - The value to round
+ *  @param {boolean} forceRounding - Round to 0 decimal places anywau
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @return {number} - The rounded value
+*/
+function roundMaybeNicely(met, forceRounding, useRounding) {
     if (forceRounding) {
         return Math.round(met);
     } else {
@@ -849,16 +855,22 @@ function convert(met, forceRounding, useRounding) {
  *  @return {string} - The converted and formatted value
 */
 function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    let multiplier = units[unitIndex].multiplier;
-    if (isUK === true && units[unitIndex].multiplierimp !== undefined)
-        multiplier = units[unitIndex].multiplierimp;
-    let unit = units[unitIndex].unit;
-    if (useMM === true && units[unitIndex].multiplier2 !== undefined) {
-        unit = units[unitIndex].unit2;
-        multiplier = units[unitIndex].multiplier2;
+    const conversion = units[unitIndex];
+    if (conversion === undefined) {
+        return ''; // TODO
+    }
+
+    let multiplier = conversion.multiplier;
+    if (isUK === true && conversion.multiplierimp !== undefined) {
+        multiplier = conversion.multiplierimp;
+    }
+    let unit = conversion.unit;
+    if (useMM === true && conversion.multiplier2 !== undefined && conversion.unit2 !== undefined) {
+        unit = conversion.unit2;
+        multiplier = conversion.multiplier2;
     }
     const forceRounding = (useRounding === false &&
-        ((useMM === true && units[unitIndex].multiplier2 !== undefined && units[unitIndex].fullround) || units[unitIndex].forceround));
+        ((useMM === true && conversion.multiplier2 !== undefined && conversion.fullround) || conversion.forceround === true));
 
     var met;
     /*if (unitIndex < 2 ) {
@@ -870,13 +882,16 @@ function convAndForm(imp, unitIndex, suffix, isUK, useMM, useGiga, useRounding, 
         }
     } else*/
     if (suffix === '²')
-        met = convert(imp * Math.pow(multiplier, 2), forceRounding, useRounding);
+        met = roundMaybeNicely(imp * Math.pow(multiplier, 2), forceRounding, useRounding);
     else if (suffix === '³') {
-        met = convert(imp * units[unitIndex].multipliercu, forceRounding, useRounding);
+        if (conversion.multipliercu === undefined) {
+            return ''; // TODO
+        }
+        met = roundMaybeNicely(imp * conversion.multipliercu, forceRounding, useRounding);
         unit = 'L';
         suffix = '';
     } else {
-        met = convert(imp * multiplier, forceRounding, useRounding);
+        met = roundMaybeNicely(imp * multiplier, forceRounding, useRounding);
         let r = stepUpOrDown(met, unit, useMM, useGiga);
 
         met = roundNicely(r.met, useRounding);
