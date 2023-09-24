@@ -1,5 +1,14 @@
 import assert from 'node:assert/strict';
-import { fahrenheitToCelsius, evaluateFraction, insertAt, roundNicely, shouldConvert, stepUpOrDown } from './lib.js';
+import { evaluateFraction, fahrenheitToCelsius, insertAt, roundNicely, shouldConvert, stepUpOrDown } from './lib.js';
+
+function testEvaluateFraction() {
+    assert.equal(evaluateFraction('½'), 0.5);
+    assert.equal(evaluateFraction('1 / 2'), 0.5);
+    assert.equal(evaluateFraction('1/ 2'), 0.5);
+    assert.equal(evaluateFraction('1 /2'), 0.5);
+    assert.equal(evaluateFraction('1/2'), 0.5);
+    assert.equal(evaluateFraction('2 / 1'), 2.0);
+}
 
 function testFahrenHeitToCelsius() {
     assert.equal(fahrenheitToCelsius(0, false), -18);
@@ -13,13 +22,10 @@ function testFahrenHeitToCelsius() {
     assert.equal(fahrenheitToCelsius(212, true), 100);
 }
 
-function testEvaluateFraction() {
-    assert.equal(evaluateFraction('½'), 0.5);
-    assert.equal(evaluateFraction('1 / 2'), 0.5);
-    assert.equal(evaluateFraction('1/ 2'), 0.5);
-    assert.equal(evaluateFraction('1 /2'), 0.5);
-    assert.equal(evaluateFraction('1/2'), 0.5);
-    assert.equal(evaluateFraction('2 / 1'), 2.0);
+function testInsertAt() {
+    assert.equal(insertAt('hello world', 'everyone in the ', 6), 'hello everyone in the world');
+    assert.equal(insertAt('hello world', 'welcome, and ', 0), 'welcome, and hello world');
+    // TODO: what should happen with index = -1? with index=999?
 }
 
 function testRoundNicely() {
@@ -71,19 +77,13 @@ function testShouldConvert() {
     assert.equal(shouldConvert('(1 m)', true), true);
 }
 
-function testInsertAt() {
-    assert.equal(insertAt('hello world', 'everyone in the ', 6), 'hello everyone in the world');
-    assert.equal(insertAt('hello world', 'welcome, and ', 0), 'welcome, and hello world');
-    // TODO: what should happen with index = -1? with index=999?
-}
-
 function main() {
-    testFahrenHeitToCelsius();
     testEvaluateFraction();
+    testFahrenHeitToCelsius();
+    testInsertAt();
     testRoundNicely();
     testStepUpOrDown();
     testShouldConvert();
-    testInsertAt();
 }
 
 main();
