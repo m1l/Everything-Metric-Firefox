@@ -271,4 +271,12 @@ function formatNumber(v, useCommaAsDecimalSeparator, useSpacesAsThousandSeparato
     }
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber };
+function whereToInsertConvertedValue(index, fullMatch) {
+    let insertIndex = index + fullMatch.length;
+    let lastchar = fullMatch[fullMatch.length -1];
+    if (/[\s \.,;]/.test(lastchar))
+        insertIndex--;
+    return insertIndex;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, whereToInsertConvertedValue };

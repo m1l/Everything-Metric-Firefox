@@ -370,14 +370,6 @@ function mpg2Lper100km(text) {
     return text;
 }
 
-function whereToInsertConvertedValue(index, fullMatch) {
-    let insertIndex = index + fullMatch.length;
-    let lastchar = fullMatch[fullMatch.length -1];
-    if (/[\s \.,;]/.test(lastchar))
-        insertIndex--;
-    return insertIndex;
-}
-
 function CleanReplace(text, match, metStr) {
     let lastchar = match[match.length -1];
     //console.log("replacing " + match + " with " + metStr + /[^a-z"″”“’'′]/i.test(lastchar));
