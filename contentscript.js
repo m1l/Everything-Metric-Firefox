@@ -267,7 +267,7 @@ function replaceFahrenheit(text) {
         while ((matches = regex.exec(text)) !== null) {
             try {
                 //console.log(matches[0]);
-                if (isAlreadyConverted(matches[0], convertBracketed)) continue;
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
                 const fullMatch = matches[1];
 
                 //for (var i=0; i<matches.length; i++)
@@ -341,7 +341,7 @@ function mpg2Lper100km(text) {
         while ((matches = regex.exec(text)) !== null) {
             try {
                 //console.log(matches[0]);
-                if (isAlreadyConverted(matches[0], convertBracketed)) continue;
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
                 const fullMatch = matches[1];
 
                 //for (var i=0; i<matches.length; i++)
@@ -402,7 +402,7 @@ function processAll(text) {
 
                     //includes a bracket, it is probably already converted. ex: 1 in (2.54 cm)
 
-                    if (isAlreadyConverted(matches[0], convertBracketed)) continue;
+                    if (!shouldConvert(matches[0], convertBracketed)) continue;
 
                     if ((matches[2] !== undefined) && (/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(matches[2]) === false)) continue;
 
@@ -583,7 +583,7 @@ function AxAxAin(text) {
         while ((matches = regex.exec(text)) !== null) {
             try {
                 const fullMatch = matches[1];
-                if (isAlreadyConverted(matches[0], convertBracketed)) continue;
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
 
                 let scale = 2.54;
                 let unit = spc + "cm";
@@ -686,7 +686,7 @@ function AxAin(text) {
                 const fullMatch = matches[1];
                 if (/[0-9][Xx\*×][ \u00A0][0-9]/.test(fullMatch))
                     continue; //it is 2x 2in something so no conversion
-                if (isAlreadyConverted(matches[0], convertBracketed)) continue;
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
 
                 let scale = 2.54;
                 let unit = spc + "cm";
@@ -724,7 +724,7 @@ function AxAft(text) {
                 const fullMatch = matches[1];
                 if (/[0-9][xX\*×][ \u00A0][0-9]/.test(fullMatch))
                     continue; //it is 2x 2ft something so no conversion
-                if (isAlreadyConverted(matches[0], convertBracketed)) continue;
+                if (!shouldConvert(matches[0], convertBracketed)) continue;
 
                 let scale = 0.3048;
                 let unit = spc + "m";
@@ -803,7 +803,7 @@ function feetInch(text) {
             }
 
 
-            if (isAlreadyConverted(matches[0], convertBracketed)) continue;
+            if (!shouldConvert(matches[0], convertBracketed)) continue;
 
             /*if (/“/.test(fullMatch)) {
                 lastQuoteOpen = true;

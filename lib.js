@@ -194,12 +194,12 @@ function insertAt(target, toInsert, index) {
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @return {boolean} - Whether the value should not be converted to metric
 */
-function isAlreadyConverted(text, convertBracketed) {
+function shouldConvert(text, convertBracketed) {
     if ((convertBracketed && /[\(]/.test(text.substring(1))) ||
        (!convertBracketed && /[\(\)]/.test(text)) ||
        /\u3010/.test(text))
-        return true;
-    return false;
+        return false;
+    return true;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, isAlreadyConverted };
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert };

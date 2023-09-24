@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { evaluateFraction, insertAt, isAlreadyConverted, stepUpOrDown } from './lib.js';
+import { evaluateFraction, insertAt, shouldConvert, stepUpOrDown } from './lib.js';
 
 async function testEvaluateFraction() {
     assert.equal(evaluateFraction('½'), 0.5);
@@ -36,16 +36,16 @@ async function testStepUpOrDown() {
     // assert.deepEqual(stepUpOrDown(1e8, 'cm', false, false), { met: 1000, unit: 'km' });
 }
 
-async function testIsAlreadyConverted() {
+async function testShouldConvert() {
     // do not convert bracketed values
-    assert.equal(isAlreadyConverted('1 m', false), false);
-    assert.equal(isAlreadyConverted('1 m (42 yards)', false), true);
-    assert.equal(isAlreadyConverted('(1 m)', false), true);
+    assert.equal(shouldConvert('1 m', false), true);
+    assert.equal(shouldConvert('1 m (42 yards)', false), false);
+    assert.equal(shouldConvert('(1 m)', false), false);
 
     // convert bracketed values
-    assert.equal(isAlreadyConverted('1 m', true), false);
-    assert.equal(isAlreadyConverted('1 m (42 yards)', true), true);
-    assert.equal(isAlreadyConverted('(1 m)', true), false);
+    assert.equal(shouldConvert('1 m', true), true);
+    assert.equal(shouldConvert('1 m (42 yards)', true), false);
+    assert.equal(shouldConvert('(1 m)', true), true);
 }
 
 async function testInsertAt() {
@@ -57,7 +57,7 @@ async function testInsertAt() {
 async function main() {
     testEvaluateFraction();
     testStepUpOrDown();
-    testIsAlreadyConverted();
+    testShouldConvert();
     testInsertAt();
 }
 
