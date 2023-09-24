@@ -83,7 +83,7 @@ function procNode(textNode) {
     }
    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) ||
         /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
-        text = replaceIkeaSurface(text);
+        text = replaceIkeaSurface(text, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         if (includeQuotes)
             text = replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceVolume(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
@@ -96,68 +96,6 @@ function procNode(textNode) {
         text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
         textNode.nodeValue = text;
     }
-}
-
-function replaceIkeaSurface(text) {//ikea US
-
-
-    //let regex = new RegExp('((?<!\/)(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x\*×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
-    ////Firefox does not support negative lookbehind so this like is changed from Chrome version
-    let regex = new RegExp('([\/]?(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x|\*|×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
-//new ((([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$)))
-    let matches;
-
-
-    while ((matches = regex.exec(text)) !== null) {
-        try {
-/*
-            for (var i=0; i<matches.length; i++)
-                console.log("matches " + i + " " + matches[i])*/
-            const fullMatch = matches[1];
-            //if (isAlreadyConverted(text, convertBracketed)) continue;
-
-
-            let inches1 = parseFloat(matches[3]);
-            if (isNaN(inches1)) inches1 = 0;
-
-            let frac1 = (matches[4]);
-            frac1 = evaluateFraction(frac1);
-            if (isNaN(frac1)) continue;
-
-            let inches2 = parseFloat(matches[6]);
-            if (isNaN(inches2)) inches2 = 0;
-
-            let frac2 = (matches[7]);
-            frac2 = evaluateFraction(frac2);
-            if (isNaN(frac2)) continue;
-
-            //console.log( inches1 + " " + frac1 + " " + inches2 + " " + frac2);
-
-            inches1 = inches1+frac1;
-            inches2 = inches2+frac2;
-
-            let scale = 2.54;
-            let unit = spc + "cm";
-            if (useMM === true) {
-                scale = 25.4;
-                unit = spc + "mm"
-            }
-
-            let cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useComma, useSpaces);
-            let cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useComma, useSpaces);
-
-
-            const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2, spc + unit, useBold, useBrackets);
-
-            //text = text.replace(matches[0], metStr);
-            text = replaceMaybeKeepLastChar(text, matches[0], metStr);
-        } catch (err) {
-            console.log(err.message);
-        }
-    }
-    return text;
-
-
 }
 
 function StringToNumber(text) {

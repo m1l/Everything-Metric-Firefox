@@ -1197,6 +1197,68 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
     return text;
 }
 
+function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+
+
+    //let regex = new RegExp('((?<!\/)(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x\*×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
+    ////Firefox does not support negative lookbehind so this like is changed from Chrome version
+    let regex = new RegExp('([\/]?(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x|\*|×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
+//new ((([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$)))
+    let matches;
+
+
+    while ((matches = regex.exec(text)) !== null) {
+        try {
+/*
+            for (var i=0; i<matches.length; i++)
+                console.log("matches " + i + " " + matches[i])*/
+            const fullMatch = matches[1];
+            //if (isAlreadyConverted(text, convertBracketed)) continue;
+
+
+            let inches1 = parseFloat(matches[3]);
+            if (isNaN(inches1)) inches1 = 0;
+
+            let frac1 = (matches[4]);
+            frac1 = evaluateFraction(frac1);
+            if (isNaN(frac1)) continue;
+
+            let inches2 = parseFloat(matches[6]);
+            if (isNaN(inches2)) inches2 = 0;
+
+            let frac2 = (matches[7]);
+            frac2 = evaluateFraction(frac2);
+            if (isNaN(frac2)) continue;
+
+            //console.log( inches1 + " " + frac1 + " " + inches2 + " " + frac2);
+
+            inches1 = inches1+frac1;
+            inches2 = inches2+frac2;
+
+            let scale = 2.54;
+            let unit = spc + "cm";
+            if (useMM === true) {
+                scale = 25.4;
+                unit = spc + "mm"
+            }
+
+            let cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+            let cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+
+
+            const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2, spc + unit, useBold, useBrackets);
+
+            //text = text.replace(matches[0], metStr);
+            text = replaceMaybeKeepLastChar(text, matches[0], metStr);
+        } catch (err) {
+            console.log(err.message);
+        }
+    }
+    return text;
+
+
+}
+
 /** Return a new string where all occurrences of other non-metric units have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
@@ -1312,4 +1374,4 @@ function replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga
     return text;
 }
 
-module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceOtherUnits };
+module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits };
