@@ -1219,7 +1219,7 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
                 : '[\/]?' // manually, TODO: it looks like the check is not done at all
             ),
             // mixed numeral
-            '(',
+            '(?:',
                 '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
                 '[\-− \u00A0]', // separator
                 '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
@@ -1228,37 +1228,37 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
             '[x\*×]', // multiplication sign
             ' ?', // optional space
             // mixed numeral
-            '(',
+            '(?:',
                 '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
                 '[\-− \u00A0]', // separator
                 '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
             ')?',
             ' ?', // optional space
-            '("|″|”|“|’’|\'\'|′′)', // inches marker
-            '([^a-z]|$)', // look for a separator
+            '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
+            '(?:[^a-z]|$)', // look for a separator
         ].join(''),
         'ig',
     );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        let inches1 = parseFloat(match[2]);
+        let inches1 = parseFloat(match[1]);
         if (isNaN(inches1)) {
             inches1 = 0;
         }
 
-        const frac1 = evaluateFraction(match[3]);
+        const frac1 = evaluateFraction(match[2]);
         if (isNaN(frac1)) {
             continue;
         }
         inches1 += frac1;
 
-        let inches2 = parseFloat(match[5]);
+        let inches2 = parseFloat(match[3]);
         if (isNaN(inches2)) {
             inches2 = 0;
         }
 
-        const frac2 = evaluateFraction(match[6]);
+        const frac2 = evaluateFraction(match[4]);
         if (isNaN(frac2)) {
             continue;
         }
