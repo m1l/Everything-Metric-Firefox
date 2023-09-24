@@ -36,6 +36,7 @@ const fractions = {
     '⅞': 7 / 8
 };
 
+/** @type{ import("./types").Unit[] } */
 const units = [
     {
         regexUnit: new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig'),
@@ -159,6 +160,7 @@ const units = [
     },
 ];
 
+/** @type{ import("./types").Unit } */
 const unitsTablespoon = {
     regexUnit: new RegExp(skipempty + '(tbsp|tablespoons?)'+skipbrackets + regend, 'ig'),
     regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tbsp|tablespoons?)' + unitSuffix + ')', 'ig'),
@@ -168,6 +170,7 @@ const unitsTablespoon = {
     multiplierimp: 17.7582
 };
 
+/** @type{ import("./types").Unit } */
 const unitsTeaspoon = {
     regexUnit: new RegExp(skipempty + '(tsp|teaspoons?)'+skipbrackets + regend, 'ig'),
     regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tsp|teaspoons?)' + unitSuffix + ')', 'ig'),
