@@ -981,8 +981,8 @@ function ParseUnitsOnly(text) {
 }
 
 
-function formatConvertedValue(number, rest, commaReplaced) {
-    if (commaReplaced === false)
+function formatConvertedValue(number, rest, numberIsFormatted) {
+    if (numberIsFormatted === false)
         number = formatNumber(number, useComma, useSpaces)
     if (rest === undefined)
         rest = '';
