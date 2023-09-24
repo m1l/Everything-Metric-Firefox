@@ -428,4 +428,15 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit };
+function replaceMaybeKeepLastChar(text, match, metStr) {
+    let lastchar = match[match.length -1];
+    //console.log("replacing " + match + " with " + metStr + /[^a-z"″”“’'′]/i.test(lastchar));
+
+    //if (/[\s \.,;\)]/.test(lastchar))
+    if (/[^a-z"″”“’'′]/i.test(lastchar))
+        return text.replace(match, metStr + lastchar);
+    else
+        return text.replace(match, metStr);
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar };

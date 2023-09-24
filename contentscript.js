@@ -295,17 +295,6 @@ function mpg2Lper100km(text) {
     return text;
 }
 
-function replaceMaybeKeepLastChar(text, match, metStr) {
-    let lastchar = match[match.length -1];
-    //console.log("replacing " + match + " with " + metStr + /[^a-z"″”“’'′]/i.test(lastchar));
-
-    //if (/[\s \.,;\)]/.test(lastchar))
-    if (/[^a-z"″”“’'′]/i.test(lastchar))
-        return text.replace(match, metStr + lastchar);
-    else
-        return text.replace(match, metStr);
-}
-
 function processAll(text) {
 
     const len = units.length;
