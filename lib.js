@@ -1116,4 +1116,32 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol };
+function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+    let regex = new RegExp('(([0-9]{0,3}).?(lbs?).?([0-9]+(\.[0-9]+)?).?oz)', 'g');
+    if (text.search(regex) !== -1) {
+        let matches;
+
+        while ((matches = regex.exec(text)) !== null) {
+            try {
+                const original = matches[0];
+                let lb = matches[2];
+                lb = parseFloat(lb);
+                let oz = matches[4];
+                oz = parseFloat(oz);
+
+                let total = 0;
+
+                total = lb * 16 + oz;
+
+                let kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), spc + 'kg', useBold, useBrackets);
+                //text = text.replace(matches[0], kg);
+                text = replaceMaybeKeepLastChar(text, matches[0], kg);
+            } catch (err) {
+                // console.log(err.message);
+            }
+        }
+    }
+    return text;
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces };

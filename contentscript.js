@@ -90,7 +90,7 @@ function procNode(textNode) {
         text = replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-        text = replacePoundsAndOunces(text);
+        text = replacePoundsAndOunces(text, convertBracketed, useRounding, useComma, useSpaces, useBold, useBrackets);
         text = replaceOtherUnits(text);
         text = replaceMilesPerGallon(text);
         text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
@@ -300,35 +300,6 @@ function replaceIkeaSurface(text) {//ikea US
     return text;
 
 
-}
-
-// 1 lb 2 oz
-function replacePoundsAndOunces(text) {
-    let regex = new RegExp('(([0-9]{0,3}).?(lbs?).?([0-9]+(\.[0-9]+)?).?oz)', 'g');
-    if (text.search(regex) !== -1) {
-        let matches;
-
-        while ((matches = regex.exec(text)) !== null) {
-            try {
-                const original = matches[0];
-                let lb = matches[2];
-                lb = parseFloat(lb);
-                let oz = matches[4];
-                oz = parseFloat(oz);
-
-                let total = 0;
-
-                total = lb * 16 + oz;
-
-                let kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), spc + 'kg', useBold, useBrackets);
-                //text = text.replace(matches[0], kg);
-                text = replaceMaybeKeepLastChar(text, matches[0], kg);
-            } catch (err) {
-                // console.log(err.message);
-            }
-        }
-    }
-    return text;
 }
 
 function StringToNumber(text) {
