@@ -981,8 +981,6 @@ function ParseUnitsOnly(text) {
 }
 
 function bold(text) {
-    if (useBold === false) return text;
-    if (useBrackets === false) return text;
     let out = text.replace(/\d/g, (c) => String.fromCodePoint(0x1D7EC - 48 + c.charCodeAt(0)));
     out = out.replace(/[a-z]/g, (c) => String.fromCodePoint(0x1D5EE - 97 + c.charCodeAt(0)));
     out = out.replace(/[A-Z]/g, (c) => String.fromCodePoint(0x1D5D4 - 65 + c.charCodeAt(0)));
@@ -1005,7 +1003,9 @@ function formatConvertedValue(number, rest, commaReplaced) {
         rest = '';
     let fullstring = number + rest;
     fullstring = addBrackets(fullstring);
-    fullstring = bold(fullstring);
+    if (useBold && useBrackets) {
+        fullstring = bold(fullstring);
+    }
     return fullstring;
 }
 
