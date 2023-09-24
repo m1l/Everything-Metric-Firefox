@@ -1208,10 +1208,63 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
  *  @return {string} - A new string with metric surfaces
 */
 function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: Firefox now supports negative look-behinds, so this version might be usable
-    //let regex = new RegExp('((?<!\/)(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x\*×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
-
-    const regex = new RegExp('([\/]?(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x|\*|×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
+    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+    const regex = false ?
+        // NOTE: Firefox now supports negative look-behinds, so this version might be usable
+        new RegExp(
+            [
+                '(',
+                    '(?<!\/)', // check that this is not preceded by a fraction bar
+                    // mixed numeral
+                    '(',
+                        '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
+                        '[\-− \u00A0]', // separator
+                        '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
+                    ')',
+                    ' ?', // optional space
+                    '[x\*×]', // multiplication sign
+                    ' ?', // optional space
+                    // mixed numeral
+                    '(',
+                        '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
+                        '[\-− \u00A0]', // separator
+                        '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
+                    ')?',
+                    ' ?', // optional space
+                    '("|″|”|“|’’|\'\'|′′)', // inches marker
+                    '([^a-z]|$)', // look for a separator
+                ')',
+            ].join(''),
+            'ig',
+        )
+        :
+        new RegExp(
+            [
+                '(',
+                    '[\/]?', // include previous fraction bar (to check manually later)
+                    // mixed numeral
+                    '(',
+                        '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
+                        '[\-− \u00A0]', // separator
+                        '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
+                    ')',
+                    ' ?', // optional space
+                    '[x|\*|×]', // multiplication sign
+                    ' ?', // optional space
+                    // mixed numeral
+                    '(',
+                        '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
+                        '[\-− \u00A0]', // separator
+                        '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
+                    ')?',
+                    ' ?', // optional space
+                    '("|″|”|“|’’|\'\'|′′)', // inches marker
+                    '([^a-z]|$)', // look for a separator
+                ')',
+            ].join(''),
+            'ig',
+        );
+    ;
 
     let match;
     while ((match = regex.exec(text)) !== null) {
