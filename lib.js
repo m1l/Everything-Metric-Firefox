@@ -226,18 +226,25 @@ function fahrenheitToCelsius(f, useKelvin) {
  *  @return {number} - The rounded number
 */
 function roundNicely(v, useRounding) {
-    if (useRounding === false)
-        return Math.round(v * 100) / 100;
+    if (useRounding) {
+        // try rounding to 0 decimal places
+        const dec0 = Math.round(v);
+        const relative_error0 = Math.abs(1 - (v / dec0));
+        if (relative_error0 < .03) {
+            // relative error is less than 3 %, OK
+            return dec0;
+        }
 
-    var dec0 = Math.round(v);
+        // try rounding to 1 decimal place
+        const dec1 = Math.round(v * 10) / 10;
+        const relative_error1 = Math.abs(1 - (v / dec1));
+        if (relative_error1 < .016) {
+            // relative error is less than 1.6 %, OK
+            return dec1;
+        }
+    }
 
-    if (Math.abs((1 - (v / dec0)) * 100) < 3) return dec0;
-    var dec1 = Math.round(v * 10) / 10;
-
-    if (Math.abs((1 - (v / dec1)) * 100) < 1.6) return dec1;
-    var dec2 = Math.round(v * 100) / 100;
-
-    return dec2;
+    return Math.round(v * 100) / 100;
 }
 
 module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely };
