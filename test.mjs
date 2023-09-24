@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { fahrenheitToCelsius, evaluateFraction, insertAt, shouldConvert, stepUpOrDown } from './lib.js';
 
-async function testFahrenHeitToCelsius() {
+function testFahrenHeitToCelsius() {
     assert.equal(fahrenheitToCelsius(0, false), -18);
     assert.equal(fahrenheitToCelsius(32, false), 0);
     assert.equal(fahrenheitToCelsius(100, false), 38);
@@ -13,7 +13,7 @@ async function testFahrenHeitToCelsius() {
     assert.equal(fahrenheitToCelsius(212, true), 100);
 }
 
-async function testEvaluateFraction() {
+function testEvaluateFraction() {
     assert.equal(evaluateFraction('½'), 0.5);
     assert.equal(evaluateFraction('1 / 2'), 0.5);
     assert.equal(evaluateFraction('1/ 2'), 0.5);
@@ -22,7 +22,7 @@ async function testEvaluateFraction() {
     assert.equal(evaluateFraction('2 / 1'), 2.0);
 }
 
-async function testStepUpOrDown() {
+function testStepUpOrDown() {
     // step down
     assert.deepEqual(stepUpOrDown(0.125, 'm', false, false), { met: 12.5, unit: 'cm' });
     assert.deepEqual(stepUpOrDown(0.125, 'm', false, true), { met: 12.5, unit: 'cm' });
@@ -48,7 +48,7 @@ async function testStepUpOrDown() {
     // assert.deepEqual(stepUpOrDown(1e8, 'cm', false, false), { met: 1000, unit: 'km' });
 }
 
-async function testShouldConvert() {
+function testShouldConvert() {
     // do not convert bracketed values
     assert.equal(shouldConvert('1 m', false), true);
     assert.equal(shouldConvert('1 m (42 yards)', false), false);
@@ -60,13 +60,13 @@ async function testShouldConvert() {
     assert.equal(shouldConvert('(1 m)', true), true);
 }
 
-async function testInsertAt() {
+function testInsertAt() {
     assert.equal(insertAt('hello world', 'everyone in the ', 6), 'hello everyone in the world');
     assert.equal(insertAt('hello world', 'welcome, and ', 0), 'welcome, and hello world');
     // TODO: what should happen with index = -1? with index=999?
 }
 
-async function main() {
+function main() {
     testFahrenHeitToCelsius();
     testEvaluateFraction();
     testStepUpOrDown();
