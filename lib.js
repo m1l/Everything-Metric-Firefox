@@ -291,8 +291,14 @@ function convertedValueInsertionOffset(fullMatch) {
  *  @return {string} - The enboldenned text
 */
 function bold(text) {
+    // convert digits to bold digits
+    // 0x1D7EC is 𝟬 (MATHEMATICAL SANS-SERIF BOLD DIGIT ZERO)
     let out = text.replace(/\d/g, (c) => String.fromCodePoint(0x1D7EC - 48 + c.charCodeAt(0)));
+    // convert lowercase Latin letters to bold lowercase Latin letters
+    // 0x1D7EC is 𝗮 (MATHEMATICAL SANS-SERIF BOLD SMALL A)
     out = out.replace(/[a-z]/g, (c) => String.fromCodePoint(0x1D5EE - 97 + c.charCodeAt(0)));
+    // convert uppercase Latin letters to bold uppercase Latin letters
+    // 0x1D7EC is 𝗔 (MATHEMATICAL SANS-SERIF BOLD CAPITAL A)
     out = out.replace(/[A-Z]/g, (c) => String.fromCodePoint(0x1D5D4 - 65 + c.charCodeAt(0)));
     return out;
 }
