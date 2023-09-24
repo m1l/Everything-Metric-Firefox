@@ -279,9 +279,9 @@ function replaceFahrenheit(text) {
                 var met2=0;
                 if (imp1!==undefined) { //is range
                     if (matches[2]!==undefined)
-                        met1 = convertToC(-imp1);
+                        met1 = convertToC(-imp1, useKelvin);
                     else
-                        met1 = convertToC(imp1);
+                        met1 = convertToC(imp1, useKelvin);
 
 
                     if (useKelvin) {
@@ -294,15 +294,15 @@ function replaceFahrenheit(text) {
 
                 if ((/[\-−]/.test(imp2.charAt(0))) ||
                     (imp1===undefined && matches[2]!==undefined)){
-                    met2 = convertToC(-imp2);
+                    met2 = convertToC(-imp2, useKelvin);
                  } else
-                     met2 = convertToC(imp2);
+                     met2 = convertToC(imp2, useKelvin);
 
                 /*if (matches[3]!==undefined) { //is range
                     if (matches[2]!==undefined)
-                        met1 = -convertToC(imp);
+                        met1 = -convertToC(imp, useKelvin);
                     else
-                        met1 = convertToC(imp);
+                        met1 = convertToC(imp, useKelvin);
                 }*/
 
 
@@ -506,7 +506,7 @@ function convAndForm(imp, unitIndex, suffix) {
 
     var met;
     /*if (unitIndex < 2 ) {
-        met = convertToC(imp);
+        met = convertToC(imp, useKelvin);
         if (useKelvin) {
             met += 273.15;
             met = roundNicely(met);
@@ -561,13 +561,6 @@ function roundNicely(v) {
     return dec2;
 }
 
-function convertToC(f) {
-    let met = (5 / 9) * (f - 32);
-    if (useKelvin)
-       return met;
-    else
-       return Math.round(met);
-}
 
 //1 x 2 x 3
 function AxAxAin(text) {
@@ -999,7 +992,7 @@ function ParseUnitsOnly(text) {
             if (text.length>=3 && /^F\u200B\u3010|^F[\(][0-9]/.test(text))
                 return text; //it has been already converted
 
-                let met = convertToC(lastquantity);
+                let met = convertToC(lastquantity, useKelvin);
 
                 var unit = '°C';
                 if (useKelvin) {

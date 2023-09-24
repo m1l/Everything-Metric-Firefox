@@ -207,4 +207,12 @@ function shouldConvert(text, convertBracketed) {
     }
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert };
+function convertToC(f, useKelvin) {
+    let met = (5 / 9) * (f - 32);
+    if (useKelvin)
+       return met;
+    else
+       return Math.round(met);
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, convertToC };
