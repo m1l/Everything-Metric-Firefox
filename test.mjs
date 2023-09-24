@@ -110,12 +110,11 @@ function testReplaceFeetAndInches() {
 
 function testReplaceFeetAndInchesSymbol() {
     setIncludeImproperSymbols(false);
-    // TODO: the original value should not be removed
-    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false), ' (0.36 m)˜');
+    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false), '1\' 2"');
 
     setIncludeImproperSymbols(true);
     // TODO: the original value should not be removed
-    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false), ' (0.36 m)˜');
+    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', true, false, false, false, false, false), '1\' 2" (35.56 cm)˜');
 }
 
 function testReplaceMaybeKeepLastChar() {
