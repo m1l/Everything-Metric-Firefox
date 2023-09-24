@@ -425,4 +425,4 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     return text;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, replaceFahrenheit };
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit };

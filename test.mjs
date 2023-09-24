@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, replaceFahrenheit, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -46,6 +46,13 @@ function testInsertAt() {
     assert.equal(insertAt('hello world', 'everyone in the ', 6), 'hello everyone in the world');
     assert.equal(insertAt('hello world', 'welcome, and ', 0), 'welcome, and hello world');
     // TODO: what should happen with index = -1? with index=999?
+}
+
+function testParseNumber() {
+    assert.equal(parseNumber('-3.14'), -3.14);
+    assert.equal(parseNumber('−3.14'), -3.14);
+    assert.equal(parseNumber('3.14'), 3.14);
+    assert.equal(parseNumber('+3.14'), 3.14);
 }
 
 function testReplaceFahrenheit() {
@@ -140,6 +147,7 @@ function main() {
     testFormatConvertedValue();
     testFormatNumber();
     testInsertAt();
+    testParseNumber();
     testReplaceFahrenheit();
     testRoundNicely();
     testStepUpOrDown();
