@@ -1,3 +1,19 @@
+const regstart = '([\(]?';
+const regend = '([^a-z]|$)';
+const intOrFloat = '([0-9,\.]+)';
+const intOrFloatSigned = '([\-−0-9,\.]+)';
+const spc = '\u00A0';
+const intOrFloatNoFrac = '([\.,0-9]+(?![\/⁄]))?';
+const skipbrackets = '(?! [\(][0-9]|\u200B\u3010)';
+const unitSuffix = '(?! [\(][0-9]| ?\u200B\u3010)([^a-z]|$)';
+//const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³]|$)';
+const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
+const unitSuffixft = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
+const unitfrac = '[\-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?';
+const sqcu = '([\-− \u00A0]?(sq\.?|square|cu\.?|cubic))?';
+const sq = '([\-− \u00A0]?(sq\.?|square))?';
+const skipempty = '^(?:[ \n\t]+)?';
+
 /** @type{ { [key: string]: number } } */
 const fractions = {
     '¼': 1 / 4,
