@@ -392,26 +392,32 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
             continue;
         }
 
+        const firstNumber = match[1];
+        if (!firstNumber) {
+            continue;
+        }
+        const secondNumber = match[2];
+
         // upper-bound of the range, or single value
-        let met1 = fahrenheitToCelsius(parseNumber(match[1]), useKelvin);
+        let met1 = fahrenheitToCelsius(parseNumber(firstNumber), useKelvin);
         if (useKelvin) {
             met1 += 273.15;
             met1 = roundNicely(met1, useRounding);
         }
-        met1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const formattedMet1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
-        let met = met1;
+        let met = formattedMet1;
 
         // lower-bound of the range
-        if (match[2]) {
-            let met2 = fahrenheitToCelsius(parseNumber(match[2]), useKelvin);
+        if (secondNumber) {
+            let met2 = fahrenheitToCelsius(parseNumber(secondNumber), useKelvin);
             if (useKelvin) {
                 met2 += 273.15;
                 met2 = roundNicely(met2, useRounding);
             }
-            met2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+            const formattedMet2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
-            met += ' to ' + met2;
+            met += ' to ' + formattedMet2;
         }
 
         const unit = useKelvin ? 'K' : '°C';
