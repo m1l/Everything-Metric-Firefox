@@ -1209,62 +1209,38 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
 */
 function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = false ?
-        // NOTE: Firefox now supports negative look-behinds, so this version might be usable
-        new RegExp(
-            [
+    const regex = new RegExp(
+        [
+            '(',
+                // NOTE: Firefox now supports negative look-behinds, so this version might be usable
+                // check that this is not preceded by a fraction bar
+                (
+                    false
+                    ? '(?<!\/)' // with look-behind
+                    : '[\/]?' // manually, TODO: it looks like the check is not done at all
+                ),
+                // mixed numeral
                 '(',
-                    '(?<!\/)', // check that this is not preceded by a fraction bar
-                    // mixed numeral
-                    '(',
-                        '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
-                        '[\-− \u00A0]', // separator
-                        '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
-                    ')',
-                    ' ?', // optional space
-                    '[x\*×]', // multiplication sign
-                    ' ?', // optional space
-                    // mixed numeral
-                    '(',
-                        '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
-                        '[\-− \u00A0]', // separator
-                        '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
-                    ')?',
-                    ' ?', // optional space
-                    '("|″|”|“|’’|\'\'|′′)', // inches marker
-                    '([^a-z]|$)', // look for a separator
+                    '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
+                    '[\-− \u00A0]', // separator
+                    '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
                 ')',
-            ].join(''),
-            'ig',
-        )
-        :
-        new RegExp(
-            [
+                ' ?', // optional space
+                '[x\*×]', // multiplication sign
+                ' ?', // optional space
+                // mixed numeral
                 '(',
-                    '[\/]?', // include previous fraction bar (to check manually later)
-                    // mixed numeral
-                    '(',
-                        '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
-                        '[\-− \u00A0]', // separator
-                        '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
-                    ')',
-                    ' ?', // optional space
-                    '[x|\*|×]', // multiplication sign
-                    ' ?', // optional space
-                    // mixed numeral
-                    '(',
-                        '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
-                        '[\-− \u00A0]', // separator
-                        '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
-                    ')?',
-                    ' ?', // optional space
-                    '("|″|”|“|’’|\'\'|′′)', // inches marker
-                    '([^a-z]|$)', // look for a separator
-                ')',
-            ].join(''),
-            'ig',
-        );
-    ;
+                    '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
+                    '[\-− \u00A0]', // separator
+                    '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
+                ')?',
+                ' ?', // optional space
+                '("|″|”|“|’’|\'\'|′′)', // inches marker
+                '([^a-z]|$)', // look for a separator
+            ')',
+        ].join(''),
+        'ig',
+    );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
