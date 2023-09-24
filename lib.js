@@ -1144,10 +1144,16 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
     let match;
     while ((match = regex.exec(text)) !== null) {
         const original = match[0];
-        const pounds = parseFloat(match[1]);
-        const ounces = parseFloat(match[2]);
+        const poundsPart = match[1];
+        const ouncesPart = match[2];
+        if (!poundsPart || !ouncesPart) {
+            continue;
+        }
+        const pounds = parseFloat(poundsPart);
+        const ounces = parseFloat(ouncesPart);
         const total = pounds * 16 + ounces;
-        const kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), ' kg', useBold, useBrackets);
+        const formattedTotal = formatNumber(roundNicely(total * 0.0283495, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const kg = formatConvertedValue(formattedTotal, ' kg', useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], kg);
     }
     return text;
