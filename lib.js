@@ -646,32 +646,18 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
  *  @return {string} - A new string with metric lengths
 */
 function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    let regex = new RegExp('(([0-9]{0,3}).?(ft|yd|foot|feet).?([0-9]+(\.[0-9]+)?).?in(ch|ches)?)', 'g');
-    if (text.search(regex) !== -1) {
-        let matches;
+    const regex = new RegExp('(([0-9]{0,3}).?(ft|yd|foot|feet).?([0-9]+(\.[0-9]+)?).?in(ch|ches)?)', 'g');
 
-        while ((matches = regex.exec(text)) !== null) {
-            try {
-                const original = matches[0];
-                let ydft = matches[2];
-                ydft = parseFloat(ydft);
-                let inches = matches[4];
-                inches = parseFloat(inches);
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+        const yards_or_feet = parseFloat(match[2]);
+        const inches = parseFloat(match[4]);
 
-                let total = 0;
-                var isyd = new RegExp('yd', 'i');
-                if (isyd.test(matches[3])) ydft *= 3;
-
-                total = ydft * 12 + inches;
-
-                let meter = formatConvertedValue(roundNicely(total * 0.0254, useRounding), spc + 'm', useBold, useBrackets);
-
-                //text = text.replace(matches[0], meter);
-                text = replaceMaybeKeepLastChar(text, matches[0], meter);
-            } catch (err) {
-                // console.log(err.message);
-            }
-        }
+        const is_yards = new RegExp('yd', 'i');
+        const feet = is_yards.test(match[3]) ? yards_or_feet * 3 : yards_or_feet;
+        const total = feet * 12 + inches;
+        const meter = formatConvertedValue(roundNicely(total * 0.0254, useRounding), ' m', useBold, useBrackets);
+        text = replaceMaybeKeepLastChar(text, match[0], meter);
     }
     return text;
 }
