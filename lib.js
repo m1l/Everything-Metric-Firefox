@@ -176,6 +176,12 @@ function stepUpOrDown(met, unit, useMM, useGiga) {
     };
 }
 
+/** Create a new string where toInsert has been inserted in target at the position index
+ *  @param {string} target - The string where toInsert should be inserted
+ *  @param {string} toInsert - The string to insert
+ *  @param {number} index - The position where toTarget should be inserted
+ *  @return {string} - A new string with toInsert at position index
+*/
 function insertAt(target, toInsert, index) {
     return target.substr(0, index) + toInsert + target.substr(index);
 }
