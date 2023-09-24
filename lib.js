@@ -1208,65 +1208,48 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
  *  @return {string} - A new string with metric surfaces
 */
 function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-
-
+    // NOTE: Firefox now supports negative look-behinds, so this version might be usable
     //let regex = new RegExp('((?<!\/)(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x\*×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
-    ////Firefox does not support negative lookbehind so this like is changed from Chrome version
-    let regex = new RegExp('([\/]?(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x|\*|×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
-//new ((([\.0-9]+(?!\/)(\.[0-9]+)?)?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$)))
-    let matches;
 
+    const regex = new RegExp('([\/]?(([0-9]+(?!\/))[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?) ?[x|\*|×] ?(([0-9]+(?!\/))?[\-− \u00A0]([0-9]+[\/⁄][0-9\.]+)?)? ?("|″|”|“|’’|\'\'|′′)([^a-z]|$))', 'ig');
 
-    while ((matches = regex.exec(text)) !== null) {
-        try {
-/*
-            for (var i=0; i<matches.length; i++)
-                console.log("matches " + i + " " + matches[i])*/
-            const fullMatch = matches[1];
-            //if (isAlreadyConverted(text, convertBracketed)) continue;
-
-
-            let inches1 = parseFloat(matches[3]);
-            if (isNaN(inches1)) inches1 = 0;
-
-            let frac1 = (matches[4]);
-            frac1 = evaluateFraction(frac1);
-            if (isNaN(frac1)) continue;
-
-            let inches2 = parseFloat(matches[6]);
-            if (isNaN(inches2)) inches2 = 0;
-
-            let frac2 = (matches[7]);
-            frac2 = evaluateFraction(frac2);
-            if (isNaN(frac2)) continue;
-
-            //console.log( inches1 + " " + frac1 + " " + inches2 + " " + frac2);
-
-            inches1 = inches1+frac1;
-            inches2 = inches2+frac2;
-
-            let scale = 2.54;
-            let unit = spc + "cm";
-            if (useMM === true) {
-                scale = 25.4;
-                unit = spc + "mm"
-            }
-
-            let cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-            let cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-
-
-            const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2, spc + unit, useBold, useBrackets);
-
-            //text = text.replace(matches[0], metStr);
-            text = replaceMaybeKeepLastChar(text, matches[0], metStr);
-        } catch (err) {
-            console.log(err.message);
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+        let inches1 = parseFloat(match[3]);
+        if (isNaN(inches1)) {
+            inches1 = 0;
         }
+
+        const frac1 = evaluateFraction(match[4]);
+        if (isNaN(frac1)) {
+            continue;
+        }
+        inches1 += frac1;
+
+        let inches2 = parseFloat(match[6]);
+        if (isNaN(inches2)) {
+            inches2 = 0;
+        }
+
+        const frac2 = evaluateFraction(match[7]);
+        if (isNaN(frac2)) {
+            continue;
+        }
+        inches2 += frac2;
+
+        let scale = 2.54;
+        let unit = spc + "cm";
+        if (useMM === true) {
+            scale = 25.4;
+            unit = spc + "mm"
+        }
+
+        const cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(`${cm1} × ${cm2}`, ` ${unit}`, useBold, useBrackets);
+        text = replaceMaybeKeepLastChar(text, match[0], metStr);
     }
     return text;
-
-
 }
 
 /** Return a new string where all occurrences of other non-metric units have been converted to metric
