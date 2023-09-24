@@ -935,7 +935,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                     // mixed numeral
                     '(?:',
                         // integer
-                        '(',
+                        '(?:',
                             '([\.,0-9]+)', // number
                             '(?!\/)', // check that this is not part of a fraction
                             '(?:[\-− \u00A0]?)', // optional separator
@@ -984,7 +984,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                     // mixed numeral
                     '(?:',
                         // integer
-                        '(',
+                        '(?:',
                             '([\.,0-9]+)', // number
                             '(?!\/)', // check that this is not part of a fraction
                             '(?:[\-− \u00A0]?)', // optional separator
@@ -1051,7 +1051,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[6] !== undefined && match[6]==='\n') {
+            if (match[5] !== undefined && match[5]==='\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
@@ -1079,7 +1079,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             feet = 0;
         }
 
-        let inches = match[3];
+        let inches = match[2];
         if (inches !== undefined && inches.length<5) {//someone used , instead of . for decimals
             inches = inches.replace(',', '.');
         }
@@ -1088,8 +1088,8 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             inches = 0;
         }
 
-        if (match[4] !== undefined) {
-            inches += evaluateFraction(match[4]);
+        if (match[3] !== undefined) {
+            inches += evaluateFraction(match[3]);
         }
 
         if (inches === 0 || isNaN(inches)) {
