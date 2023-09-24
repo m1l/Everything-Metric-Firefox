@@ -319,7 +319,7 @@ function replaceFahrenheit(text) {
                     met = met1 + ' to ';
                 met += met2;
 
-                const insertIndex = GetIndexPos(matches.index, fullMatch);
+                const insertIndex = whereToInsertConvertedValue(matches.index, fullMatch);
                 const metStr = prepareForOutput(met, unit, false);
                 text = insertAt(text, metStr, insertIndex);
             } catch (err) {
@@ -359,7 +359,7 @@ function mpg2Lper100km(text) {
                 var met = convert(l, 1, false);
                 //met = formatNumber(met, useComma, useSpaces);
 
-                const insertIndex = GetIndexPos(matches.index, fullMatch);
+                const insertIndex = whereToInsertConvertedValue(matches.index, fullMatch);
                 const metStr = prepareForOutput(met, '\u00A0L\/100\u00A0km', false);
                 text = insertAt(text, metStr, insertIndex);
             } catch (err) {
@@ -370,7 +370,7 @@ function mpg2Lper100km(text) {
     return text;
 }
 
-function GetIndexPos(index, fullMatch) {
+function whereToInsertConvertedValue(index, fullMatch) {
     let insertIndex = index + fullMatch.length;
     let lastchar = fullMatch[fullMatch.length -1];
     if (/[\s \.,;]/.test(lastchar))
@@ -478,7 +478,7 @@ function processAll(text) {
 
                     const metStr = convAndForm(imp, i, suffix);
 
-                    let insertIndex = GetIndexPos(matches.index, fullMatch);
+                    let insertIndex = whereToInsertConvertedValue(matches.index, fullMatch);
                     insertIndex = insertIndex - subtract; //subtracts behind bracket
                     text = insertAt(text, metStr, insertIndex);
 
@@ -830,7 +830,7 @@ function feetInch(text) {
                 metStr = convAndForm(feet + inches / 12, 2, ''); //2 feet
             else
                 metStr = convAndForm(feet * 12 + inches, 1, ''); //1 inch
-            const insertIndex = GetIndexPos(matches.index, fullMatch);
+            const insertIndex = whereToInsertConvertedValue(matches.index, fullMatch);
 
             text = insertAt(text, metStr, insertIndex);
 
@@ -954,7 +954,7 @@ function ParseUnitsOnly(text) {
 
                 const metStr = convAndForm(lastquantity, i, "");
                 const fullMatch = matches[0];
-                const insertIndex = GetIndexPos(matches.index, fullMatch);
+                const insertIndex = whereToInsertConvertedValue(matches.index, fullMatch);
 
                 text = insertAt(text, metStr, insertIndex);
 
