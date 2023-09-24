@@ -1212,8 +1212,8 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
 */
 function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     const len = conversions.length;
-    for (let i = 0; i < len; i++) {
-        const conversion = conversions[i];
+    for (let conversionIndex = 0; conversionIndex < len; conversionIndex++) {
+        const conversion = conversions[conversionIndex];
         if (conversion === undefined || conversion.regex === undefined) {
             continue;
         }
@@ -1229,7 +1229,7 @@ function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRoun
             }
 
             let subtract = 0;
-            if (i == 1) { //in
+            if (conversionIndex == 1) { //in
                 //if (/[a-z#$€£]/i.test(match[1].substring(0,1)))
                 if (/^[a-z#$€£]/i.test(match[0]))
                     continue;
@@ -1252,7 +1252,7 @@ function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRoun
                     subtract = match[8].length;
                 }
             }
-            if (i == 2) { //ft
+            if (conversionIndex == 2) { //ft
                 if (/[°º]/.test(match[1])) continue;
                 if (/\d/ig.test(match[5])) continue; //avoid 3' 5"
             }
@@ -1275,7 +1275,7 @@ function replaceOtherUnits(text, convertBracketed, isUK, useMM, useGiga, useRoun
                 imp = 0;
             }
 
-            if (i == 1 && / in /i.test(match[0]) && imp > 1000) {
+            if (conversionIndex == 1 && / in /i.test(match[0]) && imp > 1000) {
                 continue; //prevents 1960 in Germany
             }
 
