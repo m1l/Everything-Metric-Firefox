@@ -220,6 +220,11 @@ function fahrenheitToCelsius(f, useKelvin) {
        return Math.round(met);
 }
 
+/** Round a number
+ *  @param {number} v - The number
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @return {number} - The rounded number
+*/
 function roundNicely(v, useRounding) {
     if (useRounding === false)
         return Math.round(v * 100) / 100;
