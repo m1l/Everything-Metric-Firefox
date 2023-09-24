@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -108,6 +108,11 @@ function testReplaceFeetAndInches() {
     assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false, false), ' (0.97 m)˜');
 }
 
+function testReplaceFeetAndInchesSymbol() {
+    // TODO: the original value should not be removed
+    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false), ' (0.36 m)˜');
+}
+
 function testReplaceMaybeKeepLastChar() {
     assert.equal(replaceMaybeKeepLastChar('Hello, World!', 'World', 'Everyone'), 'Hello, Everyone!');
     assert.equal(replaceMaybeKeepLastChar('Hello, World!', 'World!', 'Everyone'), 'Hello, Everyone!');
@@ -196,6 +201,7 @@ function main() {
     testParseNumber();
     testReplaceFahrenheit();
     testReplaceFeetAndInches();
+    testReplaceFeetAndInchesSymbol();
     testReplaceMaybeKeepLastChar();
     testReplaceSurfaceInFeet();
     testReplaceSurfaceInInches();
