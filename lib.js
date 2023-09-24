@@ -247,4 +247,19 @@ function roundNicely(v, useRounding) {
     return Math.round(v * 100) / 100;
 }
 
-module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely };
+function formatNumber(mystring, useComma, useSpaces) {
+    if (useComma === false) {
+        if (useSpaces === true)
+            return mystring.toLocaleString('us-EN').replace(',', '\u00A0');
+        else
+            return mystring.toLocaleString('us-EN');
+    }
+
+    if (useSpaces === true)
+        return mystring.toLocaleString('de-DE').replace('.', '\u00A0');
+    else
+        return mystring.toLocaleString('de-DE');
+
+}
+
+module.exports = { evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber };

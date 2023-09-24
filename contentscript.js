@@ -289,7 +289,7 @@ function replaceFahrenheit(text) {
                         met1 = roundNicely(met1, useRounding);
                     }
 
-                    met1 = formatNumber(met1);
+                    met1 = formatNumber(met1, useComma, useSpaces);
                 }
 
                 if ((/[\-−]/.test(imp2.charAt(0))) ||
@@ -312,7 +312,7 @@ function replaceFahrenheit(text) {
                     met2 = roundNicely(met2, useRounding);
                 }
 
-                met2 = formatNumber(met2);
+                met2 = formatNumber(met2, useComma, useSpaces);
 
                 var met='';
                 if (imp1!==undefined)
@@ -357,7 +357,7 @@ function mpg2Lper100km(text) {
                 if (imp === 0 || isNaN(imp)) continue;
                 var l = 235.214583 / imp; // 100 * 3.785411784 / 1.609344 * imp;
                 var met = convert(l, 1, false);
-                //met = formatNumber(met);
+                //met = formatNumber(met, useComma, useSpaces);
 
                 const insertIndex = GetIndexPos(matches.index, fullMatch);
                 const metStr = prepareForOutput(met, '\u00A0L\/100\u00A0km', false);
@@ -565,9 +565,9 @@ function AxAxAin(text) {
                     scale = 25.4;
                     unit = spc + "mm"
                 }
-                let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding));
-                let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding));
-                let cm3 = formatNumber(roundNicely(matches[6] * scale, useRounding));
+                let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
+                let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
+                let cm3 = formatNumber(roundNicely(matches[6] * scale, useRounding), useComma, useSpaces);
 
 
                 const insertIndex = GetIndexPos(matches.index, fullMatch);
@@ -628,8 +628,8 @@ function AxAqq(text) {//ikea US
                 unit = spc + "mm"
             }
 
-            let cm1 = formatNumber(roundNicely(inches1 * scale, useRounding));
-            let cm2 = formatNumber(roundNicely(inches2 * scale, useRounding));
+            let cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useComma, useSpaces);
+            let cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useComma, useSpaces);
 
 
             const insertIndex = GetIndexPos(matches.index, fullMatch);
@@ -668,8 +668,8 @@ function AxAin(text) {
                     scale = 25.4;
                     unit = spc + "mm"
                 }
-                let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding));
-                let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding));
+                let cm1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
+                let cm2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
 
                 const insertIndex = GetIndexPos(matches.index, fullMatch);
                 const metStr = prepareForOutput(cm1 + spc + "x" + spc + cm2, spc + unit, true); //+ behind bracket
@@ -703,8 +703,8 @@ function AxAft(text) {
                 let scale = 0.3048;
                 let unit = spc + "m";
 
-                let m1 = formatNumber(roundNicely(matches[2] * scale, useRounding));
-                let m2 = formatNumber(roundNicely(matches[4] * scale, useRounding));
+                let m1 = formatNumber(roundNicely(matches[2] * scale, useRounding), useComma, useSpaces);
+                let m2 = formatNumber(roundNicely(matches[4] * scale, useRounding), useComma, useSpaces);
 
                 const insertIndex = GetIndexPos(matches.index, fullMatch);
                 const metStr = prepareForOutput(m1 + spc + "×" + spc + m2, spc + unit, true);
@@ -985,7 +985,7 @@ function ParseUnitsOnly(text) {
                     met = roundNicely(met, useRounding);
                 }
 
-            met = formatNumber(met);
+            met = formatNumber(met, useComma, useSpaces);
             const metStr = prepareForOutput(met, unit, false);
             text = insertAt(text, metStr, 1);
 
@@ -1014,28 +1014,13 @@ function addBrackets(text) {
 function prepareForOutput(number, rest, commaReplaced) {
     totalConversions++;
     if (commaReplaced === false)
-        number = formatNumber(number)
+        number = formatNumber(number, useComma, useSpaces)
     if (rest === undefined)
         rest = '';
     let fullstring = number + rest;
     fullstring = addBrackets(fullstring);
     fullstring = bold(fullstring);
     return fullstring;
-}
-
-function formatNumber(mystring) {
-    if (useComma === false) {
-        if (useSpaces === true)
-            return mystring.toLocaleString('us-EN').replace(',', '\u00A0');
-        else
-            return mystring.toLocaleString('us-EN');
-    }
-
-    if (useSpaces === true)
-        return mystring.toLocaleString('de-DE').replace('.', '\u00A0');
-    else
-        return mystring.toLocaleString('de-DE');
-
 }
 
 function FlashMessage() {
