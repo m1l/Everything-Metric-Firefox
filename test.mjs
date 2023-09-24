@@ -1,5 +1,17 @@
 import assert from 'node:assert/strict';
-import { evaluateFraction, insertAt, shouldConvert, stepUpOrDown } from './lib.js';
+import { convertToC, evaluateFraction, insertAt, shouldConvert, stepUpOrDown } from './lib.js';
+
+async function testConvertToC() {
+    assert.equal(convertToC(0, false), -18);
+    assert.equal(convertToC(32, false), 0);
+    assert.equal(convertToC(100, false), 38);
+    assert.equal(convertToC(212, false), 100);
+
+    assert.equal(convertToC(0, true), -17.77777777777778);
+    assert.equal(convertToC(32, true), 0);
+    assert.equal(convertToC(100, true), 37.77777777777778);
+    assert.equal(convertToC(212, true), 100);
+}
 
 async function testEvaluateFraction() {
     assert.equal(evaluateFraction('½'), 0.5);
@@ -55,6 +67,7 @@ async function testInsertAt() {
 }
 
 async function main() {
+    testConvertToC();
     testEvaluateFraction();
     testStepUpOrDown();
     testShouldConvert();
