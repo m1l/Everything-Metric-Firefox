@@ -355,7 +355,7 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
             '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
             // optionally, an additional number after a range marker
             '(?:',
-                '(?: to | and |[\-−—–‑]+)', // range marker
+                '(?: to | and |[\-−]+)', // range marker
                 '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
             ')?',
             '[ \u00A0]?', // space or no-break space

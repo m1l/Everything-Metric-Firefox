@@ -295,7 +295,7 @@ function mpg2Lper100km(text) {
     return text;
 }
 
-function CleanReplace(text, match, metStr) {
+function replaceMaybeKeepLastChar(text, match, metStr) {
     let lastchar = match[match.length -1];
     //console.log("replacing " + match + " with " + metStr + /[^a-z"″”“’'′]/i.test(lastchar));
 
@@ -491,7 +491,7 @@ function AxAxAin(text) {
                 const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2 + spc + "×" + spc + cm3, spc + unit, useBold, useBrackets);
 
                 //text = text.replace(matches[0], metStr);
-                text = CleanReplace(text, matches[0], metStr);
+                text = replaceMaybeKeepLastChar(text, matches[0], metStr);
             } catch (err) {
                 //console.log(err.message);
             }
@@ -552,7 +552,7 @@ function AxAqq(text) {//ikea US
             const metStr = formatConvertedValue(cm1 + spc + "×" + spc + cm2, spc + unit, useBold, useBrackets);
 
             //text = text.replace(matches[0], metStr);
-            text = CleanReplace(text, matches[0], metStr);
+            text = replaceMaybeKeepLastChar(text, matches[0], metStr);
         } catch (err) {
             console.log(err.message);
         }
@@ -590,7 +590,7 @@ function AxAin(text) {
                 const metStr = formatConvertedValue(cm1 + spc + "x" + spc + cm2, spc + unit, useBold, useBrackets); //+ behind bracket
 
                 //text = text.replace(matches[0], metStr);
-                text = CleanReplace(text, matches[0], metStr);
+                text = replaceMaybeKeepLastChar(text, matches[0], metStr);
             } catch (err) {
                 //console.log(err.message);
             }
@@ -624,7 +624,7 @@ function AxAft(text) {
                 const metStr = formatConvertedValue(m1 + spc + "×" + spc + m2, spc + unit, useBold, useBrackets);
 
                 //text = text.replace(matches[0], metStr);
-                text = CleanReplace(text, matches[0], metStr);
+                text = replaceMaybeKeepLastChar(text, matches[0], metStr);
             } catch (err) {
                 //console.log(err.message);
             }
@@ -782,7 +782,7 @@ function ftin2m(text) {
                 let meter = formatConvertedValue(roundNicely(total * 0.0254, useRounding), spc + 'm', useBold, useBrackets);
 
                 //text = text.replace(matches[0], meter);
-                text = CleanReplace(text, matches[0], meter);
+                text = replaceMaybeKeepLastChar(text, matches[0], meter);
             } catch (err) {
                 // console.log(err.message);
             }
@@ -811,7 +811,7 @@ function lboz2kg(text) {
 
                 let kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), spc + 'kg', useBold, useBrackets);
                 //text = text.replace(matches[0], kg);
-                text = CleanReplace(text, matches[0], kg);
+                text = replaceMaybeKeepLastChar(text, matches[0], kg);
             } catch (err) {
                 // console.log(err.message);
             }
