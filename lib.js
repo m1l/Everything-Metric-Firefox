@@ -1130,15 +1130,13 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '(',
-                '([0-9]{0,3})', // number
-                '.?', // separator
-                '(lbs?)', // pounds unit
-                '.?', // separator
-                '([0-9]+(\.[0-9]+)?)', // number
-                '.?', // separator
-                'oz', // ounces unit
-            ')',
+            '([0-9]{0,3})', // number
+            '.?', // separator
+            '(lbs?)', // pounds unit
+            '.?', // separator
+            '([0-9]+(\.[0-9]+)?)', // number
+            '.?', // separator
+            'oz', // ounces unit
         ].join(''),
         'g',
     );
@@ -1146,8 +1144,8 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
     let match;
     while ((match = regex.exec(text)) !== null) {
         const original = match[0];
-        const pounds = parseFloat(match[2]);
-        const ounces = parseFloat(match[4]);
+        const pounds = parseFloat(match[1]);
+        const ounces = parseFloat(match[3]);
         const total = pounds * 16 + ounces;
         const kg = formatConvertedValue(roundNicely(total * 0.0283495, useRounding), ' kg', useBold, useBrackets);
         text = replaceMaybeKeepLastChar(text, match[0], kg);
