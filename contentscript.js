@@ -49,21 +49,6 @@ function walk(node) {
     }
 }
 
-function replaceAll(text) {
-    text = replaceIkeaSurface(text, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-    if (includeQuotes)
-        text = replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
-    text = replaceVolume(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-    text = replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-    text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-    text = replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useComma, useSpaces, useBold, useBrackets);
-    text = replacePoundsAndOunces(text, convertBracketed, useRounding, useComma, useSpaces, useBold, useBrackets);
-    text = replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
-    text = replaceMilesPerGallon(text, convertBracketed, useRounding, useComma, useSpaces, useBold, useBrackets);
-    text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
-    return text;
-}
-
 var foundDegreeSymbol = false;
 function procNode(textNode) {
 
@@ -98,7 +83,7 @@ function procNode(textNode) {
     }
    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) ||
         /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
-        textNode.nodeValue = replaceAll(text);
+        textNode.nodeValue = replaceAll(text, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
     }
 }
 
