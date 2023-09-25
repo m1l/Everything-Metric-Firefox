@@ -228,6 +228,7 @@ function testReplaceAll() {
     fs.writeFileSync('oracles/useRounding.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, false, false));
     fs.writeFileSync('oracles/useBrackets.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, true, false, false, false));
     fs.writeFileSync('oracles/useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, false, false, false, false));
+    fs.writeFileSync('oracles/useBrackets+useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, true, false, false, false));
     fs.writeFileSync('oracles/useKelving.html', replaceAll(html, false, false, false, false, false, false, false, false, true, false, false, false, false, false));
     fs.writeFileSync('oracles/useGiga.html', replaceAll(html, false, false, false, false, false, false, false, true, false, false, false, false, false, false));
     fs.writeFileSync('oracles/useMM.html', replaceAll(html, false, false, false, false, false, false, true, false, false, false, false, false, false, false));
