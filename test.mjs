@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, conversions, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, conversions, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+
+import fs from 'fs';
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -218,6 +220,25 @@ function testWhereToInsertConvertedValue() {
     assert.equal(convertedValueInsertionOffset('1 m)'), 4);
 }
 
+function testReplaceAll() {
+    const html = fs.readFileSync('index.html', { encoding: 'utf-8' });
+    fs.writeFileSync('oracles/default.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/useSpaces.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, true));
+    fs.writeFileSync('oracles/useComma.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, true, false));
+    fs.writeFileSync('oracles/useRounding.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, false, false));
+    fs.writeFileSync('oracles/useBrackets.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, true, false, false, false));
+    fs.writeFileSync('oracles/useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, false, false, false, false));
+    fs.writeFileSync('oracles/useKelving.html', replaceAll(html, false, false, false, false, false, false, false, false, true, false, false, false, false, false));
+    fs.writeFileSync('oracles/useGiga.html', replaceAll(html, false, false, false, false, false, false, false, true, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/useMM.html', replaceAll(html, false, false, false, false, false, false, true, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/isUK.html', replaceAll(html, false, false, false, false, false, true, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeQuotes.html', replaceAll(html, false, false, false, false, true, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/matchIn.html', replaceAll(html, false, false, false, true, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeImproperSymbols.html', replaceAll(html, false, false, true, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/degWithoutFahrenheit.html', replaceAll(html, false, true, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/convertBracketed.html', replaceAll(html, true, false, false, false, false, false, false, false, false, false, false, false, false, false));
+}
+
 function main() {
     testBold();
     testConvAndForm();
@@ -241,6 +262,7 @@ function main() {
     testStepUpOrDown();
     testShouldConvert();
     testWhereToInsertConvertedValue();
+    testReplaceAll();
 }
 
 main();
