@@ -1,7 +1,6 @@
 const regstart = '([\(]?';
 const regend = '([^a-z]|$)';
 const intOrFloat = '([0-9,\.]+)';
-const intOrFloatSigned = '([\-−0-9,\.]+)';
 const spc = '\u00A0';
 const intOrFloatNoFrac = '([\.,0-9]+(?![\/⁄]))?';
 const skipbrackets = '(?! [\(][0-9]|\u200B\u3010)';
