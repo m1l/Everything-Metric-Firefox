@@ -1398,6 +1398,8 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
 
 /** Return a new string where all occurrences of other non-metric units have been converted to metric
  *  @param {string} text - The original text
+ *  @param {boolean} convertTablespoon - Whether to convert tablespoons
+ *  @param {boolean} convertTeaspoon - Whether to convert teaspoons
  *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
  *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -1411,7 +1413,7 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric units
 */
-function replaceOtherUnits(text, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     // TODO: this is ugly
     const fahrenheitConversion = conversions[0];
     if (fahrenheitConversion !== undefined) {
@@ -1431,11 +1433,19 @@ function replaceOtherUnits(text, degWithoutFahrenheit, matchIn, convertBracketed
         text = replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     }
 
+    if (convertTablespoon) {
+        text = replaceOtherUnit(text, unitsTablespoon, -1, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+    }
+    if (convertTeaspoon) {
+        text = replaceOtherUnit(text, unitsTeaspoon, -1, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+    }
     return text;
 }
 
 /** Return a new string where non-metric units has been replaced with metric units
  *  @param {string} text - The original text
+ *  @param {boolean} convertTablespoon - Whether to convert tablespoons
+ *  @param {boolean} convertTeaspoon - Whether to convert teaspoons
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
  *  @param {boolean} includeImproperSymbols} - Whether to support unofficial symbols for feet and inches
@@ -1452,7 +1462,7 @@ function replaceOtherUnits(text, degWithoutFahrenheit, matchIn, convertBracketed
  *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @return {string} - A new string with metric units
 */
-function replaceAll(text, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator) {
+function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator) {
     text = replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     if (includeQuotes)
         text = replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
@@ -1461,7 +1471,7 @@ function replaceAll(text, convertBracketed, degWithoutFahrenheit, includeImprope
     text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     text = replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     text = replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceOtherUnits(text, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+    text = replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     text = replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     return text;

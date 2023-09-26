@@ -83,7 +83,7 @@ function procNode(textNode) {
     }
    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) ||
         /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
-        textNode.nodeValue = replaceAll(text, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+        textNode.nodeValue = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
     }
 }
 
@@ -192,9 +192,6 @@ function InitRegex(){
         //only for foot
         conversions[2].regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
     }
-
-    if (convertTablespoon) conversions.push(unitsTablespoon);
-    if (convertTeaspoon) conversions.push(unitsTeaspoon);
 }
 
 

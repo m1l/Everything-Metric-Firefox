@@ -139,8 +139,8 @@ function testReplaceMilesPerGallon() {
 }
 
 function testReplaceOtherUnits() {
-    assert.equal(replaceOtherUnits('30 miles', false, false, false, false, false, false, false, false, false, false, false), '30 miles (48.28 km)˜');
-    assert.equal(replaceOtherUnits('30 miles²', false, false, false, false, false, false, false, false, false, false, false), '30 miles² (77.7 km²)˜');
+    assert.equal(replaceOtherUnits('30 miles', false, false, false, false, false, false, false, false, false, false, false, false, false), '30 miles (48.28 km)˜');
+    assert.equal(replaceOtherUnits('30 miles²', false, false, false, false, false, false, false, false, false, false, false, false, false), '30 miles² (77.7 km²)˜');
 }
 
 function testReplacePoundsAndOunces() {
@@ -222,30 +222,30 @@ function testWhereToInsertConvertedValue() {
 
 function testReplaceAll() {
     const html = fs.readFileSync('index.html', { encoding: 'utf-8' });
-    fs.writeFileSync('oracles/default.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/useSpaces.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, true));
-    fs.writeFileSync('oracles/useComma.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, true, false));
-    fs.writeFileSync('oracles/useRounding.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, false, false));
-    fs.writeFileSync('oracles/useBrackets.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, true, false, false, false));
+    fs.writeFileSync('oracles/default.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/useSpaces.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true));
+    fs.writeFileSync('oracles/useComma.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false));
+    fs.writeFileSync('oracles/useRounding.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false));
+    fs.writeFileSync('oracles/useBrackets.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false));
     // TODO: useBold have no effect without useBrackets
-    fs.writeFileSync('oracles/useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, false, false, false, false));
-    fs.writeFileSync('oracles/useBrackets+useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, true, false, false, false));
-    fs.writeFileSync('oracles/useKelving.html', replaceAll(html, false, false, false, false, false, false, false, false, true, false, false, false, false, false));
-    fs.writeFileSync('oracles/useGiga.html', replaceAll(html, false, false, false, false, false, false, false, true, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/useMM.html', replaceAll(html, false, false, false, false, false, false, true, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/isUK.html', replaceAll(html, false, false, false, false, false, true, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false));
+    fs.writeFileSync('oracles/useBrackets+useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false));
+    fs.writeFileSync('oracles/useKelving.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false));
+    fs.writeFileSync('oracles/useGiga.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/useMM.html', replaceAll(html, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/isUK.html', replaceAll(html, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false));
     // NOTE: includeQuotes has no effect without includeImproperSymbols
-    fs.writeFileSync('oracles/includeQuotes.html', replaceAll(html, false, false, false, false, true, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeQuotes.html', replaceAll(html, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false));
     // TODO: matchIn not seem to have any effect
-    fs.writeFileSync('oracles/matchIn.html', replaceAll(html, false, false, false, true, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/matchIn.html', replaceAll(html, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false));
     setIncludeImproperSymbols(true);
     // TODO: includeImproperSymbols has no effect without includeQuotes
-    fs.writeFileSync('oracles/includeImproperSymbols.html', replaceAll(html, false, false, true, false, false, false, false, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/includeQuotes+includeImproperSymbols.html', replaceAll(html, false, false, true, false, true, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeImproperSymbols.html', replaceAll(html, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeQuotes+includeImproperSymbols.html', replaceAll(html, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, false));
     setIncludeImproperSymbols(false);
     // TODO: degWithoutFahrenheit detects '212 °' but breaks detection of '212 °F'
-    fs.writeFileSync('oracles/degWithoutFahrenheit.html', replaceAll(html, false, true, false, false, false, false, false, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/convertBracketed.html', replaceAll(html, true, false, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/degWithoutFahrenheit.html', replaceAll(html, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/convertBracketed.html', replaceAll(html, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false));
 }
 
 function main() {
