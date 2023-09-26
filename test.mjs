@@ -246,6 +246,8 @@ function testReplaceAll() {
     // TODO: degWithoutFahrenheit detects '212 °' but breaks detection of '212 °F'
     fs.writeFileSync('oracles/degWithoutFahrenheit.html', replaceAll(html, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false));
     fs.writeFileSync('oracles/convertBracketed.html', replaceAll(html, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/convertTeaspoon.html', replaceAll(html, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/convertTablespoon.html', replaceAll(html, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
 }
 
 function main() {
