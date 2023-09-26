@@ -62,7 +62,7 @@ const conversions = [
     },
     {
         //([\(]?[°º]? ?([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?[-− \u00A0]?(\'|′|’)(?![\'′’])(?! ?[\(-\− \u00A0]?[0-9]| \u3010)([^a-z]|$))
-        regex: new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g'),
+        // regex is set in setIncludeImproperSymbols
         unit: 'm',
         multiplier: 0.3048
     },
@@ -1015,6 +1015,14 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
             ].join(''),
             'gi',
         );
+    }
+    const feetConversion = conversions[2];
+    if (feetConversion !== undefined ){
+        if (includeImproperSymbols) {
+            feetConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g');
+        } else {
+            feetConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
+        }
     }
 }
 

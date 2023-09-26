@@ -187,14 +187,6 @@ function FlashMessage() {
     setTimeout(function(){ x.className = x.className.replace("show", ""); }, 1500);
 }
 
-function InitRegex(){
-    if (!includeImproperSymbols) {
-        //only for foot
-        conversions[2].regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
-    }
-}
-
-
 document.addEventListener('DOMContentLoaded', function() {
 
     if (/docs\.google\./.test(window.location.toString()) ||
@@ -231,7 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
             convertTeaspoon = response.convertTeaspoon;
             includeQuotes = response.includeQuotes;
             includeImproperSymbols = response.includeImproperSymbols;
-            InitRegex();
             setIncludeImproperSymbols(response.includeImproperSymbols);
 
             if (response.metricIsEnabled === true) {
