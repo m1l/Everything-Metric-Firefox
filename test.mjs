@@ -221,6 +221,7 @@ function testWhereToInsertConvertedValue() {
 }
 
 function testReplaceAll() {
+    setIncludeImproperSymbols(false);
     const html = fs.readFileSync('index.html', { encoding: 'utf-8' });
     fs.writeFileSync('oracles/default.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
     fs.writeFileSync('oracles/useSpaces.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true));
