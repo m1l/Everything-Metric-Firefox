@@ -195,10 +195,6 @@ function InitRegex(){
 
     if (convertTablespoon) conversions.push(unitsTablespoon);
     if (convertTeaspoon) conversions.push(unitsTeaspoon);
-
-    if(degWithoutFahrenheit) {
-        conversions[0].regex = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig')
-    }
 }
 
 

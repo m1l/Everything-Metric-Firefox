@@ -139,8 +139,8 @@ function testReplaceMilesPerGallon() {
 }
 
 function testReplaceOtherUnits() {
-    assert.equal(replaceOtherUnits('30 miles', false, false, false, false, false, false, false, false, false, false), '30 miles (48.28 km)˜');
-    assert.equal(replaceOtherUnits('30 miles²', false, false, false, false, false, false, false, false, false, false), '30 miles² (77.7 km²)˜');
+    assert.equal(replaceOtherUnits('30 miles', false, false, false, false, false, false, false, false, false, false, false), '30 miles (48.28 km)˜');
+    assert.equal(replaceOtherUnits('30 miles²', false, false, false, false, false, false, false, false, false, false, false), '30 miles² (77.7 km²)˜');
 }
 
 function testReplacePoundsAndOunces() {

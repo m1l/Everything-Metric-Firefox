@@ -42,7 +42,7 @@ const fractions = {
 /** @type{ import("./types").Conversion[] } */
 const conversions = [
     {
-        regexUnit: new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig'),
+        // regexUnit is set in replaceOtherUnits
         unit: '°C',
         multiplier: 1
     },
@@ -1280,6 +1280,7 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
 
 /** Return a new string where all occurrences of other non-metric units have been converted to metric
  *  @param {string} text - The original text
+ *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
  *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
@@ -1292,7 +1293,17 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric units
 */
-function replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceOtherUnits(text, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+    // TODO: this is ugly
+    const fahrenheitConversion = conversions[0];
+    if (fahrenheitConversion !== undefined) {
+        if (degWithoutFahrenheit) {
+            fahrenheitConversion.regex = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
+        } else {
+            fahrenheitConversion.regex = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
+        }
+    }
+
     const len = conversions.length;
     for (let conversionIndex = 0; conversionIndex < len; conversionIndex++) {
         const conversion = conversions[conversionIndex];
@@ -1425,7 +1436,7 @@ function replaceAll(text, convertBracketed, degWithoutFahrenheit, includeImprope
     text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     text = replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     text = replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+    text = replaceOtherUnits(text, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     text = replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     return text;
