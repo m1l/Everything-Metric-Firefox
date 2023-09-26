@@ -234,10 +234,15 @@ function testReplaceAll() {
     fs.writeFileSync('oracles/useGiga.html', replaceAll(html, false, false, false, false, false, false, false, true, false, false, false, false, false, false));
     fs.writeFileSync('oracles/useMM.html', replaceAll(html, false, false, false, false, false, false, true, false, false, false, false, false, false, false));
     fs.writeFileSync('oracles/isUK.html', replaceAll(html, false, false, false, false, false, true, false, false, false, false, false, false, false, false));
+    // NOTE: includeQuotes has no effect without includeImproperSymbols
     fs.writeFileSync('oracles/includeQuotes.html', replaceAll(html, false, false, false, false, true, false, false, false, false, false, false, false, false, false));
-    // TODO: does not seem to have any effect
+    // TODO: matchIn not seem to have any effect
     fs.writeFileSync('oracles/matchIn.html', replaceAll(html, false, false, false, true, false, false, false, false, false, false, false, false, false, false));
+    setIncludeImproperSymbols(true);
+    // TODO: includeImproperSymbols has no effect without includeQuotes
     fs.writeFileSync('oracles/includeImproperSymbols.html', replaceAll(html, false, false, true, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeQuotes+includeImproperSymbols.html', replaceAll(html, false, false, true, false, true, false, false, false, false, false, false, false, false, false));
+    setIncludeImproperSymbols(false);
     fs.writeFileSync('oracles/degWithoutFahrenheit.html', replaceAll(html, false, true, false, false, false, false, false, false, false, false, false, false, false, false));
     fs.writeFileSync('oracles/convertBracketed.html', replaceAll(html, true, false, false, false, false, false, false, false, false, false, false, false, false, false));
 }
