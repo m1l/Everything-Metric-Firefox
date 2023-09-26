@@ -1306,7 +1306,14 @@ function replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga
                 continue;
             }
 
-            if (match[2] !== undefined && !/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(match[2])) {
+            const firstPart = match[1];
+            let impStr = match[2];
+            let fraction = match[3];
+            const unit = match[5];
+            const additionalNumber = match[7];
+            const qualifier = match[8];
+
+            if (impStr !== undefined && !/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(impStr)) {
                 continue;
             }
 
@@ -1319,65 +1326,64 @@ function replaceOtherUnits(text, matchIn, convertBracketed, isUK, useMM, useGiga
                     continue;
                 if (!matchIn && / in /i.test(match[0])) //born in 1948 in ...
                     continue;
-                if (match[8] !== undefined) {
-                    if (hasNumber(match[7])) continue; //for 1 in 2 somethings
-                    if (match[8] == ' a') continue;
-                    if (match[8] == ' an') continue;
-                    if (match[8] == ' the') continue;
-                    if (match[8] == ' my') continue;
-                    if (match[8] == ' his') continue;
-                    if (match[8] == '-') continue;
-                    if (/ her/.test(match[8])) continue;
-                    if (/ their/.test(match[8])) continue;
-                    if (/ our/.test(match[8])) continue;
-                    if (/ your/.test(match[8])) continue;
-                    subtract = match[8].length;
+                if (qualifier !== undefined) {
+                    if (additionalNumber !== undefined && hasNumber(additionalNumber)) continue; //for 1 in 2 somethings
+                    if (qualifier == ' a') continue;
+                    if (qualifier == ' an') continue;
+                    if (qualifier == ' the') continue;
+                    if (qualifier == ' my') continue;
+                    if (qualifier == ' his') continue;
+                    if (qualifier == '-') continue;
+                    if (/ her/.test(qualifier)) continue;
+                    if (/ their/.test(qualifier)) continue;
+                    if (/ our/.test(qualifier)) continue;
+                    if (/ your/.test(qualifier)) continue;
+                    subtract = qualifier.length;
                 }
             }
             if (conversionIndex == 2) { //ft
-                if (/[°º]/.test(match[1])) continue;
-                if (/\d/ig.test(match[5])) continue; //avoid 3' 5"
+                if (firstPart !== undefined && /[°º]/.test(firstPart)) continue;
+                if (unit !== undefined && /\d/ig.test(unit)) continue; //avoid 3' 5"
             }
             let suffix = '';
 
-            let imp = match[2];
+            let imp = 0;
+            if (impStr !== undefined) {
+                impStr = impStr.replace(',', '');
 
-            if (match[2] !== undefined) {
-                imp = imp.replace(',', '');
-
-                if (/[⁄]/.test(match[2])) { //improvisation, but otherwise 1⁄2 with register 1 as in
-                    match[3] = match[2];
+                if (/[⁄]/.test(impStr)) { //improvisation, but otherwise 1⁄2 with register 1 as in
+                    fraction = impStr;
                     imp = 0;
                 } else {
-                    imp = parseFloat(imp);
+                    imp = parseFloat(impStr);
+                    if (isNaN(imp)) {
+                        imp = 0;
+                    }
                 }
-            }
-            if (isNaN(imp)) {
-                imp = 0;
             }
 
             if (conversionIndex == 1 && / in /i.test(match[0]) && imp > 1000) {
                 continue; //prevents 1960 in Germany
             }
 
-            if (match[3] === '/') {
+            if (fraction === '/') {
                 continue; // 2,438/sqft
             }
-            if (match[3] !== undefined) {
-                imp += evaluateFraction(match[3]);
+            if (fraction !== undefined) {
+                imp += evaluateFraction(fraction);
             }
 
             if (imp === 0 || isNaN(imp)) {
                 continue;
             }
 
-            if (/²/.test(match[1])) {
+            if (firstPart !== undefined && /²/.test(firstPart)) {
                 suffix = '²';
-            } else if (/³/.test(match[1])) {
+            } else if (firstPart !== undefined && /³/.test(firstPart)) {
                 suffix = '³';
-            } else if (((typeof(match[5]) !== 'undefined') && match[5].toLowerCase().indexOf('sq') !== -1)) {
+            } else if (unit !== undefined && unit.toLowerCase().indexOf('sq') !== -1) {
                 suffix = '²';
-            } else if (((typeof(match[5]) !== 'undefined') && match[5].toLowerCase().indexOf('cu') !== -1)) {
+            } else if (unit !== undefined && unit.toLowerCase().indexOf('cu') !== -1) {
                 suffix = '³';
             }
 
