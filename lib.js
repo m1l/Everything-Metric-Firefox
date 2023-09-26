@@ -1278,6 +1278,124 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
     return text;
 }
 
+// TODO: remove conversionIndex from the arguments
+/** Return a new string where all occurrences of a given non-metric unit have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {import("./types").Conversion} conversion - The object describing the conversion
+ *  @param {number} conversionIndex - The index of the conversion in the conversions array
+ *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric units
+*/
+function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+    if (conversion.regex === undefined) {
+        return text;
+    }
+
+    let match;
+    while ((match = conversion.regex.exec(text)) !== null) {
+        if (!shouldConvert(match[0], convertBracketed)) {
+            continue;
+        }
+
+        const firstPart = match[1];
+        let impStr = match[2];
+        let fraction = match[3];
+        const unit = match[5];
+        const additionalNumber = match[7];
+        const qualifier = match[8];
+
+        if (impStr !== undefined && !/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(impStr)) {
+            continue;
+        }
+
+        let subtract = 0;
+        if (conversionIndex == 1) { //in
+            //if (/[a-z#$€£]/i.test(match[1].substring(0,1)))
+            if (/^[a-z#$€£]/i.test(match[0]))
+                continue;
+            if (/^in /i.test(match[0])) //born in 1948 in ...
+                continue;
+            if (!matchIn && / in /i.test(match[0])) //born in 1948 in ...
+                continue;
+            if (qualifier !== undefined) {
+                if (additionalNumber !== undefined && hasNumber(additionalNumber)) continue; //for 1 in 2 somethings
+                if (qualifier == ' a') continue;
+                if (qualifier == ' an') continue;
+                if (qualifier == ' the') continue;
+                if (qualifier == ' my') continue;
+                if (qualifier == ' his') continue;
+                if (qualifier == '-') continue;
+                if (/ her/.test(qualifier)) continue;
+                if (/ their/.test(qualifier)) continue;
+                if (/ our/.test(qualifier)) continue;
+                if (/ your/.test(qualifier)) continue;
+                subtract = qualifier.length;
+            }
+        }
+        if (conversionIndex == 2) { //ft
+            if (firstPart !== undefined && /[°º]/.test(firstPart)) continue;
+            if (unit !== undefined && /\d/ig.test(unit)) continue; //avoid 3' 5"
+        }
+        let suffix = '';
+
+        let imp = 0;
+        if (impStr !== undefined) {
+            impStr = impStr.replace(',', '');
+
+            if (/[⁄]/.test(impStr)) { //improvisation, but otherwise 1⁄2 with register 1 as in
+                fraction = impStr;
+                imp = 0;
+            } else {
+                imp = parseFloat(impStr);
+                if (isNaN(imp)) {
+                    imp = 0;
+                }
+            }
+        }
+
+        if (conversionIndex == 1 && / in /i.test(match[0]) && imp > 1000) {
+            continue; //prevents 1960 in Germany
+        }
+
+        if (fraction === '/') {
+            continue; // 2,438/sqft
+        }
+        if (fraction !== undefined) {
+            imp += evaluateFraction(fraction);
+        }
+
+        if (imp === 0 || isNaN(imp)) {
+            continue;
+        }
+
+        if (firstPart !== undefined && /²/.test(firstPart)) {
+            suffix = '²';
+        } else if (firstPart !== undefined && /³/.test(firstPart)) {
+            suffix = '³';
+        } else if (unit !== undefined && unit.toLowerCase().indexOf('sq') !== -1) {
+            suffix = '²';
+        } else if (unit !== undefined && unit.toLowerCase().indexOf('cu') !== -1) {
+            suffix = '³';
+        }
+
+        const metStr = convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+
+        let insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        insertIndex = insertIndex - subtract; //subtracts behind bracket
+        text = insertAt(text, metStr, insertIndex);
+    }
+    return text;
+}
+
 /** Return a new string where all occurrences of other non-metric units have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
@@ -1307,103 +1425,10 @@ function replaceOtherUnits(text, degWithoutFahrenheit, matchIn, convertBracketed
     const len = conversions.length;
     for (let conversionIndex = 0; conversionIndex < len; conversionIndex++) {
         const conversion = conversions[conversionIndex];
-        if (conversion === undefined || conversion.regex === undefined) {
+        if (conversion === undefined) {
             continue;
         }
-
-        let match;
-        while ((match = conversion.regex.exec(text)) !== null) {
-            if (!shouldConvert(match[0], convertBracketed)) {
-                continue;
-            }
-
-            const firstPart = match[1];
-            let impStr = match[2];
-            let fraction = match[3];
-            const unit = match[5];
-            const additionalNumber = match[7];
-            const qualifier = match[8];
-
-            if (impStr !== undefined && !/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(impStr)) {
-                continue;
-            }
-
-            let subtract = 0;
-            if (conversionIndex == 1) { //in
-                //if (/[a-z#$€£]/i.test(match[1].substring(0,1)))
-                if (/^[a-z#$€£]/i.test(match[0]))
-                    continue;
-                if (/^in /i.test(match[0])) //born in 1948 in ...
-                    continue;
-                if (!matchIn && / in /i.test(match[0])) //born in 1948 in ...
-                    continue;
-                if (qualifier !== undefined) {
-                    if (additionalNumber !== undefined && hasNumber(additionalNumber)) continue; //for 1 in 2 somethings
-                    if (qualifier == ' a') continue;
-                    if (qualifier == ' an') continue;
-                    if (qualifier == ' the') continue;
-                    if (qualifier == ' my') continue;
-                    if (qualifier == ' his') continue;
-                    if (qualifier == '-') continue;
-                    if (/ her/.test(qualifier)) continue;
-                    if (/ their/.test(qualifier)) continue;
-                    if (/ our/.test(qualifier)) continue;
-                    if (/ your/.test(qualifier)) continue;
-                    subtract = qualifier.length;
-                }
-            }
-            if (conversionIndex == 2) { //ft
-                if (firstPart !== undefined && /[°º]/.test(firstPart)) continue;
-                if (unit !== undefined && /\d/ig.test(unit)) continue; //avoid 3' 5"
-            }
-            let suffix = '';
-
-            let imp = 0;
-            if (impStr !== undefined) {
-                impStr = impStr.replace(',', '');
-
-                if (/[⁄]/.test(impStr)) { //improvisation, but otherwise 1⁄2 with register 1 as in
-                    fraction = impStr;
-                    imp = 0;
-                } else {
-                    imp = parseFloat(impStr);
-                    if (isNaN(imp)) {
-                        imp = 0;
-                    }
-                }
-            }
-
-            if (conversionIndex == 1 && / in /i.test(match[0]) && imp > 1000) {
-                continue; //prevents 1960 in Germany
-            }
-
-            if (fraction === '/') {
-                continue; // 2,438/sqft
-            }
-            if (fraction !== undefined) {
-                imp += evaluateFraction(fraction);
-            }
-
-            if (imp === 0 || isNaN(imp)) {
-                continue;
-            }
-
-            if (firstPart !== undefined && /²/.test(firstPart)) {
-                suffix = '²';
-            } else if (firstPart !== undefined && /³/.test(firstPart)) {
-                suffix = '³';
-            } else if (unit !== undefined && unit.toLowerCase().indexOf('sq') !== -1) {
-                suffix = '²';
-            } else if (unit !== undefined && unit.toLowerCase().indexOf('cu') !== -1) {
-                suffix = '³';
-            }
-
-            const metStr = convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-
-            let insertIndex = match.index + convertedValueInsertionOffset(match[0]);
-            insertIndex = insertIndex - subtract; //subtracts behind bracket
-            text = insertAt(text, metStr, insertIndex);
-        }
+        text = replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     }
 
     return text;
