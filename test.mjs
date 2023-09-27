@@ -10,26 +10,26 @@ function testBold() {
 }
 
 function testConvAndForm() {
-    assert.deepEqual(applyConversion(100, fahrenheitConversion, '', false, false, false, false), {met: 100, unit: ' °C'});
+    assert.deepEqual(applyConversion(100, fahrenheitConversion, '', false, false, false, false), {met: 100, unit: '°C'});
 
     // useMM and useRounding interact in subtle ways
-    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, false, false, false), {met: 3.1, unit: ' mm'});
-    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, false, false, true), {met: 3.1, unit: ' mm'});
-    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, true, false, false), {met: 3, unit: ' mm'});
-    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, true, false, true), {met: 3.1, unit: ' mm'});
+    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, false, false, false), {met: 3.1, unit: 'mm'});
+    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, false, false, true), {met: 3.1, unit: 'mm'});
+    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, true, false, false), {met: 3, unit: 'mm'});
+    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, true, false, true), {met: 3.1, unit: 'mm'});
 
     // surfaces and volumes
     const feetToMConv = conversions[3];
     assert(feetToMConv);
-    assert.deepEqual(applyConversion(100, feetToMConv, '', false, false, false, false), {met: 30.48, unit: ' m'});
-    assert.deepEqual(applyConversion(100, feetToMConv, '²', false, false, false, false), {met: 9.29, unit: ' m²'});
-    assert.deepEqual(applyConversion(100, feetToMConv, '³', false, false, false, false), {met: 2831.69, unit: ' L'});
+    assert.deepEqual(applyConversion(100, feetToMConv, '', false, false, false, false), {met: 30.48, unit: 'm'});
+    assert.deepEqual(applyConversion(100, feetToMConv, '²', false, false, false, false), {met: 9.29, unit: 'm²'});
+    assert.deepEqual(applyConversion(100, feetToMConv, '³', false, false, false, false), {met: 2831.69, unit: 'L'});
 
     // US customary units vs imperial units
     const fluidOncesToMlConv = conversions[9];
     assert(fluidOncesToMlConv);
-    assert.deepEqual(applyConversion(100, fluidOncesToMlConv, '', false, false, false, false), {met: 2957, unit: ' mL'});
-    assert.deepEqual(applyConversion(100, fluidOncesToMlConv, '', true, false, false, false), {met: 2841, unit: ' mL'});
+    assert.deepEqual(applyConversion(100, fluidOncesToMlConv, '', false, false, false, false), {met: 2957, unit: 'mL'});
+    assert.deepEqual(applyConversion(100, fluidOncesToMlConv, '', true, false, false, false), {met: 2841, unit: 'mL'});
 }
 
 function testEvaluateFraction() {
@@ -54,10 +54,10 @@ function testFahrenHeitToCelsius() {
 }
 
 function testFormatConvertedValue() {
-    assert.equal(formatConvertedValue('123,456.789', ' m', false, false), ' (123,456.789 m)˜');
-    assert.equal(formatConvertedValue('123,456.789', ' m', false, true), '\u200B【123,456.789 m】');
-    assert.equal(formatConvertedValue('123,456.789', ' m', true, false), ' (123,456.789 m)˜');
-    assert.equal(formatConvertedValue('123,456.789', ' m', true, true), '\u200B【𝟭𝟮𝟯,𝟰𝟱𝟲.𝟳𝟴𝟵 𝗺】');
+    assert.equal(formatConvertedValue('123,456.789', 'm', false, false), ' (123,456.789 m)˜');
+    assert.equal(formatConvertedValue('123,456.789', 'm', false, true), '\u200B【123,456.789 m】');
+    assert.equal(formatConvertedValue('123,456.789', 'm', true, false), ' (123,456.789 m)˜');
+    assert.equal(formatConvertedValue('123,456.789', 'm', true, true), '\u200B【𝟭𝟮𝟯,𝟰𝟱𝟲.𝟳𝟴𝟵 𝗺】');
 }
 
 function testFormatNumber() {
@@ -107,7 +107,7 @@ function testProcessTextBlock() {
 }
 
 function testReplaceFahrenheit() {
-    assert.equal(replaceFahrenheit('Saying 212 °F is the same as saying 100°C', false, false, false, false, false, false, false, false), 'Saying 212 °F (100°C)˜ is the same as saying 100°C');
+    assert.equal(replaceFahrenheit('Saying 212 °F is the same as saying 100°C', false, false, false, false, false, false, false, false), 'Saying 212 °F (100 °C)˜ is the same as saying 100°C');
 
     assert.equal(replaceFahrenheit('(212 °)', false, false, false, false, false, false, false, false), '(212 °)');
     assert.equal(replaceFahrenheit('(212 °)', false, false, true, false, false, false, false, false), '(212 °)');
@@ -115,23 +115,23 @@ function testReplaceFahrenheit() {
     assert.equal(replaceFahrenheit('(212 °)', false, true, true, false, false, false, false, false), '(212 °)');
     assert.equal(replaceFahrenheit('(212 °)', true, false, false, false, false, false, false, false), '(212 °)');
     assert.equal(replaceFahrenheit('(212 °)', true, false, true, false, false, false, false, false), '(212 °)');
-    assert.equal(replaceFahrenheit('(212 °)', true, true, false, false, false, false, false, false), '(212 °) (100°C)˜');
-    assert.equal(replaceFahrenheit('(212 °)', true, true, true, false, false, false, false, false), '(212 °) (373.15K)˜');
+    assert.equal(replaceFahrenheit('(212 °)', true, true, false, false, false, false, false, false), '(212 °) (100 °C)˜');
+    assert.equal(replaceFahrenheit('(212 °)', true, true, true, false, false, false, false, false), '(212 °) (373.15 K)˜');
 
     // returns '1,203 °F (NaN°C)˜' instead of '1,203 °F (651°C)˜'
     // assert.equal(replaceFahrenheit('1,203 °F', false, false, false, false, false, false, false, false), '1,203 °F (651°C)˜');
 
-    assert.equal(replaceFahrenheit('212 °F', false, false, false, false, false, false, false, false), '212 °F (100°C)˜');
-    assert.equal(replaceFahrenheit('212 degrees F', false, false, false, false, false, false, false, false), '212 degrees F (100°C)˜');
-    assert.equal(replaceFahrenheit('212 Fahrenheits', false, false, false, false, false, false, false, false), '212 Fahrenheits (100°C)˜');
+    assert.equal(replaceFahrenheit('212 °F', false, false, false, false, false, false, false, false), '212 °F (100 °C)˜');
+    assert.equal(replaceFahrenheit('212 degrees F', false, false, false, false, false, false, false, false), '212 degrees F (100 °C)˜');
+    assert.equal(replaceFahrenheit('212 Fahrenheits', false, false, false, false, false, false, false, false), '212 Fahrenheits (100 °C)˜');
     assert.equal(replaceFahrenheit('212 Fahrenheits (100 Celsius)', false, false, false, false, false, false, false, false), '212 Fahrenheits (100 Celsius)');
-    assert.equal(replaceFahrenheit('32-212 °F', false, false, false, false, false, false, false, false), '32-212 °F (0 to 100°C)˜');
+    assert.equal(replaceFahrenheit('32-212 °F', false, false, false, false, false, false, false, false), '32-212 °F (0 to 100 °C)˜');
 
-    assert.equal(replaceFahrenheit('-212 °F', false, false, false, false, false, false, false, false), '-212 °F (-136°C)˜');
-    // NOTE: in ranges, the minus sign of the upper bound is ignore
-    assert.equal(replaceFahrenheit('100--212 °F', false, false, false, false, false, false, false, false), '100--212 °F (38 to 100°C)˜');
-    assert.equal(replaceFahrenheit('-100-212 °F', false, false, false, false, false, false, false, false), '-100-212 °F (-73 to 100°C)˜');
-    assert.equal(replaceFahrenheit('-100--212 °F', false, false, false, false, false, false, false, false), '-100--212 °F (-73 to 100°C)˜');
+    assert.equal(replaceFahrenheit('-212 °F', false, false, false, false, false, false, false, false), '-212 °F (-136 °C)˜');
+    // NOTE: in ranges, the minus sign of the upper bound is ignored
+    assert.equal(replaceFahrenheit('100--212 °F', false, false, false, false, false, false, false, false), '100--212 °F (38 to 100 °C)˜');
+    assert.equal(replaceFahrenheit('-100-212 °F', false, false, false, false, false, false, false, false), '-100-212 °F (-73 to 100 °C)˜');
+    assert.equal(replaceFahrenheit('-100--212 °F', false, false, false, false, false, false, false, false), '-100--212 °F (-73 to 100 °C)˜');
 }
 
 function testReplaceFeetAndInches() {
