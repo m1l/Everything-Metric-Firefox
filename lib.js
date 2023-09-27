@@ -38,33 +38,42 @@ const fractions = {
     '⅞': 7 / 8
 };
 
+/** @type{ import("./types").Conversion } */
+const fahrenheitConversion = {
+    // regexUnit is set in replaceOtherUnits
+    unit: '°C',
+    multiplier: 1
+};
+
+/** @type{ import("./types").Conversion } */
+const inchConversion = {
+    //(?!in ) exclude... replaced with
+    // (?:in )?  to exclude converting "born in 1948 in"
+    //old regex: new RegExp('((?:in )?[a-z#$€£\(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ches|ch|²|³)?' + unitSuffixIn + ')', 'ig'),
+    //added (?=[0-9]) otherwise it will match "it is in something"
+    //regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ches|ch|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+    regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(in(ches|ch|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+    unit: 'cm',
+    unit2: 'mm',
+    multiplier: 2.54,
+    multiplier2: 25.4,
+    multipliercu: 0.0163871,
+    fullround: true
+};
+
+/** @type{ import("./types").Conversion } */
+const footConversion = {
+    //([\(]?[°º]? ?([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?[-− \u00A0]?(\'|′|’)(?![\'′’])(?! ?[\(-\− \u00A0]?[0-9]| \u3010)([^a-z]|$))
+    // regex is set in setIncludeImproperSymbols
+    unit: 'm',
+    multiplier: 0.3048
+};
+
 /** @type{ import("./types").Conversion[] } */
 const conversions = [
-    {
-        // regexUnit is set in replaceOtherUnits
-        unit: '°C',
-        multiplier: 1
-    },
-    {
-        //(?!in ) exclude... replaced with
-        // (?:in )?  to exclude converting "born in 1948 in"
-        //old regex: new RegExp('((?:in )?[a-z#$€£\(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ches|ch|²|³)?' + unitSuffixIn + ')', 'ig'),
-        //added (?=[0-9]) otherwise it will match "it is in something"
-        //regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ches|ch|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
-        regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(in(ches|ch|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
-        unit: 'cm',
-        unit2: 'mm',
-        multiplier: 2.54,
-        multiplier2: 25.4,
-        multipliercu: 0.0163871,
-        fullround: true
-    },
-    {
-        //([\(]?[°º]? ?([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?[-− \u00A0]?(\'|′|’)(?![\'′’])(?! ?[\(-\− \u00A0]?[0-9]| \u3010)([^a-z]|$))
-        // regex is set in setIncludeImproperSymbols
-        unit: 'm',
-        multiplier: 0.3048
-    },
+    fahrenheitConversion,
+    inchConversion,
+    footConversion,
     {
         regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sqcu + '[\-− \u00A0]?(feet|foot|ft)(²|³)?[\)]?' + unitSuffixft + ')', 'ig'),
         unit: 'm',
@@ -1015,13 +1024,11 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
             'gi',
         );
     }
-    const feetConversion = conversions[2];
-    if (feetConversion !== undefined ){
-        if (includeImproperSymbols) {
-            feetConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g');
-        } else {
-            feetConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
-        }
+
+    if (includeImproperSymbols) {
+        footConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g');
+    } else {
+        footConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
     }
 }
 
@@ -1106,17 +1113,9 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
 
         let metStr = '';
         if (total > 3) {
-            const conversion = conversions[2];  // feet to m
-            if (!conversion) {
-                continue;
-            }
-            metStr = convAndForm(feet + inches / 12, conversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            metStr = convAndForm(feet + inches / 12, footConversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
         } else {
-            const conversion = conversions[1];  // inches to m
-            if (!conversion) {
-                continue;
-            }
-            metStr = convAndForm(feet * 12 + inches, conversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            metStr = convAndForm(feet * 12 + inches, inchConversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
         }
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -1285,11 +1284,9 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
     return text;
 }
 
-// TODO: remove conversionIndex from the arguments
 /** Return a new string where all occurrences of a given non-metric unit have been converted to metric
  *  @param {string} text - The original text
  *  @param {import("./types").Conversion} conversion - The object describing the conversion
- *  @param {number} conversionIndex - The index of the conversion in the conversions array
  *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
@@ -1302,7 +1299,7 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric units
 */
-function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     if (conversion.regex === undefined) {
         return text;
     }
@@ -1325,7 +1322,7 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
         }
 
         let subtract = 0;
-        if (conversionIndex == 1) { //in
+        if (conversion == inchConversion) {
             //if (/[a-z#$€£]/i.test(match[1].substring(0,1)))
             if (/^[a-z#$€£]/i.test(match[0]))
                 continue;
@@ -1348,7 +1345,7 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
                 subtract = qualifier.length;
             }
         }
-        if (conversionIndex == 2) { //ft
+        if (conversion == footConversion) {
             if (firstPart !== undefined && /[°º]/.test(firstPart)) continue;
             if (unit !== undefined && /\d/ig.test(unit)) continue; //avoid 3' 5"
         }
@@ -1369,7 +1366,7 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
             }
         }
 
-        if (conversionIndex == 1 && / in /i.test(match[0]) && imp > 1000) {
+        if (conversion == inchConversion && / in /i.test(match[0]) && imp > 1000) {
             continue; //prevents 1960 in Germany
         }
 
@@ -1421,20 +1418,15 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
  *  @return {string} - A new string with metric units
 */
 function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const len = conversions.length;
-    for (let conversionIndex = 0; conversionIndex < len; conversionIndex++) {
-        const conversion = conversions[conversionIndex];
-        if (conversion === undefined) {
-            continue;
-        }
-        text = replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+    for (const conversion of conversions) {
+        text = replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     }
 
     if (convertTablespoon) {
-        text = replaceOtherUnit(text, unitsTablespoon, -1, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+        text = replaceOtherUnit(text, unitsTablespoon, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     }
     if (convertTeaspoon) {
-        text = replaceOtherUnit(text, unitsTeaspoon, -1, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+        text = replaceOtherUnit(text, unitsTeaspoon, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     }
     return text;
 }
@@ -1590,14 +1582,10 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
         return text;
     }
 
-    // TODO: this is ugly
-    const fahrenheitConversion = conversions[0];
-    if (fahrenheitConversion !== undefined) {
-        if (degWithoutFahrenheit) {
-            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
-        } else {
-            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
-        }
+    if (degWithoutFahrenheit) {
+        fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
+    } else {
+        fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
     }
 
     //console.log("now trying " + text);
