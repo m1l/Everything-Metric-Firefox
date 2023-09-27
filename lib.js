@@ -220,7 +220,7 @@ function evaluateFraction(frac) {
  *  @param {string} unit - The unit being used
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
- *  @return {import("./types").ValueWithUnit} - The scaled unit with the appropriate unit
+ *  @return {import("./types").ValueWithUnit} - The scaled value with the appropriate unit
  */
 function stepUpOrDown(met, unit, useMM, useGiga) {
     if (met < 1) {
@@ -851,13 +851,9 @@ function roundMaybeNicely(met, forceRounding, useRounding) {
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
- *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
- *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
- *  @return {string} - The converted and formatted value
+ *  @return {import("./types").ValueWithUnit} - The value with the appropriate unit
 */
-function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding) {
     let multiplier = conversion.multiplier;
     if (isUK === true && conversion.multiplierimp !== undefined) {
         multiplier = conversion.multiplierimp;
@@ -883,7 +879,7 @@ function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding,
         met = roundMaybeNicely(imp * Math.pow(multiplier, 2), forceRounding, useRounding);
     else if (suffix === '³') {
         if (conversion.multipliercu === undefined) {
-            return ''; // TODO
+            return { met: 0, unit: '' }; // TODO
         }
         met = roundMaybeNicely(imp * conversion.multipliercu, forceRounding, useRounding);
         unit = 'L';
@@ -905,8 +901,7 @@ function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding,
         unit = 'm';
     }
 
-    met = formatNumber(met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-    return formatConvertedValue(met, spc + unit + suffix, useBold, useBrackets);
+    return { met, unit: ` ${unit}${suffix}` };
 }
 
 // TODO: remove global variable
@@ -1101,14 +1096,16 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             continue;
         }
 
-        const total = feet + (inches / 12);
+        // convert to m when over 3 feet, to cm (or mm) otherwise
+        const ret = (
+            feet + inches / 12 > 3
+            ? convAndForm(feet + inches / 12, footConversion, '', isUK, useMM, useGiga, useRounding)
+            : convAndForm(feet * 12 + inches, inchConversion, '', isUK, useMM, useGiga, useRounding)
+        );
 
-        let metStr = '';
-        if (total > 3) {
-            metStr = convAndForm(feet + inches / 12, footConversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-        } else {
-            metStr = convAndForm(feet * 12 + inches, inchConversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-        }
+        const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
+
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
     }
@@ -1383,7 +1380,9 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
             suffix = '³';
         }
 
-        const metStr = convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+        const ret = convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding);
+        const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
 
         let insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         insertIndex = insertIndex - subtract; //subtracts behind bracket
@@ -1587,7 +1586,9 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
         }
         let match;
         while ((match = conversion.regexUnit.exec(text)) !== null) {
-            const metStr = convAndForm(lastquantity, conversion, "", isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
+            const ret = convAndForm(lastquantity, conversion, "", isUK, useMM, useGiga, useRounding);
+            const met = formatNumber(ret.met, useComma, useSpaces);
+            const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
             const fullMatch = match[0];
             const insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
             text = insertAt(text, metStr, insertIndex);
