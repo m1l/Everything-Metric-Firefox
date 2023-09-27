@@ -58,7 +58,7 @@ const inchConversion = {
     multiplier: 2.54,
     multiplier2: 25.4,
     multipliercu: 0.0163871,
-    fullround: true
+    forceround2: true
 };
 
 /** @type{ import("./types").Conversion } */
@@ -84,7 +84,7 @@ const conversions = [
         regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sq + '[ \u00A0]?(mi|miles?)(²|³)?' + unitSuffix + ')', 'ig'),
         unit: 'km',
         multiplier: 1.60934,
-        fullround: true
+        forceround2: true
     },
     {
         regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sq + '[ \u00A0]?(yards?|yd)(²|³)?' + unitSuffix + ')', 'ig'),
@@ -95,7 +95,7 @@ const conversions = [
         regex: new RegExp(regstart + intOrFloat + '[ \u00A0]?mph' + unitSuffix + ')', 'ig'),
         unit: 'km\/h',
         multiplier: 1.60934,
-        fullround: true,
+        forceround2: true,
         forceround: true
     },
     {
@@ -105,7 +105,7 @@ const conversions = [
         unit2: 'g',
         multiplier: 0.453592,
         multiplier2: 453.592,
-        fullround: true
+        forceround2: true
     },
     {
         regexUnit: new RegExp(skipempty + '(ounces?|oz)' + skipbrackets + regend, 'ig'),
@@ -136,7 +136,7 @@ const conversions = [
         unit2: 'mL',
         multiplier: 0.473176,
         multiplier2: 473.176,
-        fullround: true,
+        forceround2: true,
         multiplierimp: 0.568261
     },
     {
@@ -876,7 +876,7 @@ function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding,
         multiplier = conversion.multiplier2;
     }
     const forceRounding = (useRounding === false &&
-        ((useMM === true && conversion.multiplier2 !== undefined && conversion.fullround) || conversion.forceround === true));
+        ((useMM === true && conversion.multiplier2 !== undefined && conversion.forceround2) || conversion.forceround === true));
 
     let met;
     /*if (unitIndex < 2 ) {

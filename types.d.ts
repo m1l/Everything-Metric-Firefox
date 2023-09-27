@@ -7,8 +7,8 @@ export type Conversion = {
     multiplier2?: number,
     multipliercu?: number,
     multiplierimp?: number,
-    fullround?: boolean,
     forceround?: boolean,
+    forceround2?: boolean,
 };
 
 export type ValueWithUnit = {
