@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, conversions, evaluateFraction, fahrenheitConversion, fahrenheitToCelsius, formatConvertedValue, formatNumber, inchConversion, insertAt, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, conversions, evaluateFraction, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 import fs from 'fs';
 
@@ -42,15 +42,15 @@ function testEvaluateFraction() {
 }
 
 function testFahrenHeitToCelsius() {
-    assert.equal(fahrenheitToCelsius(0, false), -18);
-    assert.equal(fahrenheitToCelsius(32, false), 0);
-    assert.equal(fahrenheitToCelsius(100, false), 38);
-    assert.equal(fahrenheitToCelsius(212, false), 100);
+    assert.equal(fahrenheitToMetric(0, false, false), -18);
+    assert.equal(fahrenheitToMetric(32, false, false), 0);
+    assert.equal(fahrenheitToMetric(100, false, false), 38);
+    assert.equal(fahrenheitToMetric(212, false, false), 100);
 
-    assert.equal(fahrenheitToCelsius(0, true), -17.77777777777778);
-    assert.equal(fahrenheitToCelsius(32, true), 0);
-    assert.equal(fahrenheitToCelsius(100, true), 37.77777777777778);
-    assert.equal(fahrenheitToCelsius(212, true), 100);
+    assert.equal(fahrenheitToMetric(0, true, false), 255.37);
+    assert.equal(fahrenheitToMetric(32, true, false), 273.15);
+    assert.equal(fahrenheitToMetric(100, true, false), 310.93);
+    assert.equal(fahrenheitToMetric(212, true, false), 373.15);
 }
 
 function testFormatConvertedValue() {

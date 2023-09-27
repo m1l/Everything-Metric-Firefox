@@ -378,17 +378,18 @@ function shouldConvert(text, convertBracketed) {
     }
 }
 
-/** Convert a temperature from Fahrenheit to Celsius
+/** Convert a temperature from Fahrenheit to Celsius or Kelvin
  *  @param {number} f - A value in Fahrenheit
  *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
  *  @return {number} - The value in Celsius
 */
-function fahrenheitToCelsius(f, useKelvin) {
-    let met = (5 / 9) * (f - 32);
-    if (useKelvin)
-       return met;
-    else
-       return Math.round(met);
+function fahrenheitToMetric(f, useKelvin, useRounding) {
+    if (useKelvin) {
+        return roundNicely(273.15 + (5 / 9) * (f - 32), useRounding);
+    } else {
+        return Math.round((5 / 9) * (f - 32));
+    }
 }
 
 /** Round a number
@@ -570,24 +571,15 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
         const secondNumber = match[2];
 
         // upper-bound of the range, or single value
-        let met1 = fahrenheitToCelsius(parseNumber(firstNumber), useKelvin);
-        if (useKelvin) {
-            met1 += 273.15;
-            met1 = roundNicely(met1, useRounding);
-        }
+        const met1 = fahrenheitToMetric(parseNumber(firstNumber), useKelvin, useRounding);
         const formattedMet1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
         let met = formattedMet1;
 
         // lower-bound of the range
         if (secondNumber) {
-            let met2 = fahrenheitToCelsius(parseNumber(secondNumber), useKelvin);
-            if (useKelvin) {
-                met2 += 273.15;
-                met2 = roundNicely(met2, useRounding);
-            }
+            const met2 = fahrenheitToMetric(parseNumber(secondNumber), useKelvin, useRounding);
             const formattedMet2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-
             met += ' to ' + formattedMet2;
         }
 
@@ -1612,7 +1604,7 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
             return text; //it has been already converted
         }
 
-        let met = fahrenheitToCelsius(lastquantity, useKelvin);
+        let met = fahrenheitToMetric(lastquantity, useKelvin, useRounding);
         let unit = '°C';
         if (useKelvin) {
             met += 273.15;
@@ -1627,4 +1619,4 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
     return text;
 }
 
-module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock };
+module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock };
