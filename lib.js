@@ -853,7 +853,7 @@ function roundMaybeNicely(met, forceRounding, useRounding) {
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
  *  @return {import("./types").ValueWithUnit} - The value with the appropriate unit
 */
-function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding) {
+function applyConversion(imp, conversion, suffix, isUK, useMM, useGiga, useRounding) {
     let multiplier = conversion.multiplier;
     if (isUK === true && conversion.multiplierimp !== undefined) {
         multiplier = conversion.multiplierimp;
@@ -1099,8 +1099,8 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
         // convert to m when over 3 feet, to cm (or mm) otherwise
         const ret = (
             feet + inches / 12 > 3
-            ? convAndForm(feet + inches / 12, footConversion, '', isUK, useMM, useGiga, useRounding)
-            : convAndForm(feet * 12 + inches, inchConversion, '', isUK, useMM, useGiga, useRounding)
+            ? applyConversion(feet + inches / 12, footConversion, '', isUK, useMM, useGiga, useRounding)
+            : applyConversion(feet * 12 + inches, inchConversion, '', isUK, useMM, useGiga, useRounding)
         );
 
         const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
@@ -1380,7 +1380,7 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
             suffix = '³';
         }
 
-        const ret = convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding);
+        const ret = applyConversion(imp, conversion, suffix, isUK, useMM, useGiga, useRounding);
         const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
 
@@ -1586,7 +1586,7 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
         }
         let match;
         while ((match = conversion.regexUnit.exec(text)) !== null) {
-            const ret = convAndForm(lastquantity, conversion, "", isUK, useMM, useGiga, useRounding);
+            const ret = applyConversion(lastquantity, conversion, "", isUK, useMM, useGiga, useRounding);
             const met = formatNumber(ret.met, useComma, useSpaces);
             const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
             const fullMatch = match[0];
@@ -1620,4 +1620,4 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
     return text;
 }
 
-module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock };
+module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock };

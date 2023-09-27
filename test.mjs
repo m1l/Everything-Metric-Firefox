@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, conversions, evaluateFraction, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, applyConversion, conversions, evaluateFraction, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 import fs from 'fs';
 
@@ -10,26 +10,26 @@ function testBold() {
 }
 
 function testConvAndForm() {
-    assert.deepEqual(convAndForm(100, fahrenheitConversion, '', false, false, false, false), {met: 100, unit: ' °C'});
+    assert.deepEqual(applyConversion(100, fahrenheitConversion, '', false, false, false, false), {met: 100, unit: ' °C'});
 
     // useMM and useRounding interact in subtle ways
-    assert.deepEqual(convAndForm(0.123, inchConversion, '', false, false, false, false), {met: 3.1, unit: ' mm'});
-    assert.deepEqual(convAndForm(0.123, inchConversion, '', false, false, false, true), {met: 3.1, unit: ' mm'});
-    assert.deepEqual(convAndForm(0.123, inchConversion, '', false, true, false, false), {met: 3, unit: ' mm'});
-    assert.deepEqual(convAndForm(0.123, inchConversion, '', false, true, false, true), {met: 3.1, unit: ' mm'});
+    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, false, false, false), {met: 3.1, unit: ' mm'});
+    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, false, false, true), {met: 3.1, unit: ' mm'});
+    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, true, false, false), {met: 3, unit: ' mm'});
+    assert.deepEqual(applyConversion(0.123, inchConversion, '', false, true, false, true), {met: 3.1, unit: ' mm'});
 
     // surfaces and volumes
     const feetToMConv = conversions[3];
     assert(feetToMConv);
-    assert.deepEqual(convAndForm(100, feetToMConv, '', false, false, false, false), {met: 30.48, unit: ' m'});
-    assert.deepEqual(convAndForm(100, feetToMConv, '²', false, false, false, false), {met: 9.29, unit: ' m²'});
-    assert.deepEqual(convAndForm(100, feetToMConv, '³', false, false, false, false), {met: 2831.69, unit: ' L'});
+    assert.deepEqual(applyConversion(100, feetToMConv, '', false, false, false, false), {met: 30.48, unit: ' m'});
+    assert.deepEqual(applyConversion(100, feetToMConv, '²', false, false, false, false), {met: 9.29, unit: ' m²'});
+    assert.deepEqual(applyConversion(100, feetToMConv, '³', false, false, false, false), {met: 2831.69, unit: ' L'});
 
     // US customary units vs imperial units
     const fluidOncesToMlConv = conversions[9];
     assert(fluidOncesToMlConv);
-    assert.deepEqual(convAndForm(100, fluidOncesToMlConv, '', false, false, false, false), {met: 2957, unit: ' mL'});
-    assert.deepEqual(convAndForm(100, fluidOncesToMlConv, '', true, false, false, false), {met: 2841, unit: ' mL'});
+    assert.deepEqual(applyConversion(100, fluidOncesToMlConv, '', false, false, false, false), {met: 2957, unit: ' mL'});
+    assert.deepEqual(applyConversion(100, fluidOncesToMlConv, '', true, false, false, false), {met: 2841, unit: ' mL'});
 }
 
 function testEvaluateFraction() {
