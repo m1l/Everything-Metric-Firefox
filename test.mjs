@@ -172,17 +172,17 @@ function testReplacePoundsAndOunces() {
 
 function testReplaceSurfaceInFeet() {
     // TODO: the original value should not be removed
-    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false, false, false), 'S =  (0.3 × 0.61  m)˜');
+    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false, false, false), 'S =  (0.3 × 0.61 m)˜');
 }
 
 function testReplaceSurfaceInInches() {
     // TODO: the original value should not be removed
-    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false, false, false), 'S =  (2.54 × 5.08  cm)˜');
+    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false, false, false), 'S =  (2.54 × 5.08 cm)˜');
 }
 
 function testReplaceVolume() {
     // TODO: the original value should not be removed
-    assert.equal(replaceVolume('V = 1×2×3 in', false, false, false, false, false, false, false), 'V =  (2.54 × 5.08 × 7.62  cm)˜');
+    assert.equal(replaceVolume('V = 1×2×3 in', false, false, false, false, false, false, false), 'V =  (2.54 × 5.08 × 7.62 cm)˜');
 }
 
 function testRoundNicely() {

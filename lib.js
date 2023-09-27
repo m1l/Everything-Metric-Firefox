@@ -1,7 +1,6 @@
 const regstart = '([\(]?';
 const regend = '([^a-z]|$)';
 const intOrFloat = '([0-9,\.]+)';
-const spc = '\u00A0';
 const intOrFloatNoFrac = '([\.,0-9]+(?![\/⁄]))?';
 const skipbrackets = '(?! [\(][0-9]|\u200B\u3010)';
 const unitSuffix = '(?! [\(][0-9]| ?\u200B\u3010)([^a-z]|$)';
@@ -651,10 +650,10 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
             continue;
         }
         let scale = 2.54;
-        let unit = spc + "cm";
+        let unit = 'cm';
         if (useMM === true) {
             scale = 25.4;
-            unit = spc + "mm"
+            unit = 'mm';
         }
         const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
@@ -710,10 +709,10 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
         }
 
         let scale = 2.54;
-        let unit = spc + "cm";
+        let unit = 'cm';
         if (useMM === true) {
             scale = 25.4;
-            unit = spc + "mm"
+            unit = 'mm';
         }
         const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
@@ -770,7 +769,7 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
         }
 
         let scale = 0.3048;
-        let unit = spc + "m";
+        let unit = 'm';
         // TODO: use useMM
 
         const m1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
@@ -1259,10 +1258,10 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
         inches2 += frac2;
 
         let scale = 2.54;
-        let unit = spc + "cm";
+        let unit = 'cm';
         if (useMM === true) {
             scale = 25.4;
-            unit = spc + "mm"
+            unit = 'mm';
         }
 
         const cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
