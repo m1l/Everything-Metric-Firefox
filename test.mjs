@@ -97,6 +97,7 @@ function testParseNumber() {
     assert.deepEqual(parseNumber('+1 2345.25'), { value: 12345.25, significantFigures: 7 });
     assert.deepEqual(parseNumber('-1 2345.25'), { value: -12345.25, significantFigures: 7 });
     assert.deepEqual(parseNumber('−1,2345.25'), { value: -12345.25, significantFigures: 7 });
+    assert.deepEqual(parseNumber('123,456,789'), { value: 123456789, significantFigures: 9 });
 
     // exponential notation
     assert.deepEqual(parseNumber('1e0'), { value: 1, significantFigures: 1 });

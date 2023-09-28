@@ -1713,7 +1713,7 @@ function parseNumber(number) {
 
     const simpleNumber = match[1];
     if (simpleNumber !== undefined) {
-        const withoutGroups = simpleNumber.replace(/[,  ]/, '');
+        const withoutGroups = simpleNumber.replace(/[,  ]/g, '');
         const partialValue = Number(withoutGroups);
         if (!isFinite(partialValue)) {
             return null;
