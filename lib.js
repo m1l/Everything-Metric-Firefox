@@ -1339,7 +1339,10 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
         }
 
         const firstPart = match[1];
-        let impStr = match[2];
+        const impStr = match[2];
+        if (impStr === undefined) {
+            continue;
+        }
         const unit = match[4];
         const additionalNumber = match[6];
         const qualifier = match[7];
