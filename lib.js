@@ -568,14 +568,22 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
         const secondNumber = match[2];
 
         // upper-bound of the range, or single value
-        const met1 = fahrenheitToMetric(parseNumber(firstNumber).value, useKelvin, useRounding);
+        const parsed1 = parseNumber(firstNumber);
+        if (parsed1 === null) {
+            continue;
+        }
+        const met1 = fahrenheitToMetric(parsed1.value, useKelvin, useRounding);
         const formattedMet1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
         let met = formattedMet1;
 
         // lower-bound of the range
         if (secondNumber) {
-            const met2 = fahrenheitToMetric(parseNumber(secondNumber).value, useKelvin, useRounding);
+            const parsed2 = parseNumber(secondNumber);
+            if (parsed2 === null) {
+                continue;
+            }
+            const met2 = fahrenheitToMetric(parsed2.value, useKelvin, useRounding);
             const formattedMet2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
             met += ' to ' + formattedMet2;
         }
@@ -653,9 +661,21 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
             scale = 25.4;
             unit = 'mm';
         }
-        const cm1 = formatNumber(roundNicely(parseNumber(dim1).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(parseNumber(dim2).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm3 = formatNumber(roundNicely(parseNumber(dim3).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const parsed1 = parseNumber(dim1);
+        if (parsed1 === null) {
+            continue;
+        }
+        const parsed2 = parseNumber(dim2);
+        if (parsed2 === null) {
+            continue;
+        }
+        const parsed3 = parseNumber(dim3);
+        if (parsed3 === null) {
+            continue;
+        }
+        const cm1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm3 = formatNumber(roundNicely(parsed3.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2} × ${cm3}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -713,8 +733,16 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
             scale = 25.4;
             unit = 'mm';
         }
-        const cm1 = formatNumber(roundNicely(parseNumber(dim1).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(parseNumber(dim2).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const parsed1 = parseNumber(dim1);
+        if (parsed1 === null) {
+            continue;
+        }
+        const parsed2 = parseNumber(dim2);
+        if (parsed2 === null) {
+            continue;
+        }
+        const cm1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -772,8 +800,16 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
         let unit = 'm';
         // TODO: use useMM
 
-        const m1 = formatNumber(roundNicely(parseNumber(dim1).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const m2 = formatNumber(roundNicely(parseNumber(dim2).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const parsed1 = parseNumber(dim1);
+        if (parsed1 === null) {
+            continue;
+        }
+        const parsed2 = parseNumber(dim2);
+        if (parsed2 === null) {
+            continue;
+        }
+        const m1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${m1} × ${m2}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
