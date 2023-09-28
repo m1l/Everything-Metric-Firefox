@@ -1631,18 +1631,22 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
  *
  *  @param {string} fromCharset - Whether to convert tablespoons
  *  @param {string} toCharset - Whether to convert teaspoons
- *  @param {string?} removeCharset - Whether to convert teaspoons
- *  @return {string[string]} - The object to pass to String.translate
+ *  @param {string} [removeCharset] - Whether to convert teaspoons
+ *  @return { {[key: string]: string} } - The object to pass to String.translate
 */
 function maketrans(fromCharset, toCharset, removeCharset) {
     if (fromCharset.length != toCharset.length) {
         throw Error('the first two maketrans arguments must have equal length');
     }
+    /** @type{ { [key: string]: string } } */
     const map = {};
     // NOTE: there is no enumerate() equivalent for strings in JavaScript
     for (let i = 0; i < fromCharset.length; i++) {
         const f = fromCharset[i];
         const t = toCharset[i];
+        if (f === undefined || t === undefined) {
+            continue;
+        }
         map[f] = t;
     }
     if (removeCharset !== undefined) {
@@ -1655,7 +1659,7 @@ function maketrans(fromCharset, toCharset, removeCharset) {
 
 /** Return a copy of the string in which each character has been mapped through the given translation table
  *
- *  @param {string[string]} table - Object created by maketrans()
+ *  @param { {[key: string]: string} } table - Object created by maketrans()
  *  @return {string} toCharset - Whether to convert teaspoons
 */
 String.prototype.translate = function(table) {

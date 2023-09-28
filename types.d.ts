@@ -15,3 +15,9 @@ export type ValueWithUnit = {
     met: number,
     unit: string,
 };
+
+declare global {
+    interface String {
+        translate(table : { [key: string]: string }) : string;
+    }
+}
