@@ -1,16 +1,16 @@
-const regstart = '([\(]?';
+const regstart = '([(]?';
 const regend = '([^a-z]|$)';
-const intOrFloat = '([0-9,\.]+)';
-const intOrFloatNoFrac = '([\.,0-9]+(?![\/⁄]))?';
-const skipbrackets = '(?! [\(][0-9]|\u200B\u3010)';
-const unitSuffix = '(?! [\(][0-9]| ?\u200B\u3010)([^a-z]|$)';
-//const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³]|$)';
-const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
-const unitSuffixft = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
-const unitfrac = '[\-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?';
-const sqcu = '([\-− \u00A0]?(square|sq\.?|cubic|cu\.?))?';
-const sq = '([\-− \u00A0]?(square|sq\.?))?';
-const skipempty = '^(?:[ \n\t]+)?';
+const intOrFloat = '([0-9,\\.]+)';
+const intOrFloatNoFrac = '([\\.,0-9]+(?![/⁄]))?';
+const skipbrackets = '(?! [(][0-9]|\u200B\u3010)';
+const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)([^a-z]|$)';
+//const unitSuffixIn = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³]|$)';
+const unitSuffixIn = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
+const unitSuffixft = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
+const unitfrac = '[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[/⁄][0-9]+)?';
+const sqcu = '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
+const sq = '([-− \u00A0]?(square|sq\\.?))?';
+const skipempty = '^(?:\\s+)?';
 
 /** @type{ RegExp } */
 var feetInchRegex;
@@ -48,10 +48,10 @@ const fahrenheitConversion = {
 const inchConversion = {
     //(?!in ) exclude... replaced with
     // (?:in )?  to exclude converting "born in 1948 in"
-    //old regex: new RegExp('((?:in )?[a-z#$€£\(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ches|ch|²|³)?' + unitSuffixIn + ')', 'ig'),
+    //old regex: new RegExp('((?:in )?[a-z#$€£(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ches|ch|²|³)?' + unitSuffixIn + ')', 'ig'),
     //added (?=[0-9]) otherwise it will match "it is in something"
-    //regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ches|ch|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
-    regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(square|sq\.?|cubic|cu\.?))?[-− \u00A0]?(in(ches|ch|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+    //regex: new RegExp('((?:in)?[a-z#$€£(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\\.,0-9]+(?![/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[/⁄][0-9]+)?([-− \u00A0]?(sq\\.?|square|cu\\.?|cubic))?[-− \u00A0]?(?:in(ches|ch|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+    regex: new RegExp('((?:in)?[a-z#$€£(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\\.,0-9]+(?![/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[/⁄][0-9]+)?([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?[)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
@@ -62,7 +62,7 @@ const inchConversion = {
 
 /** @type{ import("./types").Conversion } */
 const footConversion = {
-    //([\(]?[°º]? ?([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?[-− \u00A0]?(\'|′|’)(?![\'′’])(?! ?[\(-\− \u00A0]?[0-9]| \u3010)([^a-z]|$))
+    //([(]?[°º]? ?([\\.,0-9]+(?![/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[/⁄][0-9]+)?[-− \u00A0]?(\'|′|’)(?![\'′’])(?! ?[(-− \u00A0]?[0-9]| \u3010)([^a-z]|$))
     // regex is set in setIncludeImproperSymbols
     unit: 'm',
     multiplier: 0.3048
@@ -74,7 +74,7 @@ const conversions = [
     inchConversion,
     footConversion,
     {
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sqcu + '[\-− \u00A0]?(feet|foot|ft)(²|³)?[\)]?' + unitSuffixft + ')', 'ig'),
+        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?(feet|foot|ft)(²|³)?[)]?' + unitSuffixft + ')', 'ig'),
         unit: 'm',
         multiplier: 0.3048,
         multipliercu: 28.31690879986443
@@ -200,11 +200,11 @@ function evaluateFraction(frac) {
         return value;
     }
     try {
-        if (/[a-zA-Z,\?\!]/.test(frac)) {
+        if (/[a-zA-Z,?!]/.test(frac)) {
             return 0;
         }
-        let cleanedFrac = frac.replace(/[^\d\/⁄]/, '');
-        cleanedFrac = frac.replace(/[⁄]/, '\/');
+        let cleanedFrac = frac.replace(/[^\d/⁄]/, '');
+        cleanedFrac = frac.replace(/[⁄]/, '/');
         if (cleanedFrac.length < 3) {
             return 0;
         }
@@ -370,10 +370,10 @@ function shouldConvert(text, convertBracketed) {
     }
     if (convertBracketed) {
         // if the value is followed by a parenthesis, it is probably already converted. ex: 1 in (2.54 cm)
-        return !/[\(]/.test(text.substring(1));
+        return !/[(]/.test(text.substring(1));
     } else {
         // if the text has parentheses, it is either within parentheses, or probably already converted
-        return !/[\(\)]/.test(text);
+        return !/[()]/.test(text);
     }
 }
 
@@ -522,12 +522,12 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
+            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '([-−]?[0-9,\\.]+)', // digits, optionally prefixed with a minus sign
             // optionally, an additional number after a range marker
             '(?:',
-                '(?: to | and |[\-−]+)', // range marker
-                '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
+                '(?: to | and |[-−]+)', // range marker
+                '([-−]?[0-9,\\.]+)', // digits, optionally prefixed with a minus sign
             ')?',
             '[ \u00A0]?', // space or no-break space
             // degree Fahrenheit marker
@@ -545,7 +545,7 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
             // check for already present conversion to Celsius
             '(?!', // negative look-ahead
                     ' ?', // optional space
-                    '[\(]',  // opening parenthesis
+                    '[(]',  // opening parenthesis
                     '[0-9]',  // some digit
                 '|',
                     ' ?', // optional space
@@ -620,18 +620,18 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
-            '[x\*×]', // multiplication sign
+            '[x*×]', // multiplication sign
             '[ \u00A0]?', // space or no-break space
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
-            '[x\*×]', // multiplication sign
+            '[x*×]', // multiplication sign
             '[ \u00A0]?', // space or no-break space
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
-            'in(ches|ch|.)?', // unit
+            'in(ches|ch|\\.)?', // unit
             // check for already present conversion to metric
             unitSuffix,
         ].join(''),
@@ -680,14 +680,14 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[-− \u00A0]?', // space or no-break space
-            '[x\*×]',  // multiplication sign
+            '[x*×]',  // multiplication sign
             '[-− \u00A0]?', // space or no-break space
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[-− \u00A0]?', // space or no-break space
-            'in(ches|ch|\.)?',  // unit
+            'in(ches|ch|.)?',  // unit
             // check for already present conversion to metric
             unitSuffix,
         ].join(''),
@@ -696,7 +696,7 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        if (/[0-9][Xx\*×][ \u00A0][0-9]/.test(match[0])) {
+        if (/[0-9][Xx*×][ \u00A0][0-9]/.test(match[0])) {
             continue; //it is 2x 2in something so no conversion
         }
         if (!shouldConvert(match[0], convertBracketed)) {
@@ -739,13 +739,13 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[\'′’]?',  // allow feet symbol on first number
             '[-− \u00A0]?', // space or no-break space
-            '[x\*×]', // multiplication sign
+            '[x*×]', // multiplication sign
             '[-− \u00A0]?', // space or no-break space
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[-− \u00A0]?', // space or no-break space
             '(feet|foot|ft|[\'′’])', // unit
             '(?![0-9])', // maybe to avoid matching feet2 for feet²?
@@ -757,7 +757,7 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        if (/[0-9][xX\*×][ \u00A0][0-9]/.test(match[0])) {
+        if (/[0-9][xX*×][ \u00A0][0-9]/.test(match[0])) {
             continue; //it is 2x 2ft something so no conversion
         }
         if (!shouldConvert(match[0], convertBracketed)) {
@@ -802,7 +802,7 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
             '.?', // separator
             '(ft|yd|foot|feet)', // larger unit
             '.?', // separator
-            '([0-9]+(\.[0-9]+)?)', // number
+            '([0-9]+(\\.[0-9]+)?)', // number
             '.?', // separator
             'in(?:ches|ch)?', // smaller unit
         ].join(''),
@@ -923,15 +923,15 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
                         '([0-9]{1,3})',  // number
                         '[\'’′]', // feet marker (NOTE: with improper symbols)
-                        '[\-− \u00A0]?', // optional separator
+                        '[-− \u00A0]?', // optional separator
                     ')?',
                     // mixed numeral
                     '(?:',
                         // integer
                         '(?:',
-                            '([\.,0-9]+)', // number
-                            '(?!\/)', // check that this is not part of a fraction
-                            '(?:[\-− \u00A0]?)', // optional separator
+                            '([\\.,0-9]+)', // number
+                            '(?!/)', // check that this is not part of a fraction
+                            '(?:[-− \u00A0]?)', // optional separator
                         ')?',
                         // proper fraction
                         '(',
@@ -939,12 +939,12 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                             '|',
                             // fraction written more conventionally
                                 '[0-9]+', // number
-                                '[\/⁄]', // fraction bar
-                                '[0-9\.]+', // number, TODO: why allow decimal point here?
+                                '[/⁄]', // fraction bar
+                                '[0-9\\.]+', // number, TODO: why allow decimal point here?
                         ')?',
                     ')?',
                     '[ \u00A0]?', // optional separator
-                    '(?:\"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
+                    '(?:"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
                 ')',
                 // NOTE: since we include quotes as symbols for inches, we need
                 // to detect when they are used on their to open a quotation
@@ -953,7 +953,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                 // check for already present conversion to metric
                 '(?!', // negative look-ahead
                         ' ', // non-optional space
-                        '[\(]',  // opening parenthesis
+                        '[(]',  // opening parenthesis
                         '[0-9]',  // some digit
                     '|',
                         ' ?', // optional space
@@ -973,15 +973,15 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
                         '([0-9]{1,3})',  // number
                         '[′]', // feet marker (NOTE: without improper symbols)
-                        '[\-− \u00A0]?', // optional separator
+                        '[-− \u00A0]?', // optional separator
                     ')?',
                     // mixed numeral
                     '(?:',
                         // integer
                         '(?:',
-                            '([\.,0-9]+)', // number
-                            '(?!\/)', // check that this is not part of a fraction
-                            '(?:[\-− \u00A0]?)', // optional separator
+                            '([\\.,0-9]+)', // number
+                            '(?!/)', // check that this is not part of a fraction
+                            '(?:[-− \u00A0]?)', // optional separator
                         ')?',
                         // proper fraction
                         '(',
@@ -989,8 +989,8 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                             '|',
                             // fraction written more conventionally
                                 '[0-9]+', // number
-                                '[\/⁄]', // fraction bar
-                                '[0-9\.]+', // number, TODO: why allow decimal point here?
+                                '[/⁄]', // fraction bar
+                                '[0-9\\.]+', // number, TODO: why allow decimal point here?
                         ')?',
                     ')?',
                     '[ \u00A0]?', // optional separator
@@ -1003,7 +1003,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                 // check for already present conversion to metric
                 '(?!', // negative look-ahead
                         ' ', // non-optional space
-                        '[\(]',  // opening parenthesis
+                        '[(]',  // opening parenthesis
                         '[0-9]',  // some digit
                     '|',
                         ' ?', // optional space
@@ -1016,9 +1016,9 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
     }
 
     if (includeImproperSymbols) {
-        footConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g');
+        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g');
     } else {
-        footConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
+        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
     }
 }
 
@@ -1133,7 +1133,7 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
             '.?', // separator
             '(?:lbs?)', // pounds unit
             '.?', // separator
-            '([0-9]+(\.[0-9]+)?)', // number
+            '([0-9]+(\\.[0-9]+)?)', // number
             '.?', // separator
             'oz', // ounces unit
         ].join(''),
@@ -1213,23 +1213,23 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
             // check that this is not preceded by a fraction bar
             (
                 false
-                ? '(?<!\/)' // with look-behind
-                : '[\/]?' // manually, TODO: it looks like the check is not done at all
+                ? '(?<!/)' // with look-behind
+                : '/?' // manually, TODO: it looks like the check is not done at all
             ),
             // mixed numeral
             '(?:',
-                '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
-                '[\-− \u00A0]', // separator
-                '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
+                '([0-9]+(?!/))', // integer that is not the numerator of a fraction
+                '[-− \u00A0]', // separator
+                '([0-9]+[/⁄][0-9\\.]+)?', // optional fraction
             ')',
             ' ?', // optional space
-            '[x\*×]', // multiplication sign
+            '[x*×]', // multiplication sign
             ' ?', // optional space
             // mixed numeral
             '(?:',
-                '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
-                '[\-− \u00A0]', // separator
-                '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
+                '([0-9]+(?!/))?', // integer that is not the numerator of a fraction
+                '[-− \u00A0]', // separator
+                '([0-9]+[/⁄][0-9\\.]+)?', // optional fraction
             ')?',
             ' ?', // optional space
             '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
