@@ -1693,7 +1693,10 @@ const parseNumberRegex = new RegExp(
  *  @return {import("./types").ValueWithSignificantDigits} - The evaluated number, along with the number of significant digits
 */
 function parseNumber(number) {
-    // the string contains at least one Number code-point (e.g. 1, １, ½)
+    // check that the string contains at least one Number code-point (e.g. 1, １, ½)
+    if (!/\p{Number}/u.test(number)) {
+        return null;
+    }
 
     // NOTE: ideally, we would want to use the Unicode numeric value associated
     // with each character in number. But, of course, JavaScript does not
