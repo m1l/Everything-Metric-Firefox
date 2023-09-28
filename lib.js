@@ -428,14 +428,14 @@ function formatNumber(v, useCommaAsDecimalSeparator, useSpacesAsThousandSeparato
     if (useCommaAsDecimalSeparator) {
         const withThousandSeparator = v.toLocaleString('de-DE');
         if (useSpacesAsThousandSeparator) {
-            return withThousandSeparator.replace('.', '\u00A0');
+            return withThousandSeparator.replaceAll('.', '\u00A0');
         } else {
             return withThousandSeparator;
         }
     } else {
         const withThousandSeparator = v.toLocaleString('en-US');
         if (useSpacesAsThousandSeparator) {
-            return withThousandSeparator.replace(',', '\u00A0');
+            return withThousandSeparator.replaceAll(',', '\u00A0');
         } else {
             return withThousandSeparator;
         }
