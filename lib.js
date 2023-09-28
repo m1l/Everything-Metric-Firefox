@@ -2,7 +2,6 @@ const regstart = '([(]?';
 const regend = '([^a-z]|$)';
 const skipbrackets = '(?! [(][0-9]|\u200B\u3010)';
 const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)([^a-z]|$)';
-//const unitSuffixIn = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³]|$)';
 const unitSuffixIn = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
 const unitSuffixft = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
 const sqcu = '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
@@ -59,11 +58,6 @@ const fahrenheitConversion = {
 
 /** @type{ import("./types").Conversion } */
 const inchConversion = {
-    //(?!in ) exclude... replaced with
-    // (?:in )?  to exclude converting "born in 1948 in"
-    //old regex: new RegExp('((?:in )?[a-z#$€£(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ches|ch|²|³)?' + unitSuffixIn + ')', 'ig'),
-    //added (?=[0-9]) otherwise it will match "it is in something"
-    //regex: new RegExp('((?:in)?[a-z#$€£(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\\.,0-9]+(?![/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[/⁄][0-9]+)?([-− \u00A0]?(sq\\.?|square|cu\\.?|cubic))?[-− \u00A0]?(?:in(ches|ch|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
     regex: new RegExp('((?:in)?' + numberPattern + '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?[)]?)( [a-z]+)?'+unitSuffixIn+')', 'igu'),
     unit: 'cm',
     unit2: 'mm',
@@ -75,7 +69,6 @@ const inchConversion = {
 
 /** @type{ import("./types").Conversion } */
 const footConversion = {
-    //([(]?[°º]? ?([\\.,0-9]+(?![/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[/⁄][0-9]+)?[-− \u00A0]?(\'|′|’)(?![\'′’])(?! ?[(-− \u00A0]?[0-9]| \u3010)([^a-z]|$))
     // regex is set in setIncludeImproperSymbols
     unit: 'm',
     multiplier: 0.3048
