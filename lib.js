@@ -1625,4 +1625,47 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
     return text;
 }
 
-module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock };
+/** Returns a translation table for String.translate()
+ *
+ * Similar to Python's maketrans() https://docs.python.org/3/library/stdtypes.html#str.maketrans
+ *
+ *  @param {string} fromCharset - Whether to convert tablespoons
+ *  @param {string} toCharset - Whether to convert teaspoons
+ *  @param {string?} removeCharset - Whether to convert teaspoons
+ *  @return {string[string]} - The object to pass to String.translate
+*/
+function maketrans(fromCharset, toCharset, removeCharset) {
+    if (fromCharset.length != toCharset.length) {
+        throw Error('the first two maketrans arguments must have equal length');
+    }
+    const map = {};
+    // NOTE: there is no enumerate() equivalent for strings in JavaScript
+    for (let i = 0; i < fromCharset.length; i++) {
+        const f = fromCharset[i];
+        const t = toCharset[i];
+        map[f] = t;
+    }
+    if (removeCharset !== undefined) {
+        for (const r of removeCharset) {
+            map[r] = '';
+        }
+    }
+    return map;
+}
+
+/** Return a copy of the string in which each character has been mapped through the given translation table
+ *
+ *  @param {string[string]} table - Object created by maketrans()
+ *  @return {string} toCharset - Whether to convert teaspoons
+*/
+String.prototype.translate = function(table) {
+    // NOTE: String.split() creates an intermediate array, so we do this by hand
+    const ret = [];
+    for (const c of this) {
+        const d = table[c];
+        ret.push(d !== undefined ? d : c);
+    }
+    return ret.join('');
+}
+
+module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans };

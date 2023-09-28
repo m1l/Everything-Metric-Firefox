@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
-import { bold, applyConversion, conversions, evaluateFraction, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, applyConversion, conversions, evaluateFraction, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, maketrans, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 import fs from 'fs';
+
+function testTranslate() {
+    assert.equal('cat'.translate(maketrans('abc', 'def')), 'fdt');
+    assert.equal('１２３'.translate(maketrans('１２３', '123')), '123');
+}
 
 function testBold() {
     assert.equal(bold('Hello, World!'), '𝗛𝗲𝗹𝗹𝗼, 𝗪𝗼𝗿𝗹𝗱!');
@@ -269,6 +274,7 @@ function testReplaceAll() {
 }
 
 function main() {
+    testTranslate();
     testBold();
     testConvAndForm();
     testEvaluateFraction();
