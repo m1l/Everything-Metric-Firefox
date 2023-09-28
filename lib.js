@@ -954,29 +954,13 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                     '[°º]?', // optional degree marker, TODO: don't know why
                     // feet
                     '(?:',
-                        '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
-                        '([0-9]{1,3})',  // number
+                        '[ \u00A0]?', // optional separator
+                        numberPattern,
                         '[\'’′]', // feet marker (NOTE: with improper symbols)
                         '[-− \u00A0]?', // optional separator
                     ')?',
-                    // mixed numeral
-                    '(?:',
-                        // integer
-                        '(?:',
-                            '([\\.,0-9]+)', // number
-                            '(?!/)', // check that this is not part of a fraction
-                            '(?:[-− \u00A0]?)', // optional separator
-                        ')?',
-                        // proper fraction
-                        '(',
-                                '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
-                            '|',
-                            // fraction written more conventionally
-                                '[0-9]+', // number
-                                '[/⁄]', // fraction bar
-                                '[0-9\\.]+', // number, TODO: why allow decimal point here?
-                        ')?',
-                    ')?',
+                    // inches
+                    numberPattern,
                     '[ \u00A0]?', // optional separator
                     '(?:"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
                 ')',
@@ -995,7 +979,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
                 ')',
             ].join(''),
-            'gi',
+            'giu',
         );
     } else {
         feetInchRegex = new RegExp(
@@ -1004,29 +988,13 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                     '[°º]?', // optional degree marker, TODO: don't know why
                     // feet
                     '(?:',
-                        '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
-                        '([0-9]{1,3})',  // number
+                        '[ \u00A0]?', // optional separator
+                        numberPattern,
                         '[′]', // feet marker (NOTE: without improper symbols)
                         '[-− \u00A0]?', // optional separator
                     ')?',
-                    // mixed numeral
-                    '(?:',
-                        // integer
-                        '(?:',
-                            '([\\.,0-9]+)', // number
-                            '(?!/)', // check that this is not part of a fraction
-                            '(?:[-− \u00A0]?)', // optional separator
-                        ')?',
-                        // proper fraction
-                        '(',
-                                '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
-                            '|',
-                            // fraction written more conventionally
-                                '[0-9]+', // number
-                                '[/⁄]', // fraction bar
-                                '[0-9\\.]+', // number, TODO: why allow decimal point here?
-                        ')?',
-                    ')?',
+                    // inches
+                    numberPattern,
                     '[ \u00A0]?', // optional separator
                     '(?:″|′′)', // inches marker (NOTE: without improper symbols)
                 ')',
@@ -1045,7 +1013,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
                 ')',
             ].join(''),
-            'gi',
+            'giu',
         );
     }
 
@@ -1089,7 +1057,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[4] === '\n') {
+            if (match[3] === '\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
@@ -1111,33 +1079,27 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             continue;
         }
 
-        let feet = parseFloat(match[1] || '0');
-        if (isNaN(feet)) {
-            feet = 0;
+        const feetStr = match[1];
+        const inchStr = match[2];
+        if (!feetStr && !inchStr) {
+            continue;
         }
 
-        let inchesStr = match[2] || '0';
-        if (inchesStr.length < 5) { // guess when comma use as decimal separator
-            inchesStr = inchesStr.replace(',', '.');
-        }
-        let inches = parseFloat(inchesStr);
-        if (isNaN(inches)) {
-            inches = 0;
+        const feet = parseNumber(feetStr || '0');
+        if (feet === null) {
+            continue;
         }
 
-        if (match[3] !== undefined) {
-            inches += evaluateFraction(match[3]);
-        }
-
-        if (inches === 0 || isNaN(inches)) {
+        const inches = parseNumber(inchStr || '0');
+        if (inches === null) {
             continue;
         }
 
         // convert to m when over 3 feet, to cm (or mm) otherwise
         const ret = (
-            feet + inches / 12 > 3
-            ? applyConversion(feet + inches / 12, footConversion, '', isUK, useMM, useGiga, useRounding)
-            : applyConversion(feet * 12 + inches, inchConversion, '', isUK, useMM, useGiga, useRounding)
+            feet.value + inches.value / 12 > 3
+            ? applyConversion(feet.value + inches.value / 12, footConversion, '', isUK, useMM, useGiga, useRounding)
+            : applyConversion(feet.value * 12 + inches.value, inchConversion, '', isUK, useMM, useGiga, useRounding)
         );
 
         const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
