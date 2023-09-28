@@ -1750,7 +1750,7 @@ function parseNumber(number) {
     const unicodeFraction = match[2];
     if (unicodeFraction !== undefined) {
         const partialValue = fractions[unicodeFraction];
-        if (!isFinite(value)) {
+        if (partialValue === undefined || !isFinite(partialValue)) {
             return null;
         }
         value += partialValue;
@@ -1761,7 +1761,7 @@ function parseNumber(number) {
     if (asciiFraction !== undefined) {
         const [numerator, denominator] = asciiFraction.replace(' ', '').split('/');
         const partialValue = Number(numerator) / Number(denominator);
-        if (!isFinite(value)) {
+        if (!isFinite(partialValue)) {
             return null;
         }
         value += partialValue;
