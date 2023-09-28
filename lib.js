@@ -8,8 +8,8 @@ const unitSuffix = '(?! [\(][0-9]| ?\u200B\u3010)([^a-z]|$)';
 const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
 const unitSuffixft = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
 const unitfrac = '[\-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?';
-const sqcu = '([\-− \u00A0]?(sq\.?|square|cu\.?|cubic))?';
-const sq = '([\-− \u00A0]?(sq\.?|square))?';
+const sqcu = '([\-− \u00A0]?(square|sq\.?|cubic|cu\.?))?';
+const sq = '([\-− \u00A0]?(square|sq\.?))?';
 const skipempty = '^(?:[ \n\t]+)?';
 
 /** @type{ RegExp } */
@@ -51,7 +51,7 @@ const inchConversion = {
     //old regex: new RegExp('((?:in )?[a-z#$€£\(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ches|ch|²|³)?' + unitSuffixIn + ')', 'ig'),
     //added (?=[0-9]) otherwise it will match "it is in something"
     //regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ches|ch|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
-    regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(in(ches|ch|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+    regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(square|sq\.?|cubic|cu\.?))?[-− \u00A0]?(in(ches|ch|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
@@ -80,7 +80,7 @@ const conversions = [
         multipliercu: 28.31690879986443
     },
     {
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sq + '[ \u00A0]?(mi|miles?)(²|³)?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sq + '[ \u00A0]?(miles?|mi)(²|³)?' + unitSuffix + ')', 'ig'),
         unit: 'km',
         multiplier: 1.60934,
         forceround2: true

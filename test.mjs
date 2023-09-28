@@ -137,6 +137,7 @@ function testReplaceFahrenheit() {
 function testReplaceFeetAndInches() {
     assert.equal(replaceFeetAndInches('1 ft 2 in', false, false, false, false, false, false, false), '1 ft 2 in (0.36 m)˜');
     assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false, false, false), '1 yd 2 in (0.97 m)˜');
+    assert.equal(replaceFeetAndInches('1 yd 2 inches', false, false, false, false, false, false, false), '1 yd 2 inches (0.97 m)˜');
 }
 
 function testReplaceFeetAndInchesSymbol() {
