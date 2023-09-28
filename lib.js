@@ -1671,7 +1671,7 @@ const parseNumberRegex = new RegExp(
 
 /** Parse a number, and count the number of significant digits
  *  @param {string} number - The number to parse as a string
- *  @return {import("./types").ValueWithSignificantDigits} - The evaluated number, along with the number of significant digits
+ *  @return {import("./types").ValueWithSignificantDigits | null} - The evaluated number, along with the number of significant digits
 */
 function parseNumber(number) {
     // check that the string contains at least one Number code-point (e.g. 1, １, ½)
