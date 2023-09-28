@@ -659,7 +659,8 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
         const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const cm3 = formatNumber(roundNicely(parseNumber(dim3) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2} × ${cm3}`, unit, useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], metStr);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -717,7 +718,8 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
         const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], metStr);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -775,7 +777,8 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
         const m1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const m2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${m1} × ${m2}`, unit, useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], metStr);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -822,8 +825,9 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
         const feet = is_yards.test(larger_unit) ? yards_or_feet * 3 : yards_or_feet;
         const total = feet * 12 + inches;
         const m = formatNumber(roundNicely(total * 0.0254, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const meter = formatConvertedValue(m, 'm', useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], meter);
+        const metStr = formatConvertedValue(m, 'm', useBold, useBrackets);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -1147,8 +1151,9 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
         const ounces = parseFloat(ouncesPart);
         const total = pounds * 16 + ounces;
         const formattedTotal = formatNumber(roundNicely(total * 0.0283495, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const kg = formatConvertedValue(formattedTotal, 'kg', useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], kg);
+        const metStr = formatConvertedValue(formattedTotal, 'kg', useBold, useBrackets);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -1267,7 +1272,8 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
         const cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], metStr);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }

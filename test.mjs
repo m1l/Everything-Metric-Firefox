@@ -135,9 +135,8 @@ function testReplaceFahrenheit() {
 }
 
 function testReplaceFeetAndInches() {
-    // TODO: the original value should not be removed
-    assert.equal(replaceFeetAndInches('1 ft 2 in', false, false, false, false, false, false, false), ' (0.36 m)˜');
-    assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false, false, false), ' (0.97 m)˜');
+    assert.equal(replaceFeetAndInches('1 ft 2 in', false, false, false, false, false, false, false), '1 ft 2 in (0.36 m)˜');
+    assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false, false, false), '1 yd 2 in (0.97 m)˜');
 }
 
 function testReplaceFeetAndInchesSymbol() {
@@ -166,23 +165,19 @@ function testReplaceOtherUnits() {
 }
 
 function testReplacePoundsAndOunces() {
-    // TODO: the original value should not be removed
-    assert.equal(replacePoundsAndOunces('1 lb 2 oz', false, false, false, false, false, false), ' (0.51 kg)˜');
+    assert.equal(replacePoundsAndOunces('1 lb 2 oz', false, false, false, false, false, false), '1 lb 2 oz (0.51 kg)˜');
 }
 
 function testReplaceSurfaceInFeet() {
-    // TODO: the original value should not be removed
-    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false, false, false), 'S =  (0.3 × 0.61 m)˜');
+    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false, false, false), 'S = 1×2 ft (0.3 × 0.61 m)˜');
 }
 
 function testReplaceSurfaceInInches() {
-    // TODO: the original value should not be removed
-    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false, false, false), 'S =  (2.54 × 5.08 cm)˜');
+    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false, false, false), 'S = 1×2 in (2.54 × 5.08 cm)˜');
 }
 
 function testReplaceVolume() {
-    // TODO: the original value should not be removed
-    assert.equal(replaceVolume('V = 1×2×3 in', false, false, false, false, false, false, false), 'V =  (2.54 × 5.08 × 7.62 cm)˜');
+    assert.equal(replaceVolume('V = 1×2×3 in', false, false, false, false, false, false, false), 'V = 1×2×3 in (2.54 × 5.08 × 7.62 cm)˜');
 }
 
 function testRoundNicely() {
