@@ -11,7 +11,7 @@ const skipempty = '^(?:\\s+)?';
 const numberPattern = [
     '(',
         // main number
-        '(?:[+\\-−]?[\\p{Nd},  \\.e]+?)?',
+        '(?:[+\\-−]?[\\p{Nd},  \\.]+?(?:e[+\-]?[0-9]+)?)?',
         '(?:\\s*|-)',
         // fraction
         '(?:',
