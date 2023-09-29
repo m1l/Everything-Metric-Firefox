@@ -57,7 +57,7 @@ function processTextBlock(text) {
     //skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
 
     if (lastquantity !== undefined && lastquantity !== 0 && skips < 2) {
-        text = ParseUnitsOnly(text, foundDegreeSymbol);
+        text = parseUnitOnly(text, foundDegreeSymbol);
         if (/^[a-zA-Z°º]+$/g.test(text)) {
             lastquantity = 0;
         }
@@ -125,7 +125,7 @@ function parseNumberWithPadding(text) {
 }
 
 
-function ParseUnitsOnly(text) {
+function parseUnitOnly(text) {
     // TODO: this is ugly
     const fahrenheitConversion = conversions[0];
     if (fahrenheitConversion !== undefined) {
