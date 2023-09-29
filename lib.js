@@ -499,14 +499,6 @@ function formatConvertedValue(number, unit, useBold, useBrackets) {
 }
 
 /** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
- *  @param {string} s - The original text
- *  @return {number} - A new string with metric temperatures
-*/
-function parseNumber(s) {
-    return parseFloat(s.replace('−', '-'));
-}
-
-/** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -570,14 +562,14 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
         const secondNumber = match[2];
 
         // upper-bound of the range, or single value
-        const met1 = fahrenheitToMetric(parseNumber(firstNumber), useKelvin, useRounding);
+        const met1 = fahrenheitToMetric(parseNumber(firstNumber).value, useKelvin, useRounding);
         const formattedMet1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
         let met = formattedMet1;
 
         // lower-bound of the range
         if (secondNumber) {
-            const met2 = fahrenheitToMetric(parseNumber(secondNumber), useKelvin, useRounding);
+            const met2 = fahrenheitToMetric(parseNumber(secondNumber).value, useKelvin, useRounding);
             const formattedMet2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
             met += ' to ' + formattedMet2;
         }
@@ -655,9 +647,9 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
             scale = 25.4;
             unit = 'mm';
         }
-        const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm3 = formatNumber(roundNicely(parseNumber(dim3) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm1 = formatNumber(roundNicely(parseNumber(dim1).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(parseNumber(dim2).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm3 = formatNumber(roundNicely(parseNumber(dim3).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2} × ${cm3}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -715,8 +707,8 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
             scale = 25.4;
             unit = 'mm';
         }
-        const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm1 = formatNumber(roundNicely(parseNumber(dim1).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(parseNumber(dim2).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -774,8 +766,8 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
         let unit = 'm';
         // TODO: use useMM
 
-        const m1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const m2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m1 = formatNumber(roundNicely(parseNumber(dim1).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m2 = formatNumber(roundNicely(parseNumber(dim2).value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${m1} × ${m2}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -1670,6 +1662,90 @@ String.prototype.translate = function(table) {
         ret.push(d !== undefined ? d : c);
     }
     return ret.join('');
+}
+
+const numberTranslation = maketrans(
+    '−÷∕⁄０１２３４５６７８９',
+    '-///0123456789',
+);
+
+const parseNumberRegex = new RegExp(
+    [
+        '^',
+        // main number
+        '([+-]?[0-9,  \\.e]+?)?',
+        '\\s*',
+        // fraction
+        '(?:',
+            // Unicode fraction
+                '([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])',
+            '|',
+            // ASCII fraction
+                '([0-9]+\\s*/\\s*[0-9]+)',
+        ')?',
+        '$',
+    ].join(''),
+    'u',
+);
+
+/** Parse a number, and count the number of significant digits
+ *  @param {string} number - The number to parse as a string
+ *  @return {import("./types").ValueWithSignificantDigits} - The evaluated number, along with the number of significant digits
+*/
+function parseNumber(number) {
+    // the string contains at least one Number code-point (e.g. 1, １, ½)
+
+    // NOTE: ideally, we would want to use the Unicode numeric value associated
+    // with each character in number. But, of course, JavaScript does not
+    // expose this. So, instead, we just support a small character set by hand
+    const mostlyAsciiNumber = number.translate(numberTranslation);
+
+    const match = mostlyAsciiNumber.match(parseNumberRegex);
+    if (!match) {
+        return null;
+    }
+
+    let value = 0;
+    let significantFigures = 0;
+
+    // NOTE: parseFloat matches as many characters as possible, and ignore
+    // invalid ones, so it does not detect invalid numbers. We use Number().
+
+    const simpleNumber = match[1];
+    if (simpleNumber !== undefined) {
+        const withoutGroups = simpleNumber.replace(/[,  ]/, '');
+        const partialValue = Number(withoutGroups);
+        if (!isFinite(partialValue)) {
+            return null;
+        }
+        value += partialValue;
+        significantFigures = partialValue.toExponential().replace(/^-?0*|\.|0*e.*/g, '').length;
+    }
+
+    // Note: NFKD normalization would allow us to expand Unicode fractions,
+    // but '3½' would end up as “31/2”, so we're doing it manually
+    const unicodeFraction = match[2];
+    if (unicodeFraction !== undefined) {
+        const partialValue = fractions[unicodeFraction];
+        if (!isFinite(value)) {
+            return null;
+        }
+        value += partialValue;
+        significantFigures = 0;
+    }
+
+    const asciiFraction = match[3];
+    if (asciiFraction !== undefined) {
+        const [numerator, denominator] = asciiFraction.replace(' ', '').split('/');
+        const partialValue = Number(numerator) / Number(denominator);
+        if (!isFinite(value)) {
+            return null;
+        }
+        value += partialValue;
+        significantFigures = 0;
+    }
+
+    return { value, significantFigures };
 }
 
 module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans };

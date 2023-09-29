@@ -79,10 +79,61 @@ function testInsertAt() {
 }
 
 function testParseNumber() {
-    assert.equal(parseNumber('-3.14'), -3.14);
-    assert.equal(parseNumber('−3.14'), -3.14);
-    assert.equal(parseNumber('3.14'), 3.14);
-    assert.equal(parseNumber('+3.14'), 3.14);
+    // simple integers
+    assert.deepEqual(parseNumber('1'), { value: 1, significantFigures: 1 });
+    assert.deepEqual(parseNumber('1001'), { value: 1001, significantFigures: 4 });
+    assert.deepEqual(parseNumber('100000000000000000000000000000000'), { value: 1e32, significantFigures: 1 });
+
+    // decimal numbers
+    assert.deepEqual(parseNumber('-3.14'), { value: -3.14, significantFigures: 3 });
+    assert.deepEqual(parseNumber('−3.14'), { value: -3.14, significantFigures: 3 });
+    assert.deepEqual(parseNumber('3.14'), { value: 3.14, significantFigures: 3 });
+    assert.deepEqual(parseNumber('+3.14'), { value: 3.14, significantFigures: 3 });
+
+    // localized decimal numbers
+    assert.deepEqual(parseNumber('1,2345.25'), { value: 12345.25, significantFigures: 7 });
+    assert.deepEqual(parseNumber('1 2345.25'), { value: 12345.25, significantFigures: 7 });
+    assert.deepEqual(parseNumber('1,2345.25'), { value: 12345.25, significantFigures: 7 });
+    assert.deepEqual(parseNumber('+1 2345.25'), { value: 12345.25, significantFigures: 7 });
+    assert.deepEqual(parseNumber('-1 2345.25'), { value: -12345.25, significantFigures: 7 });
+    assert.deepEqual(parseNumber('−1,2345.25'), { value: -12345.25, significantFigures: 7 });
+
+    // exponential notation
+    assert.deepEqual(parseNumber('1e0'), { value: 1, significantFigures: 1 });
+    assert.deepEqual(parseNumber('1e3'), { value: 1000, significantFigures: 1 });
+    assert.deepEqual(parseNumber('1.5e3'), { value: 1500, significantFigures: 2 });
+    // TODO: in exponential notation, all digits should be considered significant
+    // assert.deepEqual(parseNumber('1.0e3'), { value: 1, significantFigures: 2 });
+    assert.deepEqual(parseNumber('10e3'), { value: 10000, significantFigures: 1 });
+    assert.deepEqual(parseNumber('+10e3'), { value: 10000, significantFigures: 1 });
+
+    // fractions
+    assert.deepEqual(parseNumber('½'), { value: 0.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('1 / 2'), { value: 0.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('1/ 2'), { value: 0.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('1 /2'), { value: 0.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('1/2'), { value: 0.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('2 / 1'), { value: 2.0, significantFigures: 0 });
+    assert.deepEqual(parseNumber('1÷2'), { value: 0.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('1∕2'), { value: 0.5, significantFigures: 0 });
+
+    // mixed numerals
+    assert.deepEqual(parseNumber('3½'), { value: 3.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('3 ½'), { value: 3.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('3 1 / 2'), { value: 3.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('3 1/ 2'), { value: 3.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('3 1 /2'), { value: 3.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('3 1/2'), { value: 3.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('3 2 / 1'), { value: 5.0, significantFigures: 0 });
+    assert.deepEqual(parseNumber('3 1÷2'), { value: 3.5, significantFigures: 0 });
+    assert.deepEqual(parseNumber('3 1∕2'), { value: 3.5, significantFigures: 0 });
+
+    // invalid numbers
+    assert.equal(parseNumber('3/1∕2'), null);
+    assert.equal(parseNumber('1e2e3'), null);
+    assert.equal(parseNumber('1.2.3'), null);
+    assert.equal(parseNumber('1+2'), null);
+    assert.equal(parseNumber('1-2'), null);
 }
 
 function testProcessTextBlock() {

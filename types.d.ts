@@ -21,3 +21,8 @@ declare global {
         translate(table : { [key: string]: string }) : string;
     }
 }
+
+export type ValueWithSignificantDigits = {
+    value: number,
+    significantFigures: number,
+};
