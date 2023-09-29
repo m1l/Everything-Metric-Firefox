@@ -1212,51 +1212,35 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
                 ? '(?<!/)' // with look-behind
                 : '/?' // manually, TODO: it looks like the check is not done at all
             ),
-            // mixed numeral
-            '(?:',
-                '([0-9]+(?!/))', // integer that is not the numerator of a fraction
-                '[-− \u00A0]', // separator
-                '([0-9]+[/⁄][0-9\\.]+)?', // optional fraction
-            ')',
+            numberPattern,
             ' ?', // optional space
             '[x*×]', // multiplication sign
             ' ?', // optional space
-            // mixed numeral
-            '(?:',
-                '([0-9]+(?!/))?', // integer that is not the numerator of a fraction
-                '[-− \u00A0]', // separator
-                '([0-9]+[/⁄][0-9\\.]+)?', // optional fraction
-            ')?',
+            numberPattern,
             ' ?', // optional space
             '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
             '(?:[^a-z]|$)', // look for a separator
         ].join(''),
-        'ig',
+        'igu',
     );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        let inches1 = parseFloat(match[1] || '0');
-        if (isNaN(inches1)) {
-            inches1 = 0;
-        }
-
-        const frac1 = evaluateFraction(match[2] || '0');
-        if (isNaN(frac1)) {
+        const number1 = match[1];
+        const number2 = match[2];
+        if (number1 === undefined || number2 === undefined) {
             continue;
         }
-        inches1 += frac1;
 
-        let inches2 = parseFloat(match[3] || '0');
-        if (isNaN(inches2)) {
-            inches2 = 0;
-        }
-
-        const frac2 = evaluateFraction(match[4] || '0');
-        if (isNaN(frac2)) {
+        let inches1 = parseNumber(number1);
+        if (inches1 === null) {
             continue;
         }
-        inches2 += frac2;
+
+        let inches2 = parseNumber(number2);
+        if (inches2 === null) {
+            continue;
+        }
 
         let scale = 2.54;
         let unit = 'cm';
@@ -1265,8 +1249,8 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
             unit = 'mm';
         }
 
-        const cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm1 = formatNumber(roundNicely(inches1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(inches2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
