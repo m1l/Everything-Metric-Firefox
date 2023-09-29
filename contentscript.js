@@ -127,6 +127,16 @@ function StringToNumber(text) {
 
 
 function ParseUnitsOnly(text) {
+    // TODO: this is ugly
+    const fahrenheitConversion = conversions[0];
+    if (fahrenheitConversion !== undefined) {
+        if (degWithoutFahrenheit) {
+            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
+        } else {
+            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
+        }
+    }
+
     //console.log("now trying " + text);
     const len = conversions.length;
     for (let i = 0; i < len; i++) {

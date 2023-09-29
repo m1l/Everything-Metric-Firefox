@@ -1421,16 +1421,6 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
  *  @return {string} - A new string with metric units
 */
 function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // TODO: this is ugly
-    const fahrenheitConversion = conversions[0];
-    if (fahrenheitConversion !== undefined) {
-        if (degWithoutFahrenheit) {
-            fahrenheitConversion.regex = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
-        } else {
-            fahrenheitConversion.regex = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
-        }
-    }
-
     const len = conversions.length;
     for (let conversionIndex = 0; conversionIndex < len; conversionIndex++) {
         const conversion = conversions[conversionIndex];
