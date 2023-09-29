@@ -137,7 +137,7 @@ function ParseUnitsOnly(text) {
         while ((matches = conversions[i].regexUnit.exec(text)) !== null) {
             try {
 
-                const metStr = convAndForm(lastquantity, i, "", isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
+                const metStr = convAndForm(lastquantity, conversions[i], "", isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
                 const fullMatch = matches[0];
                 const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
 
