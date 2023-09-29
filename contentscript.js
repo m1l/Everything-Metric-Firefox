@@ -73,7 +73,7 @@ function processTextBlock(text) {
     } else {
         lastquantity = 0;
         if (text.length < 50) {
-            let quantity = StringToNumber(text);
+            let quantity = parseNumberWithPadding(text);
             lastquantity = quantity;
             skips = 0;
         }
@@ -86,7 +86,7 @@ function processTextBlock(text) {
     return text;
 }
 
-function StringToNumber(text) {
+function parseNumberWithPadding(text) {
     let regex = new RegExp('^(?![a-z])(?:[ \n\t]+)?([\.,0-9]+(?![\/⁄]))?(?:[-\− \u00A0])?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?(?:[ \n\t]+)?$', 'ig');
     //console.log("try"+text+"s");
 
