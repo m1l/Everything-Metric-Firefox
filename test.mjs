@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, conversions, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, conversions, evaluateFraction, fahrenheitConversion, fahrenheitToCelsius, formatConvertedValue, formatNumber, inchConversion, insertAt, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 import fs from 'fs';
 
@@ -10,17 +10,13 @@ function testBold() {
 }
 
 function testConvAndForm() {
-    const fahrenheitToCelsiusConv = conversions[0];
-    assert(fahrenheitToCelsiusConv);
-    assert.equal(convAndForm(100, fahrenheitToCelsiusConv, '', false, false, false, false, false, false, false, false), ' (100 °C)˜');
+    assert.equal(convAndForm(100, fahrenheitConversion, '', false, false, false, false, false, false, false, false), ' (100 °C)˜');
 
     // useMM and useRounding interact in subtle ways
-    const inchesToCmConv = conversions[1];
-    assert(inchesToCmConv);
-    assert.equal(convAndForm(0.123, inchesToCmConv, '', false, false, false, false, false, false, false, false), ' (3.1 mm)˜');
-    assert.equal(convAndForm(0.123, inchesToCmConv, '', false, false, false, true, false, false, false, false), ' (3.1 mm)˜');
-    assert.equal(convAndForm(0.123, inchesToCmConv, '', false, true, false, false, false, false, false, false), ' (3 mm)˜');
-    assert.equal(convAndForm(0.123, inchesToCmConv, '', false, true, false, true, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm(0.123, inchConversion, '', false, false, false, false, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm(0.123, inchConversion, '', false, false, false, true, false, false, false, false), ' (3.1 mm)˜');
+    assert.equal(convAndForm(0.123, inchConversion, '', false, true, false, false, false, false, false, false), ' (3 mm)˜');
+    assert.equal(convAndForm(0.123, inchConversion, '', false, true, false, true, false, false, false, false), ' (3.1 mm)˜');
 
     // surfaces and volumes
     const feetToMConv = conversions[3];
