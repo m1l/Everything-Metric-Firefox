@@ -42,7 +42,7 @@ function walk(node) {
             }
             break;
         case 3: // Text node
-            procNode(node);
+            node.nodeValue = processTextBlock(node.nodeValue);
             break;
         default:
             break;
@@ -50,12 +50,9 @@ function walk(node) {
 }
 
 var foundDegreeSymbol = false;
-function procNode(textNode) {
-
-    let text = textNode.nodeValue;
-
+function processTextBlock(text) {
     if (text.startsWith('{') || text.length<1)
-        return;
+        return text;
 
     //skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
 
@@ -83,8 +80,10 @@ function procNode(textNode) {
     }
    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) ||
         /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
-        textNode.nodeValue = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+        text = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
     }
+
+    return text;
 }
 
 function StringToNumber(text) {
