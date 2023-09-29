@@ -1474,6 +1474,7 @@ function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, 
     return text;
 }
 
+/** @type{ number | undefined } */
 var lastquantity = 0;
 var skips = 0;
 var foundDegreeSymbol = false;
@@ -1505,7 +1506,7 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
     // skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
 
     if (lastquantity !== undefined && lastquantity !== 0 && skips < 2) {
-        text = parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
+        text = parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
         if (/^[a-zA-Z°º]+$/g.test(text)) {
             lastquantity = 0;
         }
@@ -1541,39 +1542,54 @@ function parseNumberWithPadding(text) {
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        if (match[1] === undefined && match[2] === undefined) {
+        const decimal = match[1];
+        let properFraction = match[2];
+        if (decimal === undefined && properFraction === undefined) {
             continue;
         }
-        let imp = match[1]; //.replace(',','');
-        if (match[1] !== undefined) {
-            imp = imp.replace(',', '');
-            if (/[⁄]/.test(match[1])) { //improvisation, but otherwise 1⁄2 with register 1 as in
-                match[2] = match[1];
-                imp = 0;
+        let value = 0; //.replace(',','');
+        if (decimal !== undefined) {
+            if (/[⁄]/.test(decimal)) { //improvisation, but otherwise 1⁄2 with register 1 as in
+                properFraction = decimal;
             } else {
-                imp = parseFloat(imp);
+                value += parseFloat(decimal.replace(',', ''));
             }
         }
-        if (isNaN(imp)) {
-            imp = 0;
+        if (isNaN(value)) {
+            value = 0;
         }
 
-        if (match[2] !== undefined) {
-            imp += evaluateFraction(match[2]);
+        if (properFraction !== undefined) {
+            value += evaluateFraction(properFraction);
         }
 
-        if (imp === 0 || isNaN(imp)) {
+        if (value === 0 || isNaN(value)) {
             continue;
         }
-        return imp;
+        return value;
     }
+    return undefined;
 }
 
 /** Parse a non-metric unit, using lastquantity as the value
  *  @param {string} text - The string containing the unit
+ *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
+ *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
+ *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useComma - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpaces - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string where the unit has been converted to metric
 */
-function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets) {
+function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets) {
+    if (lastquantity === undefined) {
+        return text;
+    }
+
     // TODO: this is ugly
     const fahrenheitConversion = conversions[0];
     if (fahrenheitConversion !== undefined) {
@@ -1616,8 +1632,8 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useRoun
             met = roundNicely(met, useRounding);
         }
 
-        met = formatNumber(met, useComma, useSpaces);
-        const metStr = formatConvertedValue(met, unit, useBold, useBrackets);
+        const formatted = formatNumber(met, useComma, useSpaces);
+        const metStr = formatConvertedValue(formatted, unit, useBold, useBrackets);
         text = insertAt(text, metStr, 1);
     }
     return text;
