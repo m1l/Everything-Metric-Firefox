@@ -1477,6 +1477,26 @@ function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, 
 var lastquantity = 0;
 var skips = 0;
 var foundDegreeSymbol = false;
+/** Replace non-metric units with metric units and handle cross-node cases
+ *  @param {string} text - The original text
+ *  @param {boolean} convertTablespoon - Whether to convert tablespoons
+ *  @param {boolean} convertTeaspoon - Whether to convert teaspoons
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
+ *  @param {boolean} includeImproperSymbols} - Whether to support unofficial symbols for feet and inches
+ *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
+ *  @param {boolean} includeQuotes - Whether single and double quotes should be interpreted as feet and inches
+ *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
+ *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useComma - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpaces - Whether to use spaces as thousand separator
+ *  @return {string} - A new string with metric units
+*/
 function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces) {
     if (text.startsWith('{') || text.length<1)
         return text;
@@ -1513,6 +1533,10 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
     return text;
 }
 
+/** Parse a number, allows white space before and after the pattern
+ *  @param {string} text - The string containing the number
+ *  @return {number | undefined} - The parsed number in case of success, or undefined otherwise
+*/
 function parseNumberWithPadding(text) {
     let regex = new RegExp('^(?![a-z])(?:[ \n\t]+)?([\.,0-9]+(?![\/⁄]))?(?:[-\− \u00A0])?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?(?:[ \n\t]+)?$', 'ig');
     //console.log("try"+text+"s");
@@ -1551,6 +1575,10 @@ function parseNumberWithPadding(text) {
     }
 }
 
+/** Parse a non-metric unit, using lastquantity as the value
+ *  @param {string} text - The string containing the unit
+ *  @return {string} - A new string where the unit has been converted to metric
+*/
 function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets) {
     // TODO: this is ugly
     const fahrenheitConversion = conversions[0];
