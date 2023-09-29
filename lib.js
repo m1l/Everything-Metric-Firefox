@@ -1637,4 +1637,4 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useRoun
     return text;
 }
 
-module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll };
+module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock };

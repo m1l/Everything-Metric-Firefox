@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, convAndForm, conversions, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, convAndForm, conversions, evaluateFraction, fahrenheitToCelsius, formatConvertedValue, formatNumber, insertAt, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 import fs from 'fs';
 
@@ -82,6 +82,31 @@ function testParseNumber() {
     assert.equal(parseNumber('−3.14'), -3.14);
     assert.equal(parseNumber('3.14'), 3.14);
     assert.equal(parseNumber('+3.14'), 3.14);
+}
+
+function testProcessTextBlock() {
+    const tests = [
+        ['1', 'pounds of stuff', 'pounds (450 g)˜ of stuff'],
+        ['1½', 'pounds of stuff', 'pounds of stuff'],
+        ['1 ½', 'pounds of stuff', 'pounds (680 g)˜ of stuff'],
+        ['1', 'in of stuff', 'in of stuff'],
+        ['1½', 'in of stuff', 'in of stuff'],
+        ['1 ½', 'in of stuff', 'in of stuff'],
+        ['1', '" of stuff', '" of stuff'],
+        ['1½', '" of stuff', '" of stuff'],
+        ['1 ½', '" of stuff', '" of stuff'],
+        ['1', 'miles of stuff', 'miles of stuff'],
+        ['1½', 'miles of stuff', 'miles of stuff'],
+        ['1 ½', 'miles of stuff', 'miles of stuff'],
+        ['1', '°F of stuff', '°F (1 °C)˜ of stuff'],
+        ['1½', '°F of stuff', '°F of stuff'],
+        ['1 ½', '°F of stuff', '°F (1.5 °C)˜ of stuff'],
+    ];
+    for (const [text1, text2, converted] of tests) {
+        processTextBlock(text1, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
+        const output = processTextBlock(text2, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
+        assert.equal(output, converted);
+    }
 }
 
 function testReplaceFahrenheit() {
@@ -260,6 +285,7 @@ function main() {
     testFormatNumber();
     testInsertAt();
     testParseNumber();
+    testProcessTextBlock();
     testReplaceFahrenheit();
     testReplaceFeetAndInches();
     testReplaceFeetAndInchesSymbol();
