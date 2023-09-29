@@ -1474,4 +1474,139 @@ function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, 
     return text;
 }
 
+var lastquantity = 0;
+var skips = 0;
+var foundDegreeSymbol = false;
+function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces) {
+    if (text.startsWith('{') || text.length<1)
+        return text;
+
+    //skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
+
+    if (lastquantity !== undefined && lastquantity !== 0 && skips < 2) {
+        text = parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
+        if (/^[a-zA-Z°º]+$/g.test(text)) {
+            lastquantity = 0;
+        }
+        else {
+            skips++;
+            if (/[°º]/g.test(text))
+                 foundDegreeSymbol=true;
+            else
+                foundDegreeSymbol=false;
+
+        }
+        //console.log(text);
+    } else {
+        lastquantity = 0;
+        if (text.length < 50) {
+            let quantity = parseNumberWithPadding(text);
+            lastquantity = quantity;
+            skips = 0;
+        }
+    }
+   if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) ||
+        /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
+        text = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+    }
+
+    return text;
+}
+
+function parseNumberWithPadding(text) {
+    let regex = new RegExp('^(?![a-z])(?:[ \n\t]+)?([\.,0-9]+(?![\/⁄]))?(?:[-\− \u00A0])?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?(?:[ \n\t]+)?$', 'ig');
+    //console.log("try"+text+"s");
+
+    let matches;
+
+    while ((matches = regex.exec(text)) !== null) {
+        try {
+            if (matches[1] === undefined && matches[2] === undefined)
+                continue;
+            let imp = matches[1]; //.replace(',','');
+            //console.log("found:"+matches[1]);
+            if (matches[1] !== undefined) {
+                imp = imp.replace(',', '');
+
+                if (/[⁄]/.test(matches[1])) { //improvisation, but otherwise 1⁄2 with register 1 as in
+                    matches[2] = matches[1];
+                    imp = 0;
+                } else {
+                    imp = parseFloat(imp);
+                }
+            }
+            //console.log("imp " + imp);
+            if (isNaN(imp))
+                imp = 0;
+
+            if (matches[2] !== undefined)
+                imp += evaluateFraction(matches[2]);
+            //console.log("imp2 " + imp);
+
+            if (imp === 0 || isNaN(imp)) continue;
+            return imp;
+        } catch {
+            //console.log(err.message);
+        }
+    }
+}
+
+function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets) {
+    // TODO: this is ugly
+    const fahrenheitConversion = conversions[0];
+    if (fahrenheitConversion !== undefined) {
+        if (degWithoutFahrenheit) {
+            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
+        } else {
+            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
+        }
+    }
+
+    //console.log("now trying " + text);
+    const len = conversions.length;
+    for (let i = 0; i < len; i++) {
+        if (conversions[i].regexUnit === undefined)
+            continue;
+        let matches;
+
+        while ((matches = conversions[i].regexUnit.exec(text)) !== null) {
+            try {
+
+                const metStr = convAndForm(lastquantity, conversions[i], "", isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
+                const fullMatch = matches[0];
+                const insertIndex = matches.index + convertedValueInsertionOffset(fullMatch);
+
+                text = insertAt(text, metStr, insertIndex);
+
+            } catch (err) {
+                //console.log(err.message);
+            }
+        }
+
+    }
+
+    if (foundDegreeSymbol) {
+            if ( text.charAt(0)!=='F')
+                return text;
+
+            if (text.length>=3 && /^F\u200B\u3010|^F[\(][0-9]/.test(text))
+                return text; //it has been already converted
+
+                let met = fahrenheitToCelsius(lastquantity, useKelvin);
+
+                var unit = '°C';
+                if (useKelvin) {
+                    met += 273.15;
+                    unit = 'K';
+                    met = roundNicely(met, useRounding);
+                }
+
+            met = formatNumber(met, useComma, useSpaces);
+            const metStr = formatConvertedValue(met, unit, useBold, useBrackets);
+            text = insertAt(text, metStr, 1);
+
+        }
+    return text;
+}
+
 module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll };
