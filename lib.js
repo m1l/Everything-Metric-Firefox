@@ -1474,57 +1474,19 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
                 foundDegreeSymbol=false;
             }
         }
+    } else if (text.length < 50) {
+        const parsed = parseNumber(text);
+        lastquantity = parsed  === null ? undefined : parsed.value;
+        skips = 0;
     } else {
         lastquantity = 0;
-        if (text.length < 50) {
-            let quantity = parseNumberWithPadding(text);
-            lastquantity = quantity;
-            skips = 0;
-        }
     }
+
     if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) || /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
         text = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
     }
 
     return text;
-}
-
-/** Parse a number, allows white space before and after the pattern
- *  @param {string} text - The string containing the number
- *  @return {number | undefined} - The parsed number in case of success, or undefined otherwise
-*/
-function parseNumberWithPadding(text) {
-    let regex = new RegExp('^(?![a-z])(?:[ \n\t]+)?([\.,0-9]+(?![\/⁄]))?(?:[-\− \u00A0])?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?(?:[ \n\t]+)?$', 'ig');
-
-    let match;
-    while ((match = regex.exec(text)) !== null) {
-        const decimal = match[1];
-        let properFraction = match[2];
-        if (decimal === undefined && properFraction === undefined) {
-            continue;
-        }
-        let value = 0; //.replace(',','');
-        if (decimal !== undefined) {
-            if (/[⁄]/.test(decimal)) { //improvisation, but otherwise 1⁄2 with register 1 as in
-                properFraction = decimal;
-            } else {
-                value += parseFloat(decimal.replace(',', ''));
-            }
-        }
-        if (isNaN(value)) {
-            value = 0;
-        }
-
-        if (properFraction !== undefined) {
-            value += evaluateFraction(properFraction);
-        }
-
-        if (value === 0 || isNaN(value)) {
-            continue;
-        }
-        return value;
-    }
-    return undefined;
 }
 
 /** Parse a non-metric unit, using lastquantity as the value
