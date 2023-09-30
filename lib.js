@@ -1397,14 +1397,14 @@ function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, 
 }
 
 /** @type{ number | undefined } */
-var lastquantity = 0;
+var lastquantity = undefined;
 var skips = 0;
 var foundDegreeSymbol = false;
 
 /** Reset the global state associated with block processing
 */
 function resetBlockProcessing() {
-    lastquantity = 0;
+    lastquantity = undefined;
     skips = 0;
     foundDegreeSymbol = false;
 }
@@ -1437,10 +1437,10 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
 
     // skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
 
-    if (lastquantity !== undefined && lastquantity !== 0 && skips < 2) {
+    if (lastquantity !== undefined && skips < 2) {
         text = parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
         if (/^[a-zA-Z°º]+$/g.test(text)) {
-            lastquantity = 0;
+            lastquantity = undefined;
         }
         else {
             skips++;
@@ -1455,10 +1455,10 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
         lastquantity = parsed  === null ? undefined : parsed.value;
         skips = 0;
     } else {
-        lastquantity = 0;
+        lastquantity = undefined;
     }
 
-    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) || /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
+    if ((lastquantity !== undefined && skips <= 2) || /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
         text = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
     }
 

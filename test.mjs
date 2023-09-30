@@ -131,6 +131,7 @@ function testParseNumber() {
 function testProcessTextBlock() {
     /** @type{ [string, string, string][] } */
     const tests = [
+        ['0', 'pounds of stuff', 'pounds (0 g)˜ of stuff'],
         ['1', 'pounds of stuff', 'pounds (450 g)˜ of stuff'],
         [' 1', 'pounds of stuff', 'pounds (450 g)˜ of stuff'],
         ['1 ', 'pounds of stuff', 'pounds (450 g)˜ of stuff'],
