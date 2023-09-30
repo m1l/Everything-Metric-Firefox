@@ -48,10 +48,10 @@ const conversions = [
     {
         //(?!in ) exclude... replaced with
         // (?:in )?  to exclude converting "born in 1948 in"
-        //old regex: new RegExp('((?:in )?[a-z#$€£\(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ch|ches|²|³)?' + unitSuffixIn + ')', 'ig'),
+        //old regex: new RegExp('((?:in )?[a-z#$€£\(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ches|ch|²|³)?' + unitSuffixIn + ')', 'ig'),
         //added (?=[0-9]) otherwise it will match "it is in something"
-        //regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ch|ches|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
-        regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(in(ch|ches|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+        //regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ches|ch|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
+        regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(in(ches|ch|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
         unit: 'cm',
         unit2: 'mm',
         multiplier: 2.54,
@@ -631,7 +631,7 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
             '[ \u00A0]?', // space or no-break space
             '([0-9]+(?:\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
-            'in(ch|ches|.)?', // unit
+            'in(ches|ch|.)?', // unit
             // check for already present conversion to metric
             unitSuffix,
         ].join(''),
@@ -686,7 +686,7 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
             '[-− \u00A0]?', // space or no-break space
             '([0-9]+(?:\.[0-9]+)?)', // number
             '[-− \u00A0]?', // space or no-break space
-            'in(ch|ches|\.)?',  // unit
+            'in(ches|ch|\.)?',  // unit
             // check for already present conversion to metric
             unitSuffix,
         ].join(''),
@@ -801,7 +801,7 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
             '.?', // separator
             '([0-9]+(\.[0-9]+)?)', // number
             '.?', // separator
-            'in(?:ch|ches)?', // smaller unit
+            'in(?:ches|ch)?', // smaller unit
         ].join(''),
         'g',
     );
