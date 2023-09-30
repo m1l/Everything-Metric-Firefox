@@ -141,6 +141,9 @@ function testProcessTextBlock() {
     /** @type{ [string, string, string][] } */
     const tests = [
         ['1', 'pounds of stuff', 'pounds (450 g)˜ of stuff'],
+        [' 1', 'pounds of stuff', 'pounds (450 g)˜ of stuff'],
+        ['1 ', 'pounds of stuff', 'pounds (450 g)˜ of stuff'],
+        [' 1 ', 'pounds of stuff', 'pounds (450 g)˜ of stuff'],
         ['1½', 'pounds of stuff', 'pounds (680 g)˜ of stuff'],
         ['1 ½', 'pounds of stuff', 'pounds (680 g)˜ of stuff'],
         ['1', 'in of stuff', 'in of stuff'],
