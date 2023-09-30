@@ -2,8 +2,7 @@ const regstart = '([(]?';
 const regend = '([^a-z]|$)';
 const skipbrackets = '(?! [(][0-9]|\u200B\u3010)';
 const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)([^a-z]|$)';
-const unitSuffixIn = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
-const unitSuffixft = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
+const unitSuffixInFt = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
 const sqcu = '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
 const sq = '([-− \u00A0]?(square|sq\\.?))?';
 const skipempty = '^(?:\\s+)?';
@@ -58,7 +57,7 @@ const fahrenheitConversion = {
 
 /** @type{ import("./types").Conversion } */
 const inchConversion = {
-    regex: new RegExp('((?:in)?' + numberPattern + '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?[)]?)( [a-z]+)?'+unitSuffixIn+')', 'igu'),
+    regex: new RegExp('((?:in)?' + numberPattern + '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?[)]?)( [a-z]+)?'+unitSuffixInFt+')', 'igu'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
@@ -80,7 +79,7 @@ const conversions = [
     inchConversion,
     footConversion,
     {
-        regex: new RegExp(regstart + numberPattern + sqcu + '[-− \u00A0]?(feet|foot|ft)(²|³)?[)]?' + unitSuffixft + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + sqcu + '[-− \u00A0]?(feet|foot|ft)(²|³)?[)]?' + unitSuffixInFt + ')', 'igu'),
         unit: 'm',
         multiplier: 0.3048,
         multipliercu: 28.31690879986443
@@ -994,9 +993,9 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
     }
 
     if (includeImproperSymbols) {
-        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'gu');
+        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixInFt + ')', 'gu');
     } else {
-        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'gu');
+        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?([′])(?![′])' + unitSuffixInFt + ')', 'gu');
     }
 }
 
