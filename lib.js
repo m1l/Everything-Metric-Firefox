@@ -196,30 +196,6 @@ const unitsTeaspoon = {
     multiplierimp: 5.91939
 };
 
-/** Evaluate text that looks like a fraction
- *  @param {string} frac - The fraction-like text
- *  @return {number} - The value of the fraction (0 if evaluation fails)
-*/
-function evaluateFraction(frac) {
-    const value = fractions[frac];
-    if (value !== undefined) {
-        return value;
-    }
-    try {
-        if (/[a-zA-Z,?!]/.test(frac)) {
-            return 0;
-        }
-        let cleanedFrac = frac.replace(/[^\d/⁄]/, '');
-        cleanedFrac = frac.replace(/[⁄]/, '/');
-        if (cleanedFrac.length < 3) {
-            return 0;
-        }
-        return eval(cleanedFrac);
-    } catch (err) {
-        return 0;
-    }
-}
-
 /** If the value if smaller than 1, or larger than 10,000, use a more convenient SI prefix
  *  @param {number} met - The value
  *  @param {string} unit - The unit being used
@@ -1689,4 +1665,4 @@ function parseNumber(number) {
     return { value, significantFigures };
 }
 
-module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans, resetBlockProcessing };
+module.exports = { fahrenheitConversion, inchConversion, conversions, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans, resetBlockProcessing };

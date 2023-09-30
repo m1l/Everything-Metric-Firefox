@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, applyConversion, conversions, evaluateFraction, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, maketrans, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, resetBlockProcessing, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, applyConversion, conversions, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, maketrans, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, resetBlockProcessing, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 import fs from 'fs';
 
@@ -35,15 +35,6 @@ function testConvAndForm() {
     assert(fluidOncesToMlConv);
     assert.deepEqual(applyConversion(100, fluidOncesToMlConv, '', false, false, false, false), {met: 2957, unit: 'mL'});
     assert.deepEqual(applyConversion(100, fluidOncesToMlConv, '', true, false, false, false), {met: 2841, unit: 'mL'});
-}
-
-function testEvaluateFraction() {
-    assert.equal(evaluateFraction('½'), 0.5);
-    assert.equal(evaluateFraction('1 / 2'), 0.5);
-    assert.equal(evaluateFraction('1/ 2'), 0.5);
-    assert.equal(evaluateFraction('1 /2'), 0.5);
-    assert.equal(evaluateFraction('1/2'), 0.5);
-    assert.equal(evaluateFraction('2 / 1'), 2.0);
 }
 
 function testFahrenHeitToCelsius() {
@@ -333,7 +324,6 @@ function main() {
     testTranslate();
     testBold();
     testConvAndForm();
-    testEvaluateFraction();
     testFahrenHeitToCelsius();
     testFormatConvertedValue();
     testFormatNumber();
