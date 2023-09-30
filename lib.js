@@ -1424,6 +1424,16 @@ function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, 
 var lastquantity = 0;
 var skips = 0;
 var foundDegreeSymbol = false;
+
+/** Reset the global state associated with block processing
+*/
+function resetBlockProcessing() {
+    lastquantity = 0;
+    skips = 0;
+    foundDegreeSymbol = false;
+}
+
+
 /** Replace non-metric units with metric units and handle cross-node cases
  *  @param {string} text - The original text
  *  @param {boolean} convertTablespoon - Whether to convert tablespoons
@@ -1717,4 +1727,4 @@ function parseNumber(number) {
     return { value, significantFigures };
 }
 
-module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans };
+module.exports = { fahrenheitConversion, inchConversion, conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans, resetBlockProcessing };
