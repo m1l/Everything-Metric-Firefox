@@ -17,9 +17,9 @@ var includeImproperSymbols;
 
 function updateIcon() {
     if (metricIsEnabled===true)
-	{
-		chrome.browserAction.setIcon({
-			path: {
+    {
+        chrome.browserAction.setIcon({
+            path: {
                 "16": "icons/everything-metric-16.png",
                 "19": "icons/everything-metric-19.png",
                 "32": "icons/everything-metric-32.png",
@@ -27,61 +27,61 @@ function updateIcon() {
                 "48": "icons/everything-metric-48.png",
                 "96": "icons/everything-metric-96.png",
                 "128": "icons/everything-metric-128.png"
-			}
-		});        
-		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗡.\nYou can customize it in 𝗔𝗱𝗱-𝗼𝗻 𝗢𝗽𝘁𝗶𝗼𝗻𝘀"}); 
-	}
+            }
+        });
+        chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗡.\nYou can customize it in 𝗔𝗱𝗱-𝗼𝗻 𝗢𝗽𝘁𝗶𝗼𝗻𝘀"});
+    }
     else
-	{
-		chrome.browserAction.setIcon({
-			path: {
+    {
+        chrome.browserAction.setIcon({
+            path: {
                 "16": "icons/everything-metric-16-off.png",
                 "19": "icons/everything-metric-19-off.png",
                 "32": "icons/everything-metric-32-off.png",
                 "38": "icons/everything-metric-38-off.png",
                 "48": "icons/everything-metric-48-off.png",
                 "96": "icons/everything-metric-96-off.png"
-			}
-		});
-		chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});            
-	}
-}  
+            }
+        });
+        chrome.browserAction.setTitle({title: "Automatic 𝗠𝗲𝘁𝗿𝗶𝗰/SI conversion is 𝗢𝗙𝗙.\nPress 𝗔𝗟𝗧+𝗠 to convert page without turning it ON"});
+    }
+}
 
 
 
 function toggleMetric() {
-	if (metricIsEnabled===true) {
-		metricIsEnabled=false;
-	} else {
-		metricIsEnabled=true;
-	}
-	updateIcon();    
-    
+    if (metricIsEnabled===true) {
+        metricIsEnabled=false;
+    } else {
+        metricIsEnabled=true;
+    }
+    updateIcon();
+
     chrome.storage.sync.set({
         metricIsEnabled: metricIsEnabled
-	}, function() {		
-	});
+    }, function() {
+    });
 }
 
 
 
 
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {   
-        
+    function(request, sender, sendResponse) {
+
         if (request.message==="Is metric enabled")
-		{
-			var response = {};
-			response.metricIsEnabled = metricIsEnabled;
-			response.useComma = useComma;
-			response.useMM = useMM;
-			response.useRounding = useRounding;
-			response.useMO = useMO;
-			response.useGiga = useGiga;
-			response.useSpaces = useSpaces;
+        {
+            var response = {};
+            response.metricIsEnabled = metricIsEnabled;
+            response.useComma = useComma;
+            response.useMM = useMM;
+            response.useRounding = useRounding;
+            response.useMO = useMO;
+            response.useGiga = useGiga;
+            response.useSpaces = useSpaces;
             response.useKelvin = useKelvin;
             response.degWithoutFahrenheit = degWithoutFahrenheit;
-			response.useBold=useBold;
+            response.useBold=useBold;
             response.useBrackets=useBrackets;
             response.useMetricOnly=useMetricOnly;
             response.convertBracketed=convertBracketed;
@@ -91,26 +91,26 @@ chrome.runtime.onMessage.addListener(
             response.convertTeaspoon=convertTeaspoon;
             response.includeQuotes=includeQuotes;
             response.includeImproperSymbols=includeImproperSymbols;
-			sendResponse(response);
-		}
+            sendResponse(response);
+        }
         else { //request to reload
             restore_options();
             sendResponse("ok");
         }
-        updateIcon();   
+        updateIcon();
     }
 );
 
 function restore_options() {
-	chrome.storage.sync.get({
+    chrome.storage.sync.get({
         metricIsEnabled:true,
-		useComma:true,
-		useMM:false,
-		useRounding:true,
-		isFirstRun:true,
-		useMO:false,
-		useGiga:false,
-		useSpaces:true,
+        useComma:true,
+        useMM:false,
+        useRounding:true,
+        isFirstRun:true,
+        useMO:false,
+        useGiga:false,
+        useSpaces:true,
         useKelvin:false,
         degWithoutFahrenheit:false,
         useBold: false,
@@ -123,14 +123,14 @@ function restore_options() {
         convertTeaspoon: false,
         includeQuotes: true,
         includeImproperSymbols: true
-	}, function(items) {   
+    }, function(items) {
         metricIsEnabled = items.metricIsEnabled;
-		useComma = items.useComma;
-		useMM = items.useMM;
-		useRounding = items.useRounding; 
-		useMO = items.useMO;
-		useGiga = items.useGiga;
-		useSpaces = items.useSpaces;
+        useComma = items.useComma;
+        useMM = items.useMM;
+        useRounding = items.useRounding;
+        useMO = items.useMO;
+        useGiga = items.useGiga;
+        useSpaces = items.useSpaces;
         useKelvin = items.useKelvin;
         degWithoutFahrenheit = items.degWithoutFahrenheit;
         useBold= items.useBold;
@@ -143,12 +143,12 @@ function restore_options() {
         convertTeaspoon = items.convertTeaspoon;
         includeQuotes = items.includeQuotes;
         includeImproperSymbols = items.includeImproperSymbols;
-		if (items.isFirstRun===true) 
-		{
-			console.log("firstrun");
-			try {
-				chrome.storage.sync.set({ isFirstRun: false });
-				
+        if (items.isFirstRun===true)
+        {
+            console.log("firstrun");
+            try {
+                chrome.storage.sync.set({ isFirstRun: false });
+
                 //chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
                  var optionsUrl = chrome.extension.getURL('options.html');
 
@@ -159,11 +159,11 @@ function restore_options() {
                             chrome.tabs.create({url: optionsUrl});
                         }
                     });
-			} catch(err) {}
-		}
-        
-       
-	}); 
+            } catch(err) {}
+        }
+
+
+    });
 }
 restore_options();
 
@@ -171,7 +171,7 @@ chrome.browserAction.onClicked.addListener(function(tab){
     toggleMetric();
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.reload(tabs[0].id);
-    });    
+    });
 });
 
 chrome.commands.onCommand.addListener( function(command) {
@@ -183,4 +183,4 @@ chrome.commands.onCommand.addListener( function(command) {
         });
      }
 });
-    
+
