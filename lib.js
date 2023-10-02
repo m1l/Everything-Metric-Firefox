@@ -1474,4 +1474,169 @@ function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, 
     return text;
 }
 
-module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll };
+/** @type{ number | undefined } */
+var lastquantity = 0;
+var skips = 0;
+var foundDegreeSymbol = false;
+/** Replace non-metric units with metric units and handle cross-node cases
+ *  @param {string} text - The original text
+ *  @param {boolean} convertTablespoon - Whether to convert tablespoons
+ *  @param {boolean} convertTeaspoon - Whether to convert teaspoons
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
+ *  @param {boolean} includeImproperSymbols} - Whether to support unofficial symbols for feet and inches
+ *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
+ *  @param {boolean} includeQuotes - Whether single and double quotes should be interpreted as feet and inches
+ *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
+ *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useComma - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpaces - Whether to use spaces as thousand separator
+ *  @return {string} - A new string with metric units
+*/
+function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces) {
+    if (text.startsWith('{') || text.length < 1) {
+        return text;
+    }
+
+    // skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
+
+    if (lastquantity !== undefined && lastquantity !== 0 && skips < 2) {
+        text = parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
+        if (/^[a-zA-Z°º]+$/g.test(text)) {
+            lastquantity = 0;
+        }
+        else {
+            skips++;
+            if (/[°º]/g.test(text)) {
+                foundDegreeSymbol=true;
+            } else {
+                foundDegreeSymbol=false;
+            }
+        }
+    } else {
+        lastquantity = 0;
+        if (text.length < 50) {
+            let quantity = parseNumberWithPadding(text);
+            lastquantity = quantity;
+            skips = 0;
+        }
+    }
+    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) || /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
+        text = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+    }
+
+    return text;
+}
+
+/** Parse a number, allows white space before and after the pattern
+ *  @param {string} text - The string containing the number
+ *  @return {number | undefined} - The parsed number in case of success, or undefined otherwise
+*/
+function parseNumberWithPadding(text) {
+    let regex = new RegExp('^(?![a-z])(?:[ \n\t]+)?([\.,0-9]+(?![\/⁄]))?(?:[-\− \u00A0])?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?(?:[ \n\t]+)?$', 'ig');
+
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+        const decimal = match[1];
+        let properFraction = match[2];
+        if (decimal === undefined && properFraction === undefined) {
+            continue;
+        }
+        let value = 0; //.replace(',','');
+        if (decimal !== undefined) {
+            if (/[⁄]/.test(decimal)) { //improvisation, but otherwise 1⁄2 with register 1 as in
+                properFraction = decimal;
+            } else {
+                value += parseFloat(decimal.replace(',', ''));
+            }
+        }
+        if (isNaN(value)) {
+            value = 0;
+        }
+
+        if (properFraction !== undefined) {
+            value += evaluateFraction(properFraction);
+        }
+
+        if (value === 0 || isNaN(value)) {
+            continue;
+        }
+        return value;
+    }
+    return undefined;
+}
+
+/** Parse a non-metric unit, using lastquantity as the value
+ *  @param {string} text - The string containing the unit
+ *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
+ *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
+ *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
+ *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
+ *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useComma - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpaces - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string where the unit has been converted to metric
+*/
+function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets) {
+    if (lastquantity === undefined) {
+        return text;
+    }
+
+    // TODO: this is ugly
+    const fahrenheitConversion = conversions[0];
+    if (fahrenheitConversion !== undefined) {
+        if (degWithoutFahrenheit) {
+            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
+        } else {
+            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
+        }
+    }
+
+    //console.log("now trying " + text);
+    for (const conversion of conversions) {
+        if (conversion.regexUnit === undefined) {
+            continue;
+        }
+        let match;
+        while ((match = conversion.regexUnit.exec(text)) !== null) {
+            const metStr = convAndForm(lastquantity, conversion, "", isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
+            const fullMatch = match[0];
+            const insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
+            text = insertAt(text, metStr, insertIndex);
+        }
+
+    }
+
+    if (foundDegreeSymbol) {
+        if (text.charAt(0) !== 'F') {
+            return text;
+        }
+
+        if (text.length>=3 && /^F\u200B\u3010|^F[\(][0-9]/.test(text)) {
+            return text; //it has been already converted
+        }
+
+        let met = fahrenheitToCelsius(lastquantity, useKelvin);
+        let unit = '°C';
+        if (useKelvin) {
+            met += 273.15;
+            unit = 'K';
+            met = roundNicely(met, useRounding);
+        }
+
+        const formatted = formatNumber(met, useComma, useSpaces);
+        const metStr = formatConvertedValue(formatted, unit, useBold, useBrackets);
+        text = insertAt(text, metStr, 1);
+    }
+    return text;
+}
+
+module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock };
