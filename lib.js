@@ -571,21 +571,6 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     return text;
 }
 
-/** Return a new string where match has been replaced with replacement in haystack
- *  @param {string} haystack - Where to search for the pattern
- *  @param {string} needle - The pattern to be replaced
- *  @param {string} replacement - The replacement
- *  @return {string} - Text, where needle has been replaced with replacement
-*/
-function replaceMaybeKeepLastChar(haystack, needle, replacement) {
-    const lastChar = needle[needle.length -1];
-    if (lastChar && /[^a-z"″”“’'′]/i.test(lastChar)) {
-        return haystack.replace(needle, replacement + lastChar);
-    } else {
-        return haystack.replace(needle, replacement);
-    }
-}
-
 /** Return a new string where all occurrences of volumes (“L×l×h in”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -1664,4 +1649,4 @@ function parseNumber(number) {
     return { value, significantFigures };
 }
 
-module.exports = { fahrenheitConversion, inchConversion, conversions, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans, resetBlockProcessing };
+module.exports = { fahrenheitConversion, inchConversion, conversions, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans, resetBlockProcessing };

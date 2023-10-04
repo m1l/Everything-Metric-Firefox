@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bold, applyConversion, conversions, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, maketrans, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMaybeKeepLastChar, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, resetBlockProcessing, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
+import { bold, applyConversion, conversions, fahrenheitConversion, fahrenheitToMetric, formatConvertedValue, formatNumber, inchConversion, insertAt, maketrans, parseNumber, processTextBlock, replaceAll, replaceFahrenheit, replaceFeetAndInches, replaceFeetAndInchesSymbol, replaceMilesPerGallon, replaceOtherUnits, replacePoundsAndOunces, replaceSurfaceInFeet, replaceSurfaceInInches, replaceVolume, resetBlockProcessing, setIncludeImproperSymbols, roundNicely, shouldConvert, stepUpOrDown, convertedValueInsertionOffset } from './lib.js';
 
 import fs from 'fs';
 
@@ -203,11 +203,6 @@ function testReplaceFeetAndInchesSymbol() {
     assert.equal(replaceFeetAndInchesSymbol('"they were 3"', true, false, false, false, false, false, false, false, false, false), '"they were 3"');
 }
 
-function testReplaceMaybeKeepLastChar() {
-    assert.equal(replaceMaybeKeepLastChar('Hello, World!', 'World', 'Everyone'), 'Hello, Everyone!');
-    assert.equal(replaceMaybeKeepLastChar('Hello, World!', 'World!', 'Everyone'), 'Hello, Everyone!');
-}
-
 function testReplaceMilesPerGallon() {
     assert.equal(replaceMilesPerGallon('12 mpg', false, false, false, false, false, false), '12 mpg (19.6 L/100 km)˜');
 }
@@ -334,7 +329,6 @@ function main() {
     testReplaceFahrenheit();
     testReplaceFeetAndInches();
     testReplaceFeetAndInchesSymbol();
-    testReplaceMaybeKeepLastChar();
     testReplaceMilesPerGallon();
     testReplaceOtherUnits();
     testReplacePoundsAndOunces();
