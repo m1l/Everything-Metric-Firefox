@@ -74,10 +74,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    browser.runtime.sendMessage({
-            message: "Is metric enabled"
-        },
-        function(response) {
+    browser.runtime
+        .sendMessage({ message: "Is metric enabled" })
+        .then(function(response) {
             metricIsEnabled = response.metricIsEnabled;
             useComma = response.useComma;
             useMM = response.useMM;
@@ -119,8 +118,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (useMO === true || isamazon === true)
                     initMO(document.body);
             }
-        }
-    );
+        })
+    ;
 }, false);
 /*
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

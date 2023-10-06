@@ -32,6 +32,7 @@
   },
   "background": {
     "scripts": [
+      "browser-polyfill.min.js",
       "background.js"
     ]
   },
@@ -42,6 +43,7 @@
         "https://*/*"
       ],
       "js": [
+        "browser-polyfill.min.js",
         "lib.js",
         "contentscript.js"
       ],
