@@ -1253,7 +1253,6 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
 
         let subtract = 0;
         if (conversion == inchConversion) {
-            const additionalNumber = match[3];
             const qualifier = match[4];
             //if (/[a-z#$€£]/i.test(fullmatch.substring(0,1)))
             if (/^[a-z#$€£]/i.test(fullmatch))
@@ -1263,7 +1262,6 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
             if (!matchIn && / in /i.test(fullmatch)) //born in 1948 in ...
                 continue;
             if (qualifier !== undefined) {
-                if (additionalNumber !== undefined && hasNumber(additionalNumber)) continue; //for 1 in 2 somethings
                 if (qualifier == ' a') continue;
                 if (qualifier == ' an') continue;
                 if (qualifier == ' the') continue;
