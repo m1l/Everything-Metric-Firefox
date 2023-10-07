@@ -1260,10 +1260,6 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
             if (!matchIn && / in /i.test(fullmatch)) //born in 1948 in ...
                 continue;
         }
-        if (conversion == footConversion) {
-            if (fullmatch !== undefined && /[°º]/.test(fullmatch)) continue;
-            if (unit !== undefined && /\d/ig.test(unit)) continue; //avoid 3' 5"
-        }
         let suffix = '';
 
         const parsed = parseNumber(impStr);
