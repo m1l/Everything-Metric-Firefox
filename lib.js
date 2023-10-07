@@ -1257,8 +1257,6 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
             //if (/[a-z#$€£]/i.test(fullmatch.substring(0,1)))
             if (/^[a-z#$€£]/i.test(fullmatch))
                 continue;
-            if (/^in /i.test(fullmatch)) //born in 1948 in ...
-                continue;
             if (!matchIn && / in /i.test(fullmatch)) //born in 1948 in ...
                 continue;
             if (qualifier !== undefined) {
