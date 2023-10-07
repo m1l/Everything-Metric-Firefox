@@ -1265,7 +1265,6 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
                 if (qualifier == ' the') continue;
                 if (qualifier == ' my') continue;
                 if (qualifier == ' his') continue;
-                if (qualifier == '-') continue;
                 if (/ her/.test(qualifier)) continue;
                 if (/ their/.test(qualifier)) continue;
                 if (/ our/.test(qualifier)) continue;
