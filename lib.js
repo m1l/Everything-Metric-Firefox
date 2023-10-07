@@ -1,11 +1,11 @@
 const regstart = '[(]?';
 const regend = '([^a-z]|$)';
 const skipbrackets = '(?! [(][0-9]|\u200B\u3010)';
-const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)([^a-z]|$)';
-const unitSuffixInFt = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
+const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)(?:[^a-z]|$)';
+const unitSuffixInFt = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)(?:[^a-z²³\u3010\u200B)]|$)';
 const notQualifier = '(?!\\s*(?:a|an|the|my|his|her|hers|their|theirs|our|ours|your|yours)\\b)';
-const sqcu = '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
-const sq = '([-− \u00A0]?(square|sq\\.?))?';
+const sqcu = '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
+const sq = '(?:[-− \u00A0]?(square|sq\\.?))?';
 const skipempty = '^(?:\\s+)?';
 
 const numberPattern = [
