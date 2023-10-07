@@ -6,6 +6,7 @@ const unitSuffixInFt = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)(?:[^a-z²³\u30
 const notQualifier = '(?!\\s*(?:a|an|the|my|his|her|hers|their|theirs|our|ours|your|yours)\\b)';
 const sqcu = '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
 const sq = '(?:[-− \u00A0]?(square|sq\\.?))?';
+const nosqcu = '()';
 const skipempty = '^(?:\\s+)?';
 
 const numberPattern = [
@@ -97,7 +98,7 @@ const conversions = [
         multiplier: 0.9144
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?mph' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0]?mph' + unitSuffix, 'igu'),
         unit: 'km\/h',
         multiplier: 1.60934,
         forceround2: true,
@@ -105,7 +106,7 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(pound|lb)s?' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(?:pound|lb)s?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0\n]?(?:pound|lb)s?' + unitSuffix, 'igu'),
         unit: 'kg',
         unit2: 'g',
         multiplier: 0.453592,
@@ -114,14 +115,14 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(ounces?|oz)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(?:ounces?|oz)' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0\n]?(?:ounces?|oz)' + unitSuffix, 'igu'),
         unit: 'g',
         multiplier: 28.3495,
         forceround: true
     },
     {
         regexUnit: new RegExp(skipempty + 'fl(uid)? ?(ounces?|oz)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?fl(?:uid)? ?(?:ounces?|oz)' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0\n]?fl(?:uid)? ?(?:ounces?|oz)' + unitSuffix, 'igu'),
         unit: 'mL',
         multiplier: 29.5735,
         forceround: true,
@@ -129,14 +130,14 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + 'gal(lons?)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?gal(?:lons?)?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0\n]?gal(?:lons?)?' + unitSuffix, 'igu'),
         unit: 'L',
         multiplier: 3.78541,
         multiplierimp: 4.54609
     },
     {
         regexUnit: new RegExp(skipempty + '^pints?' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?pints?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0\n]?pints?' + unitSuffix, 'igu'),
         unit: 'L',
         unit2: 'mL',
         multiplier: 0.473176,
@@ -146,7 +147,7 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + 'cups?'+skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?cups?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[-− \u00A0\n]?cups?' + unitSuffix, 'igu'),
         unit: 'mL',
         multiplier: 236.59,
         forceround: true,
@@ -154,23 +155,23 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(qt|quarts?)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(?:qt|quarts?)' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[-− \u00A0\n]?(?:qt|quarts?)' + unitSuffix, 'igu'),
         unit: 'L',
         multiplier: 0.946353,
         multiplierimp: 1.13652
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?stones?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0]?stones?' + unitSuffix, 'igu'),
         unit: 'kg',
         multiplier: 6.35029
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?acres?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0]?acres?' + unitSuffix, 'igu'),
         unit: 'ha',
         multiplier: 0.4046856422
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?horsepower?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + nosqcu + '[ \u00A0]?horsepower?' + unitSuffix, 'igu'),
         unit: 'kW',
         multiplier: 0.745699872
     },
@@ -179,7 +180,7 @@ const conversions = [
 /** @type{ import("./types").Conversion } */
 const unitsTablespoon = {
     regexUnit: new RegExp(skipempty + '(tbsp|tablespoons?)'+skipbrackets + regend, 'ig'),
-    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(?:tbsp|tablespoons?)' + unitSuffix, 'igu'),
+    regex: new RegExp(regstart + numberPattern + nosqcu + '[-− \u00A0\n]?(?:tbsp|tablespoons?)' + unitSuffix, 'igu'),
     unit: 'mL',
     multiplier: 14.7868,
     forceround: true,
@@ -189,7 +190,7 @@ const unitsTablespoon = {
 /** @type{ import("./types").Conversion } */
 const unitsTeaspoon = {
     regexUnit: new RegExp(skipempty + '(tsp|teaspoons?)'+skipbrackets + regend, 'ig'),
-    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(?:tsp|teaspoons?)' + unitSuffix, 'igu'),
+    regex: new RegExp(regstart + numberPattern + nosqcu + '[-− \u00A0\n]?(?:tsp|teaspoons?)' + unitSuffix, 'igu'),
     unit: 'mL',
     multiplier: 4.92892,
     forceround: true,
@@ -979,9 +980,9 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
     }
 
     if (includeImproperSymbols) {
-        footConversion.regex = new RegExp(regstart + '[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?(?:\'|′|’)(?![\'′’])' + unitSuffixInFt, 'gu');
+        footConversion.regex = new RegExp(regstart + '[°º]?[ \u00A0]?' + numberPattern + nosqcu + '[-− \u00A0]?(?:\'|′|’)(?![\'′’])' + unitSuffixInFt, 'gu');
     } else {
-        footConversion.regex = new RegExp(regstart + '[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?(?:[′])(?![′])' + unitSuffixInFt, 'gu');
+        footConversion.regex = new RegExp(regstart + '[°º]?[ \u00A0]?' + numberPattern + nosqcu + '[-− \u00A0]?(?:[′])(?![′])' + unitSuffixInFt, 'gu');
     }
 }
 
