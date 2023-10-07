@@ -1250,17 +1250,15 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
         if (impStr === undefined) {
             continue;
         }
-        const unit = match[2];
 
-        let subtract = 0;
         if (conversion == inchConversion) {
-            //if (/[a-z#$€£]/i.test(fullmatch.substring(0,1)))
-            if (/^[a-z#$€£]/i.test(fullmatch))
+            if (/^[a-z#$€£]/i.test(fullmatch)) {
                 continue;
-            if (!matchIn && / in /i.test(fullmatch)) //born in 1948 in ...
+            }
+            if (!matchIn && / in /i.test(fullmatch))  { // “born in 1948 in …”
                 continue;
+            }
         }
-        let suffix = '';
 
         const parsed = parseNumber(impStr);
         if (parsed === null) {
@@ -1269,16 +1267,18 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
         const imp = parsed.value;
 
         if (conversion == inchConversion && / in /i.test(fullmatch) && imp > 1000) {
-            continue; //prevents 1960 in Germany
+            continue; // prevents converting “1960 in Germany”
         }
 
-        if (fullmatch !== undefined && /²/.test(fullmatch)) {
+        const squareCubePrefix = match[2];
+        let suffix = '';
+        if (/²/.test(fullmatch)) {
             suffix = '²';
-        } else if (fullmatch !== undefined && /³/.test(fullmatch)) {
+        } else if (/³/.test(fullmatch)) {
             suffix = '³';
-        } else  if (unit !== undefined && unit.toLowerCase().indexOf('sq') !== -1) {
+        } else  if (squareCubePrefix !== undefined && /sq/i.test(squareCubePrefix)) {
             suffix = '²';
-        } else if (unit !== undefined && unit.toLowerCase().indexOf('cu') !== -1) {
+        } else if (squareCubePrefix !== undefined && /cu/i.test(squareCubePrefix)) {
             suffix = '³';
         }
 
@@ -1286,8 +1286,7 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
         const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
 
-        let insertIndex = match.index + convertedValueInsertionOffset(fullmatch);
-        insertIndex = insertIndex - subtract; //subtracts behind bracket
+        const insertIndex = match.index + convertedValueInsertionOffset(fullmatch);
         text = insertAt(text, metStr, insertIndex);
     }
     return text;
