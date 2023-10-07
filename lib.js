@@ -1,4 +1,4 @@
-const regstart = '([(]?';
+const regstart = '[(]?';
 const regend = '([^a-z]|$)';
 const skipbrackets = '(?! [(][0-9]|\u200B\u3010)';
 const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)([^a-z]|$)';
@@ -57,7 +57,7 @@ const fahrenheitConversion = {
 
 /** @type{ import("./types").Conversion } */
 const inchConversion = {
-    regex: new RegExp('((?:in)?' + numberPattern + '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?)[)]?( [a-z]+)?'+unitSuffixInFt+')', 'igu'),
+    regex: new RegExp('(?:in)?' + numberPattern + '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?)[)]?( [a-z]+)?' + unitSuffixInFt, 'igu'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
@@ -79,24 +79,24 @@ const conversions = [
     inchConversion,
     footConversion,
     {
-        regex: new RegExp(regstart + numberPattern + sqcu + '[-− \u00A0]?(feet|foot|ft)(²|³)?[)]?' + unitSuffixInFt + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + sqcu + '[-− \u00A0]?(feet|foot|ft)(²|³)?[)]?' + unitSuffixInFt, 'igu'),
         unit: 'm',
         multiplier: 0.3048,
         multipliercu: 28.31690879986443
     },
     {
-        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(miles?|mi)(²|³)?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(miles?|mi)(²|³)?' + unitSuffix, 'igu'),
         unit: 'km',
         multiplier: 1.60934,
         forceround2: true
     },
     {
-        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(yards?|yd)(²|³)?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(yards?|yd)(²|³)?' + unitSuffix, 'igu'),
         unit: 'm',
         multiplier: 0.9144
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?mph' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?mph' + unitSuffix, 'igu'),
         unit: 'km\/h',
         multiplier: 1.60934,
         forceround2: true,
@@ -104,7 +104,7 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(pound|lb)s?' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(pound|lb)s?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(pound|lb)s?' + unitSuffix, 'igu'),
         unit: 'kg',
         unit2: 'g',
         multiplier: 0.453592,
@@ -113,14 +113,14 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(ounces?|oz)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(ounces?|oz)' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(ounces?|oz)' + unitSuffix, 'igu'),
         unit: 'g',
         multiplier: 28.3495,
         forceround: true
     },
     {
         regexUnit: new RegExp(skipempty + 'fl(uid)? ?(ounces?|oz)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?fl(uid)? ?(ounces?|oz)' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?fl(uid)? ?(ounces?|oz)' + unitSuffix, 'igu'),
         unit: 'mL',
         multiplier: 29.5735,
         forceround: true,
@@ -128,14 +128,14 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + 'gal(lons?)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?gal(lons?)?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?gal(lons?)?' + unitSuffix, 'igu'),
         unit: 'L',
         multiplier: 3.78541,
         multiplierimp: 4.54609
     },
     {
         regexUnit: new RegExp(skipempty + '^pints?' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?pints?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?pints?' + unitSuffix, 'igu'),
         unit: 'L',
         unit2: 'mL',
         multiplier: 0.473176,
@@ -145,7 +145,7 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + 'cups?'+skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?cups?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?cups?' + unitSuffix, 'igu'),
         unit: 'mL',
         multiplier: 236.59,
         forceround: true,
@@ -153,23 +153,23 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(qt|quarts?)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(qt|quarts?)' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(qt|quarts?)' + unitSuffix, 'igu'),
         unit: 'L',
         multiplier: 0.946353,
         multiplierimp: 1.13652
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?stones?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?stones?' + unitSuffix, 'igu'),
         unit: 'kg',
         multiplier: 6.35029
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?acres?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?acres?' + unitSuffix, 'igu'),
         unit: 'ha',
         multiplier: 0.4046856422
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?horsepower?' + unitSuffix + ')', 'igu'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?horsepower?' + unitSuffix, 'igu'),
         unit: 'kW',
         multiplier: 0.745699872
     },
@@ -178,7 +178,7 @@ const conversions = [
 /** @type{ import("./types").Conversion } */
 const unitsTablespoon = {
     regexUnit: new RegExp(skipempty + '(tbsp|tablespoons?)'+skipbrackets + regend, 'ig'),
-    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(tbsp|tablespoons?)' + unitSuffix + ')', 'igu'),
+    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(tbsp|tablespoons?)' + unitSuffix, 'igu'),
     unit: 'mL',
     multiplier: 14.7868,
     forceround: true,
@@ -188,7 +188,7 @@ const unitsTablespoon = {
 /** @type{ import("./types").Conversion } */
 const unitsTeaspoon = {
     regexUnit: new RegExp(skipempty + '(tsp|teaspoons?)'+skipbrackets + regend, 'ig'),
-    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(tsp|teaspoons?)' + unitSuffix + ')', 'igu'),
+    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(tsp|teaspoons?)' + unitSuffix, 'igu'),
     unit: 'mL',
     multiplier: 4.92892,
     forceround: true,
@@ -978,9 +978,9 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
     }
 
     if (includeImproperSymbols) {
-        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixInFt + ')', 'gu');
+        footConversion.regex = new RegExp(regstart + '[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixInFt, 'gu');
     } else {
-        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?([′])(?![′])' + unitSuffixInFt + ')', 'gu');
+        footConversion.regex = new RegExp(regstart + '[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?([′])(?![′])' + unitSuffixInFt, 'gu');
     }
 }
 
@@ -1125,7 +1125,7 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
  *  @return {string} - A new string with metric equivalent to mpg
 */
 function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix + ')', 'igu');
+    const regex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix, 'igu');
 
     let match;
     while ((match = regex.exec(text)) !== null) {
@@ -1133,7 +1133,7 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
             continue;
         }
 
-        let impPart = match[2];
+        let impPart = match[1];
         if (!impPart) {
             continue;
         }
@@ -1240,27 +1240,27 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
 
     let match;
     while ((match = conversion.regex.exec(text)) !== null) {
-        if (!shouldConvert(match[0], convertBracketed)) {
+        const fullmatch = match[0];
+        if (!shouldConvert(fullmatch, convertBracketed)) {
             continue;
         }
 
-        const firstPart = match[1];
-        const impStr = match[2];
+        const impStr = match[1];
         if (impStr === undefined) {
             continue;
         }
-        const unit = match[4];
-        const additionalNumber = match[6];
-        const qualifier = match[7];
+        const unit = match[3];
 
         let subtract = 0;
         if (conversion == inchConversion) {
-            //if (/[a-z#$€£]/i.test(match[1].substring(0,1)))
-            if (/^[a-z#$€£]/i.test(match[0]))
+            const additionalNumber = match[5];
+            const qualifier = match[6];
+            //if (/[a-z#$€£]/i.test(fullmatch.substring(0,1)))
+            if (/^[a-z#$€£]/i.test(fullmatch))
                 continue;
-            if (/^in /i.test(match[0])) //born in 1948 in ...
+            if (/^in /i.test(fullmatch)) //born in 1948 in ...
                 continue;
-            if (!matchIn && / in /i.test(match[0])) //born in 1948 in ...
+            if (!matchIn && / in /i.test(fullmatch)) //born in 1948 in ...
                 continue;
             if (qualifier !== undefined) {
                 if (additionalNumber !== undefined && hasNumber(additionalNumber)) continue; //for 1 in 2 somethings
@@ -1278,7 +1278,7 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
             }
         }
         if (conversion == footConversion) {
-            if (firstPart !== undefined && /[°º]/.test(firstPart)) continue;
+            if (fullmatch !== undefined && /[°º]/.test(fullmatch)) continue;
             if (unit !== undefined && /\d/ig.test(unit)) continue; //avoid 3' 5"
         }
         let suffix = '';
@@ -1289,15 +1289,15 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
         }
         const imp = parsed.value;
 
-        if (conversion == inchConversion && / in /i.test(match[0]) && imp > 1000) {
+        if (conversion == inchConversion && / in /i.test(fullmatch) && imp > 1000) {
             continue; //prevents 1960 in Germany
         }
 
-        if (firstPart !== undefined && /²/.test(firstPart)) {
+        if (fullmatch !== undefined && /²/.test(fullmatch)) {
             suffix = '²';
-        } else if (firstPart !== undefined && /³/.test(firstPart)) {
+        } else if (fullmatch !== undefined && /³/.test(fullmatch)) {
             suffix = '³';
-        } else if (unit !== undefined && unit.toLowerCase().indexOf('sq') !== -1) {
+        } else  if (unit !== undefined && unit.toLowerCase().indexOf('sq') !== -1) {
             suffix = '²';
         } else if (unit !== undefined && unit.toLowerCase().indexOf('cu') !== -1) {
             suffix = '³';
@@ -1307,7 +1307,7 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
         const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
         const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
 
-        let insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        let insertIndex = match.index + convertedValueInsertionOffset(fullmatch);
         insertIndex = insertIndex - subtract; //subtracts behind bracket
         text = insertAt(text, metStr, insertIndex);
     }
