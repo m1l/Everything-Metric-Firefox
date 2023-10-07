@@ -3,6 +3,7 @@ const regend = '([^a-z]|$)';
 const skipbrackets = '(?! [(][0-9]|\u200B\u3010)';
 const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)([^a-z]|$)';
 const unitSuffixInFt = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
+const notQualifier = '(?!\\s*(?:a|an|the|my|his|her|hers|their|theirs|our|ours|your|yours)\\b)';
 const sqcu = '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
 const sq = '([-− \u00A0]?(square|sq\\.?))?';
 const skipempty = '^(?:\\s+)?';
@@ -57,7 +58,7 @@ const fahrenheitConversion = {
 
 /** @type{ import("./types").Conversion } */
 const inchConversion = {
-    regex: new RegExp('(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(?:inches|inch|in)(?:²|³)?[)]?( [a-z]+)?' + unitSuffixInFt, 'igu'),
+    regex: new RegExp('(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(?:inches|inch|in' + notQualifier + ')(?:²|³)?[)]?' + unitSuffixInFt, 'igu'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
@@ -1253,24 +1254,11 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
 
         let subtract = 0;
         if (conversion == inchConversion) {
-            const qualifier = match[3];
             //if (/[a-z#$€£]/i.test(fullmatch.substring(0,1)))
             if (/^[a-z#$€£]/i.test(fullmatch))
                 continue;
             if (!matchIn && / in /i.test(fullmatch)) //born in 1948 in ...
                 continue;
-            if (qualifier !== undefined) {
-                if (qualifier == ' a') continue;
-                if (qualifier == ' an') continue;
-                if (qualifier == ' the') continue;
-                if (qualifier == ' my') continue;
-                if (qualifier == ' his') continue;
-                if (/ her/.test(qualifier)) continue;
-                if (/ their/.test(qualifier)) continue;
-                if (/ our/.test(qualifier)) continue;
-                if (/ your/.test(qualifier)) continue;
-                subtract = qualifier.length;
-            }
         }
         if (conversion == footConversion) {
             if (fullmatch !== undefined && /[°º]/.test(fullmatch)) continue;
