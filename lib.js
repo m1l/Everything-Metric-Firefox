@@ -57,7 +57,7 @@ const fahrenheitConversion = {
 
 /** @type{ import("./types").Conversion } */
 const inchConversion = {
-    regex: new RegExp('(?:in)?' + numberPattern + '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(?:inches|inch|in)(²|³)?[)]?( [a-z]+)?' + unitSuffixInFt, 'igu'),
+    regex: new RegExp('(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(?:inches|inch|in)(²|³)?[)]?( [a-z]+)?' + unitSuffixInFt, 'igu'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
