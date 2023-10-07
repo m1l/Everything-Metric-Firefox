@@ -57,7 +57,7 @@ const fahrenheitConversion = {
 
 /** @type{ import("./types").Conversion } */
 const inchConversion = {
-    regex: new RegExp('(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(?:inches|inch|in)(²|³)?[)]?( [a-z]+)?' + unitSuffixInFt, 'igu'),
+    regex: new RegExp('(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(?:inches|inch|in)(?:²|³)?[)]?( [a-z]+)?' + unitSuffixInFt, 'igu'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
@@ -79,19 +79,19 @@ const conversions = [
     inchConversion,
     footConversion,
     {
-        regex: new RegExp(regstart + numberPattern + sqcu + '[-− \u00A0]?(?:feet|foot|ft)(²|³)?[)]?' + unitSuffixInFt, 'igu'),
+        regex: new RegExp(regstart + numberPattern + sqcu + '[-− \u00A0]?(?:feet|foot|ft)(?:²|³)?[)]?' + unitSuffixInFt, 'igu'),
         unit: 'm',
         multiplier: 0.3048,
         multipliercu: 28.31690879986443
     },
     {
-        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(?:miles?|mi)(²|³)?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(?:miles?|mi)(?:²|³)?' + unitSuffix, 'igu'),
         unit: 'km',
         multiplier: 1.60934,
         forceround2: true
     },
     {
-        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(?:yards?|yd)(²|³)?' + unitSuffix, 'igu'),
+        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(?:yards?|yd)(?:²|³)?' + unitSuffix, 'igu'),
         unit: 'm',
         multiplier: 0.9144
     },
@@ -1253,7 +1253,7 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
 
         let subtract = 0;
         if (conversion == inchConversion) {
-            const qualifier = match[4];
+            const qualifier = match[3];
             //if (/[a-z#$€£]/i.test(fullmatch.substring(0,1)))
             if (/^[a-z#$€£]/i.test(fullmatch))
                 continue;
