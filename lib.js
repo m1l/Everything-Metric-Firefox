@@ -57,7 +57,7 @@ const fahrenheitConversion = {
 
 /** @type{ import("./types").Conversion } */
 const inchConversion = {
-    regex: new RegExp('(?:in)?' + numberPattern + '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?)[)]?( [a-z]+)?' + unitSuffixInFt, 'igu'),
+    regex: new RegExp('(?:in)?' + numberPattern + '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(?:inches|inch|in)(²|³)?[)]?( [a-z]+)?' + unitSuffixInFt, 'igu'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
@@ -1253,8 +1253,8 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
 
         let subtract = 0;
         if (conversion == inchConversion) {
-            const additionalNumber = match[4];
-            const qualifier = match[5];
+            const additionalNumber = match[3];
+            const qualifier = match[4];
             //if (/[a-z#$€£]/i.test(fullmatch.substring(0,1)))
             if (/^[a-z#$€£]/i.test(fullmatch))
                 continue;
