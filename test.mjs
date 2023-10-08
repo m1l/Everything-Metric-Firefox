@@ -57,10 +57,7 @@ function testFormatConvertedValue() {
 }
 
 function testFormatNumber() {
-    assert.equal(formatNumber(123456.789, false, false), '123,456.789');
-    assert.equal(formatNumber(123456.789, false, true), '123 456.789');
-    assert.equal(formatNumber(123456.789, true, false), '123.456,789');
-    assert.equal(formatNumber(123456.789, true, true), '123 456,789');
+    assert.equal(formatNumber(123456.789), '123,456.789');
 }
 
 function testInsertAt() {
@@ -153,79 +150,79 @@ function testProcessTextBlock() {
     ];
     for (const [text1, text2, converted] of tests) {
         resetBlockProcessing();
-        processTextBlock(text1, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-        const output = processTextBlock(text2, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
+        processTextBlock(text1, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
+        const output = processTextBlock(text2, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
         assert.equal(output, converted, `Failed to properly parse "${text1}" + "${text2}"`);
     }
 }
 
 function testReplaceFahrenheit() {
-    assert.equal(replaceFahrenheit('Saying 212 °F is the same as saying 100°C', false, false, false, false, false, false, false, false), 'Saying 212 °F (100 °C)˜ is the same as saying 100°C');
+    assert.equal(replaceFahrenheit('Saying 212 °F is the same as saying 100°C', false, false, false, false, false, false), 'Saying 212 °F (100 °C)˜ is the same as saying 100°C');
 
-    assert.equal(replaceFahrenheit('(212 °)', false, false, false, false, false, false, false, false), '(212 °)');
-    assert.equal(replaceFahrenheit('(212 °)', false, false, true, false, false, false, false, false), '(212 °)');
-    assert.equal(replaceFahrenheit('(212 °)', false, true, false, false, false, false, false, false), '(212 °)');
-    assert.equal(replaceFahrenheit('(212 °)', false, true, true, false, false, false, false, false), '(212 °)');
-    assert.equal(replaceFahrenheit('(212 °)', true, false, false, false, false, false, false, false), '(212 °)');
-    assert.equal(replaceFahrenheit('(212 °)', true, false, true, false, false, false, false, false), '(212 °)');
-    assert.equal(replaceFahrenheit('(212 °)', true, true, false, false, false, false, false, false), '(212 °) (100 °C)˜');
-    assert.equal(replaceFahrenheit('(212 °)', true, true, true, false, false, false, false, false), '(212 °) (373.15 K)˜');
+    assert.equal(replaceFahrenheit('(212 °)', false, false, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', false, false, true, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', false, true, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', false, true, true, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', true, false, false, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', true, false, true, false, false, false), '(212 °)');
+    assert.equal(replaceFahrenheit('(212 °)', true, true, false, false, false, false), '(212 °) (100 °C)˜');
+    assert.equal(replaceFahrenheit('(212 °)', true, true, true, false, false, false), '(212 °) (373.15 K)˜');
 
     // returns '1,203 °F (NaN°C)˜' instead of '1,203 °F (651°C)˜'
-    // assert.equal(replaceFahrenheit('1,203 °F', false, false, false, false, false, false, false, false), '1,203 °F (651°C)˜');
+    // assert.equal(replaceFahrenheit('1,203 °F', false, false, false, false, false, false), '1,203 °F (651°C)˜');
 
-    assert.equal(replaceFahrenheit('212 °F', false, false, false, false, false, false, false, false), '212 °F (100 °C)˜');
-    assert.equal(replaceFahrenheit('212 degrees F', false, false, false, false, false, false, false, false), '212 degrees F (100 °C)˜');
-    assert.equal(replaceFahrenheit('212 Fahrenheits', false, false, false, false, false, false, false, false), '212 Fahrenheits (100 °C)˜');
-    assert.equal(replaceFahrenheit('212 Fahrenheits (100 Celsius)', false, false, false, false, false, false, false, false), '212 Fahrenheits (100 Celsius)');
-    assert.equal(replaceFahrenheit('32-212 °F', false, false, false, false, false, false, false, false), '32-212 °F (0 to 100 °C)˜');
+    assert.equal(replaceFahrenheit('212 °F', false, false, false, false, false, false), '212 °F (100 °C)˜');
+    assert.equal(replaceFahrenheit('212 degrees F', false, false, false, false, false, false), '212 degrees F (100 °C)˜');
+    assert.equal(replaceFahrenheit('212 Fahrenheits', false, false, false, false, false, false), '212 Fahrenheits (100 °C)˜');
+    assert.equal(replaceFahrenheit('212 Fahrenheits (100 Celsius)', false, false, false, false, false, false), '212 Fahrenheits (100 Celsius)');
+    assert.equal(replaceFahrenheit('32-212 °F', false, false, false, false, false, false), '32-212 °F (0 to 100 °C)˜');
 
-    assert.equal(replaceFahrenheit('-212 °F', false, false, false, false, false, false, false, false), '-212 °F (-136 °C)˜');
+    assert.equal(replaceFahrenheit('-212 °F', false, false, false, false, false, false), '-212 °F (-136 °C)˜');
     // NOTE: in ranges, the minus sign of the upper bound is ignored
-    assert.equal(replaceFahrenheit('100--212 °F', false, false, false, false, false, false, false, false), '100--212 °F (38 to 100 °C)˜');
-    assert.equal(replaceFahrenheit('-100-212 °F', false, false, false, false, false, false, false, false), '-100-212 °F (-73 to 100 °C)˜');
-    assert.equal(replaceFahrenheit('-100--212 °F', false, false, false, false, false, false, false, false), '-100--212 °F (-73 to 100 °C)˜');
+    assert.equal(replaceFahrenheit('100--212 °F', false, false, false, false, false, false), '100--212 °F (38 to 100 °C)˜');
+    assert.equal(replaceFahrenheit('-100-212 °F', false, false, false, false, false, false), '-100-212 °F (-73 to 100 °C)˜');
+    assert.equal(replaceFahrenheit('-100--212 °F', false, false, false, false, false, false), '-100--212 °F (-73 to 100 °C)˜');
 }
 
 function testReplaceFeetAndInches() {
-    assert.equal(replaceFeetAndInches('1 ft 2 in', false, false, false, false, false, false, false), '1 ft 2 in (0.36 m)˜');
-    assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false, false, false), '1 yd 2 in (0.97 m)˜');
-    assert.equal(replaceFeetAndInches('1 yd 2 inches', false, false, false, false, false, false, false), '1 yd 2 inches (0.97 m)˜');
+    assert.equal(replaceFeetAndInches('1 ft 2 in', false, false, false, false, false), '1 ft 2 in (0.36 m)˜');
+    assert.equal(replaceFeetAndInches('1 yd 2 in', false, false, false, false, false), '1 yd 2 in (0.97 m)˜');
+    assert.equal(replaceFeetAndInches('1 yd 2 inches', false, false, false, false, false), '1 yd 2 inches (0.97 m)˜');
 }
 
 function testReplaceFeetAndInchesSymbol() {
     setIncludeImproperSymbols(false);
-    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false, false, false, false, false), '1\' 2"');
+    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', false, false, false, false, false, false, false, false), '1\' 2"');
 
     setIncludeImproperSymbols(true);
-    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', true, false, false, false, false, false, false, false, false, false), '1\' 2" (35.56 cm)˜');
-    assert.equal(replaceFeetAndInchesSymbol('3"', true, false, false, false, false, false, false, false, false, false), '3" (7.62 cm)˜');
-    assert.equal(replaceFeetAndInchesSymbol('"they were 3"', true, false, false, false, false, false, false, false, false, false), '"they were 3"');
+    assert.equal(replaceFeetAndInchesSymbol('1\' 2"', true, false, false, false, false, false, false, false), '1\' 2" (35.56 cm)˜');
+    assert.equal(replaceFeetAndInchesSymbol('3"', true, false, false, false, false, false, false, false), '3" (7.62 cm)˜');
+    assert.equal(replaceFeetAndInchesSymbol('"they were 3"', true, false, false, false, false, false, false, false), '"they were 3"');
 }
 
 function testReplaceMilesPerGallon() {
-    assert.equal(replaceMilesPerGallon('12 mpg', false, false, false, false, false, false), '12 mpg (19.6 L/100 km)˜');
+    assert.equal(replaceMilesPerGallon('12 mpg', false, false, false, false), '12 mpg (19.6 L/100 km)˜');
 }
 
 function testReplaceOtherUnits() {
-    assert.equal(replaceOtherUnits('30 miles', false, false, false, false, false, false, false, false, false, false, false, false, false), '30 miles (48.28 km)˜');
-    assert.equal(replaceOtherUnits('30 miles²', false, false, false, false, false, false, false, false, false, false, false, false, false), '30 miles² (77.7 km²)˜');
+    assert.equal(replaceOtherUnits('30 miles', false, false, false, false, false, false, false, false, false, false, false), '30 miles (48.28 km)˜');
+    assert.equal(replaceOtherUnits('30 miles²', false, false, false, false, false, false, false, false, false, false, false), '30 miles² (77.7 km²)˜');
 }
 
 function testReplacePoundsAndOunces() {
-    assert.equal(replacePoundsAndOunces('1 lb 2 oz', false, false, false, false, false, false), '1 lb 2 oz (0.51 kg)˜');
+    assert.equal(replacePoundsAndOunces('1 lb 2 oz', false, false, false, false), '1 lb 2 oz (0.51 kg)˜');
 }
 
 function testReplaceSurfaceInFeet() {
-    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false, false, false), 'S = 1×2 ft (0.3 × 0.61 m)˜');
+    assert.equal(replaceSurfaceInFeet('S = 1×2 ft', false, false, false, false, false), 'S = 1×2 ft (0.3 × 0.61 m)˜');
 }
 
 function testReplaceSurfaceInInches() {
-    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false, false, false), 'S = 1×2 in (2.54 × 5.08 cm)˜');
+    assert.equal(replaceSurfaceInInches('S = 1×2 in', false, false, false, false, false), 'S = 1×2 in (2.54 × 5.08 cm)˜');
 }
 
 function testReplaceVolume() {
-    assert.equal(replaceVolume('V = 1×2×3 in', false, false, false, false, false, false, false), 'V = 1×2×3 in (2.54 × 5.08 × 7.62 cm)˜');
+    assert.equal(replaceVolume('V = 1×2×3 in', false, false, false, false, false), 'V = 1×2×3 in (2.54 × 5.08 × 7.62 cm)˜');
 }
 
 function testRoundNicely() {
@@ -288,32 +285,30 @@ function testWhereToInsertConvertedValue() {
 function testReplaceAll() {
     setIncludeImproperSymbols(false);
     const html = fs.readFileSync('index.html', { encoding: 'utf-8' });
-    fs.writeFileSync('oracles/default.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/useSpaces.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true));
-    fs.writeFileSync('oracles/useComma.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false));
-    fs.writeFileSync('oracles/useRounding.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false));
-    fs.writeFileSync('oracles/useBrackets.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false));
+    fs.writeFileSync('oracles/default.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/useRounding.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, false, true));
+    fs.writeFileSync('oracles/useBrackets.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, false, true, false));
     // TODO: useBold have no effect without useBrackets
-    fs.writeFileSync('oracles/useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false));
-    fs.writeFileSync('oracles/useBrackets+useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false));
-    fs.writeFileSync('oracles/useKelvin.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false));
-    fs.writeFileSync('oracles/useGiga.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/useMM.html', replaceAll(html, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/isUK.html', replaceAll(html, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, false, false));
+    fs.writeFileSync('oracles/useBrackets+useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, true, false));
+    fs.writeFileSync('oracles/useKelvin.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, true, false, false, false));
+    fs.writeFileSync('oracles/useGiga.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, false, false, false, false));
+    fs.writeFileSync('oracles/useMM.html', replaceAll(html, false, false, false, false, false, false, false, false, true, false, false, false, false, false));
+    fs.writeFileSync('oracles/isUK.html', replaceAll(html, false, false, false, false, false, false, false, true, false, false, false, false, false, false));
     // NOTE: includeQuotes has no effect without includeImproperSymbols
-    fs.writeFileSync('oracles/includeQuotes.html', replaceAll(html, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeQuotes.html', replaceAll(html, false, false, false, false, false, false, true, false, false, false, false, false, false, false));
     // TODO: matchIn not seem to have any effect
-    fs.writeFileSync('oracles/matchIn.html', replaceAll(html, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/matchIn.html', replaceAll(html, false, false, false, false, false, true, false, false, false, false, false, false, false, false));
     setIncludeImproperSymbols(true);
     // TODO: includeImproperSymbols has no effect without includeQuotes
-    fs.writeFileSync('oracles/includeImproperSymbols.html', replaceAll(html, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/includeQuotes+includeImproperSymbols.html', replaceAll(html, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeImproperSymbols.html', replaceAll(html, false, false, false, false, true, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/includeQuotes+includeImproperSymbols.html', replaceAll(html, false, false, false, false, true, false, true, false, false, false, false, false, false, false));
     setIncludeImproperSymbols(false);
     // TODO: degWithoutFahrenheit detects '212 °' but breaks detection of '212 °F'
-    fs.writeFileSync('oracles/degWithoutFahrenheit.html', replaceAll(html, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/convertBracketed.html', replaceAll(html, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/convertTeaspoon.html', replaceAll(html, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
-    fs.writeFileSync('oracles/convertTablespoon.html', replaceAll(html, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/degWithoutFahrenheit.html', replaceAll(html, false, false, false, true, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/convertBracketed.html', replaceAll(html, false, false, true, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/convertTeaspoon.html', replaceAll(html, false, true, false, false, false, false, false, false, false, false, false, false, false, false));
+    fs.writeFileSync('oracles/convertTablespoon.html', replaceAll(html, true, false, false, false, false, false, false, false, false, false, false, false, false, false));
 }
 
 function main() {

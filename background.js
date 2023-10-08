@@ -1,10 +1,8 @@
 var metricIsEnabled;
-var useComma;
 var useMM;
 var useRounding;
 var useMO;
 var useGiga;
-var useSpaces;
 var useKelvin;
 var degWithoutFahrenheit;
 var convertBracketed;
@@ -73,12 +71,10 @@ chrome.runtime.onMessage.addListener(
         {
             var response = {};
             response.metricIsEnabled = metricIsEnabled;
-            response.useComma = useComma;
             response.useMM = useMM;
             response.useRounding = useRounding;
             response.useMO = useMO;
             response.useGiga = useGiga;
-            response.useSpaces = useSpaces;
             response.useKelvin = useKelvin;
             response.degWithoutFahrenheit = degWithoutFahrenheit;
             response.useBold=useBold;
@@ -104,13 +100,11 @@ chrome.runtime.onMessage.addListener(
 function restore_options() {
     chrome.storage.sync.get({
         metricIsEnabled:true,
-        useComma:true,
         useMM:false,
         useRounding:true,
         isFirstRun:true,
         useMO:false,
         useGiga:false,
-        useSpaces:true,
         useKelvin:false,
         degWithoutFahrenheit:false,
         useBold: false,
@@ -125,12 +119,10 @@ function restore_options() {
         includeImproperSymbols: true
     }, function(items) {
         metricIsEnabled = items.metricIsEnabled;
-        useComma = items.useComma;
         useMM = items.useMM;
         useRounding = items.useRounding;
         useMO = items.useMO;
         useGiga = items.useGiga;
-        useSpaces = items.useSpaces;
         useKelvin = items.useKelvin;
         degWithoutFahrenheit = items.degWithoutFahrenheit;
         useBold= items.useBold;
