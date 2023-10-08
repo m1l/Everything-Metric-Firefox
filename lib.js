@@ -10,7 +10,7 @@ const skipempty = '^(?:\\s+)?';
 const numberPattern = [
     '(',
             // main number
-            '(?:[+\\-−\\p{Nd},\\.][\\p{Nd},  \\.]*(?:e[+\-]?[0-9]+)?)',
+            '(?:[+\\-−\\d,\\.][\\d,  \\.]*(?:e[+\-]?[0-9]+)?)',
         '|',
             // fraction
             '(?:',
@@ -18,11 +18,11 @@ const numberPattern = [
                     '(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])',
                 '|',
                 // ASCII fraction
-                    '(?:\\p{Nd}+\\s*[/÷∕⁄]\\s*\\p{Nd}+)',
+                    '(?:\\d+\\s*[/÷∕⁄]\\s*\\d+)',
             ')',
         '|',
             // main number
-            '(?:[+\\-−\\p{Nd},\\.][\\p{Nd},  \\.]*(?:e[+\-]?[0-9]+)?)',
+            '(?:[+\\-−\\d,\\.][\\d,  \\.]*(?:e[+\-]?[0-9]+)?)',
             '(?:\\s*|-)',
             // fraction
             '(?:',
@@ -30,7 +30,7 @@ const numberPattern = [
                     '(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])',
                 '|',
                 // ASCII fraction
-                    '(?:\\p{Nd}+\\s*[/÷∕⁄]\\s*\\p{Nd}+)',
+                    '(?:\\d+\\s*[/÷∕⁄]\\s*\\d+)',
             ')',
     ')(?<!\\s)',
 ].join('');
@@ -83,7 +83,7 @@ function unitPattern(pattern) {
  */
 function getOtherUnitsRegex() {
     if (otherUnitsRegex === null) {
-        otherUnitsRegex = new RegExp(regstart + '(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + sqcu + '[-−\\s]*' + notInPlusQualifier + '(' + units.join('|') + ')(?:²|³)?[)]?' + unitSuffixInFt, 'igu');
+        otherUnitsRegex = new RegExp(regstart + '(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + sqcu + '[-−\\s]*' + notInPlusQualifier + '(' + units.join('|') + ')(?:²|³)?[)]?' + unitSuffixInFt, 'ig');
     }
     return otherUnitsRegex;
 }
@@ -982,7 +982,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
                 ')',
             ].join(''),
-            'giu',
+            'gi',
         );
     } else {
         feetInchRegex = new RegExp(
@@ -1016,7 +1016,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
                 ')',
             ].join(''),
-            'giu',
+            'gi',
         );
     }
 
@@ -1168,7 +1168,7 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
  *  @return {string} - A new string with metric equivalent to mpg
 */
 function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix, 'igu');
+    const regex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix, 'ig');
 
     let match;
     while ((match = regex.exec(text)) !== null) {
@@ -1224,7 +1224,7 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
             '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
             '(?:[^a-z]|$)', // look for a separator
         ].join(''),
-        'igu',
+        'ig',
     );
 
     let match;
@@ -1589,8 +1589,8 @@ String.prototype.translate = function(table) {
 }
 
 const numberTranslation = maketrans(
-    '−÷∕⁄０１２３４５６７８９',
-    '-///0123456789',
+    '−÷∕⁄',
+    '-///',
 );
 
 const parseNumberRegex = new RegExp(
@@ -1609,7 +1609,6 @@ const parseNumberRegex = new RegExp(
         ')?',
         '$',
     ].join(''),
-    'u',
 );
 
 /** Parse a number, and count the number of significant digits
