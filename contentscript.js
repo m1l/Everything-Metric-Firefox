@@ -159,26 +159,20 @@ function hasParentEditableNode(el) {
 }
 
 function hasEditableNode(el) {
-    try {
-        var namedNodeMap = el.attributes;
-
-        for (var i = 0; i < namedNodeMap.length; i++) {
-            var attr = namedNodeMap.item(i);
-            if (attr.name === "contenteditable") {
-
-                return true;
-            } else if (attr.name === "class" && attr.value === "notranslate") {
-
-                return true;
-            } else if (attr.name === "translate" && attr.value === "no") {
-
-                return true;
-            } else if (attr.name === "role" && attr.value === "textbox") {
-
-                return true;
-            }
+    if (el.classList !== undefined && el.classList.contains('notranslate')) {
+        return true;
+    }
+    if (el.getAttribute !== undefined) {
+        if (el.getAttribute('contenteditable')) {
+            return true;
         }
-    } catch (error) {}
+        if (el.getAttribute('translate') === 'no') {
+            return true;
+        }
+        if (el.getAttribute('role') === 'textbox') {
+            return true;
+        }
+    }
     return false;
 }
 
