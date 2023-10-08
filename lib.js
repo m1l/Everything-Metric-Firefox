@@ -63,13 +63,29 @@ const fractions = {
 /** @type{string[]} */
 const units = [];
 
+/** @type{RegExp?} */
+let otherUnitsRegex = null;
+
 /** Register a pattern for a US customary or imperial unit marker
  *  @param {string} pattern - The pattern for the unit
  *  @return {RegExp} - A regex matching the unit as a full string, case-insensitive
  */
 function unitPattern(pattern) {
+    if (otherUnitsRegex !== null) {
+        throw Error('unitPattern must not be called after getOtherUnitsRegex');
+    }
     units.push(pattern);
     return RegExp('^(?:' + pattern + ')$', 'i');
+}
+
+/** Regex for matching all the other values in US customary or imperial units
+ *  @return {RegExp} - The regex
+ */
+function getOtherUnitsRegex() {
+    if (otherUnitsRegex === null) {
+        otherUnitsRegex = new RegExp(regstart + '(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + sqcu + '[-−\\s]*' + notInPlusQualifier + '(' + units.join('|') + ')(?:²|³)?[)]?' + unitSuffixInFt, 'igu');
+    }
+    return otherUnitsRegex;
 }
 
 /** @type{ import("./types").Conversion } */
@@ -96,6 +112,9 @@ const footConversion = {
     unit: 'm',
     multiplier: 0.3048
 };
+
+const footRegexWithImproperSymbols = unitPattern('[\'′’](?![\'′’])');
+const footRegexWithoutImproperSymbols = unitPattern('[′](?![′])');
 
 /** @type{ import("./types").Conversion[] } */
 const conversions = [
@@ -1002,9 +1021,9 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
     }
 
     if (includeImproperSymbols) {
-        footConversion.regex = unitPattern('[\'′’](?![\'′’])');
+        footConversion.regex = footRegexWithImproperSymbols;
     } else {
-        footConversion.regex = unitPattern('[′](?![′])');
+        footConversion.regex = footRegexWithoutImproperSymbols;
     }
 }
 
@@ -1322,10 +1341,8 @@ function replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga
  *  @return {string} - A new string with metric units
 */
 function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp(regstart + '(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + sqcu + '[-−\\s]*' + notInPlusQualifier + '(' + units.join('|') + ')(?:²|³)?[)]?' + unitSuffixInFt, 'igu');
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = getOtherUnitsRegex().exec(text)) !== null) {
         const fullmatch = match[0];
         if (!shouldConvert(fullmatch, convertBracketed)) {
             continue;
