@@ -52,7 +52,7 @@ const fractions = {
 
 /** @type{ import("./types").Conversion } */
 const fahrenheitConversion = {
-    // regexUnit is set in replaceOtherUnits
+    // regexUnit is set in parseUnitOnly
     unit: '°C',
     multiplier: 1
 };
