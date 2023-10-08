@@ -522,21 +522,13 @@ function formatConvertedValue(number, unit, useBold, useBrackets) {
     return fullstring;
 }
 
-/** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
- *  @param {string} text - The original text
+/** Generate the RegExp sued by replaceFahrenheit
  *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
- *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
- *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
- *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
- *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
- *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
- *  @return {string} - A new string with metric temperatures
+ *  @return {RegExp} - The appropriate RegExp
 */
-function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function makeFahrenheitRegex(degWithoutFahrenheit) {
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
+    return new RegExp(
         [
             '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
             '([-−]?[0-9,\\.]+)', // digits, optionally prefixed with a minus sign
@@ -572,6 +564,25 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
         ].join(''),
         'ig'
     );
+}
+
+const replaceFahrenheitRegexWithSymbol = makeFahrenheitRegex(false);
+const replaceFahrenheitRegexWithoutSymbol = makeFahrenheitRegex(true);
+
+/** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric temperatures
+*/
+function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+    const regex = degWithoutFahrenheit ? replaceFahrenheitRegexWithoutSymbol : replaceFahrenheitRegexWithSymbol;
 
     let match;
     while ((match = regex.exec(text)) !== null) {
@@ -614,6 +625,27 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceVolumeRegex = new RegExp(
+    [
+        '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[ \u00A0]?', // space or no-break space
+        '[x*×]', // multiplication sign
+        '[ \u00A0]?', // space or no-break space
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[ \u00A0]?', // space or no-break space
+        '[x*×]', // multiplication sign
+        '[ \u00A0]?', // space or no-break space
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[ \u00A0]?', // space or no-break space
+        'in(ches|ch|\\.)?', // unit
+        // check for already present conversion to metric
+        unitSuffix,
+    ].join(''),
+    'ig',
+);
+
 /** Return a new string where all occurrences of volumes (“L×l×h in”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -626,29 +658,8 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
  *  @return {string} - A new string with metric volumes
 */
 function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[ \u00A0]?', // space or no-break space
-            '[x*×]', // multiplication sign
-            '[ \u00A0]?', // space or no-break space
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[ \u00A0]?', // space or no-break space
-            '[x*×]', // multiplication sign
-            '[ \u00A0]?', // space or no-break space
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[ \u00A0]?', // space or no-break space
-            'in(ches|ch|\\.)?', // unit
-            // check for already present conversion to metric
-            unitSuffix,
-        ].join(''),
-        'ig',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceVolumeRegex.exec(text)) !== null) {
         if (!shouldConvert(match[0], convertBracketed)) {
             continue;
         }
@@ -686,6 +697,23 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceSurfaceInInchesRegex = new RegExp(
+    [
+        '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[-− \u00A0]?', // space or no-break space
+        '[x*×]',  // multiplication sign
+        '[-− \u00A0]?', // space or no-break space
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[-− \u00A0]?', // space or no-break space
+        'in(ches|ch|.)?',  // unit
+        // check for already present conversion to metric
+        unitSuffix,
+    ].join(''),
+    'ig',
+);
+
 /** Return a new string where all occurrences of surfaces in inches (“L×l in”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -698,25 +726,8 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
  *  @return {string} - A new string with metric surfaces
 */
 function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[-− \u00A0]?', // space or no-break space
-            '[x*×]',  // multiplication sign
-            '[-− \u00A0]?', // space or no-break space
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[-− \u00A0]?', // space or no-break space
-            'in(ches|ch|.)?',  // unit
-            // check for already present conversion to metric
-            unitSuffix,
-        ].join(''),
-        'ig',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceSurfaceInInchesRegex.exec(text)) !== null) {
         if (/[0-9][Xx*×][ \u00A0][0-9]/.test(match[0])) {
             continue; //it is 2x 2in something so no conversion
         }
@@ -753,6 +764,26 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceSurfaceInFeetRegex = new RegExp(
+    [
+        '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[\'′’]?',  // allow feet symbol on first number
+        '[-− \u00A0]?', // space or no-break space
+        '[x*×]', // multiplication sign
+        '[-− \u00A0]?', // space or no-break space
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[-− \u00A0]?', // space or no-break space
+        '(feet|foot|ft|[\'′’])', // unit
+        '(?![0-9])', // maybe to avoid matching feet2 for feet²?
+        // check for already present conversion to metric
+        unitSuffix
+    ].join(''),
+    'ig',
+);
+
+
 /** Return a new string where all occurrences of surfaces in feet (“L×l ft”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -765,27 +796,8 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
  *  @return {string} - A new string with metric surfaces
 */
 function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[\'′’]?',  // allow feet symbol on first number
-            '[-− \u00A0]?', // space or no-break space
-            '[x*×]', // multiplication sign
-            '[-− \u00A0]?', // space or no-break space
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[-− \u00A0]?', // space or no-break space
-            '(feet|foot|ft|[\'′’])', // unit
-            '(?![0-9])', // maybe to avoid matching feet2 for feet²?
-            // check for already present conversion to metric
-            unitSuffix
-        ].join(''),
-        'ig',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceSurfaceInFeetRegex.exec(text)) !== null) {
         if (/[0-9][xX*×][ \u00A0][0-9]/.test(match[0])) {
             continue; //it is 2x 2ft something so no conversion
         }
@@ -820,6 +832,20 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceFeetAndInchesRegex = new RegExp(
+    [
+        '([0-9]{0,3})', // number
+        '.?', // separator
+        '(ft|yd|foot|feet)', // larger unit
+        '.?', // separator
+        '([0-9]+(\\.[0-9]+)?)', // number
+        '.?', // separator
+        'in(?:ches|ch)?', // smaller unit
+    ].join(''),
+    'g',
+);
+
 /** Return a new string where all occurrences of lengths in feet and inches (“1 ft 2 in”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -832,22 +858,8 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
  *  @return {string} - A new string with metric lengths
 */
 function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '([0-9]{0,3})', // number
-            '.?', // separator
-            '(ft|yd|foot|feet)', // larger unit
-            '.?', // separator
-            '([0-9]+(\\.[0-9]+)?)', // number
-            '.?', // separator
-            'in(?:ches|ch)?', // smaller unit
-        ].join(''),
-        'g',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceFeetAndInchesRegex.exec(text)) !== null) {
         const dim1 = match[1];
         const larger_unit = match[2];
         const dim2 = match[3];
@@ -1114,6 +1126,20 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replacePoundsAndOuncesRegex = new RegExp(
+    [
+        '([0-9]{0,3})', // number
+        '.?', // separator
+        '(?:lbs?)', // pounds unit
+        '.?', // separator
+        '([0-9]+(\\.[0-9]+)?)', // number
+        '.?', // separator
+        'oz', // ounces unit
+    ].join(''),
+    'g',
+);
+
 /** Return a new string where all occurrences of weights (“1 lb 2 oz”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -1125,22 +1151,8 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
  *  @return {string} - A new string with metric weights
 */
 function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '([0-9]{0,3})', // number
-            '.?', // separator
-            '(?:lbs?)', // pounds unit
-            '.?', // separator
-            '([0-9]+(\\.[0-9]+)?)', // number
-            '.?', // separator
-            'oz', // ounces unit
-        ].join(''),
-        'g',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replacePoundsAndOuncesRegex.exec(text)) !== null) {
         const poundsPart = match[1];
         const ouncesPart = match[2];
         if (!poundsPart || !ouncesPart) {
@@ -1157,6 +1169,8 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
     return text;
 }
 
+const replaceMilesPerGallonRegex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix, 'ig');
+
 /** Return a new string where all occurrences of miles-per-gallon (“12 mpg”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -1168,10 +1182,8 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
  *  @return {string} - A new string with metric equivalent to mpg
 */
 function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix, 'ig');
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceMilesPerGallonRegex.exec(text)) !== null) {
         if (!shouldConvert(match[0], convertBracketed)) {
             continue;
         }
@@ -1194,6 +1206,28 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceIkeaSurfaceRegex = new RegExp(
+    [
+        // NOTE: Firefox now supports negative look-behinds, so this version might be usable
+        // check that this is not preceded by a fraction bar
+        (
+            false
+            ? '(?<!/)' // with look-behind
+            : '/?' // manually, TODO: it looks like the check is not done at all
+        ),
+        numberPattern,
+        ' ?', // optional space
+        '[x*×]', // multiplication sign
+        ' ?', // optional space
+        numberPattern,
+        ' ?', // optional space
+        '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
+        '(?:[^a-z]|$)', // look for a separator
+    ].join(''),
+    'ig',
+);
+
 /** Return a new string where all occurrences of surfaces in the US Ikea format has been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
@@ -1205,30 +1239,8 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
  *  @return {string} - A new string with metric surfaces
 */
 function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            // NOTE: Firefox now supports negative look-behinds, so this version might be usable
-            // check that this is not preceded by a fraction bar
-            (
-                false
-                ? '(?<!/)' // with look-behind
-                : '/?' // manually, TODO: it looks like the check is not done at all
-            ),
-            numberPattern,
-            ' ?', // optional space
-            '[x*×]', // multiplication sign
-            ' ?', // optional space
-            numberPattern,
-            ' ?', // optional space
-            '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
-            '(?:[^a-z]|$)', // look for a separator
-        ].join(''),
-        'ig',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceIkeaSurfaceRegex.exec(text)) !== null) {
         const number1 = match[1];
         const number2 = match[2];
         if (number1 === undefined || number2 === undefined) {
