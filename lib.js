@@ -1,17 +1,27 @@
-const regstart = '([\(]?';
+const regstart = '([(]?';
 const regend = '([^a-z]|$)';
-const intOrFloat = '([0-9,\.]+)';
-const spc = '\u00A0';
-const intOrFloatNoFrac = '([\.,0-9]+(?![\/⁄]))?';
-const skipbrackets = '(?! [\(][0-9]|\u200B\u3010)';
-const unitSuffix = '(?! [\(][0-9]| ?\u200B\u3010)([^a-z]|$)';
-//const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³]|$)';
-const unitSuffixIn = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
-const unitSuffixft = '(?! ?[\(\-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B\)]|$)';
-const unitfrac = '[\-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?';
-const sqcu = '([\-− \u00A0]?(sq\.?|square|cu\.?|cubic))?';
-const sq = '([\-− \u00A0]?(sq\.?|square))?';
-const skipempty = '^(?:[ \n\t]+)?';
+const skipbrackets = '(?! [(][0-9]|\u200B\u3010)';
+const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)([^a-z]|$)';
+const unitSuffixInFt = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
+const sqcu = '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
+const sq = '([-− \u00A0]?(square|sq\\.?))?';
+const skipempty = '^(?:\\s+)?';
+
+const numberPattern = [
+    '(',
+        // main number
+        '(?:[+\\-−]?[\\p{Nd},  \\.]+?(?:e[+\-]?[0-9]+)?)?',
+        '(?:\\s*|-)',
+        // fraction
+        '(?:',
+            // Unicode fraction
+                '(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])',
+            '|',
+            // ASCII fraction
+                '(?:\\p{Nd}+\\s*[/÷∕⁄]\\s*\\p{Nd}+)',
+        ')?',
+    ')',
+].join('');
 
 /** @type{ RegExp } */
 var feetInchRegex;
@@ -38,76 +48,79 @@ const fractions = {
     '⅞': 7 / 8
 };
 
+/** @type{ import("./types").Conversion } */
+const fahrenheitConversion = {
+    // regexUnit is set in replaceOtherUnits
+    unit: '°C',
+    multiplier: 1
+};
+
+/** @type{ import("./types").Conversion } */
+const inchConversion = {
+    regex: new RegExp('((?:in)?' + numberPattern + '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?[)]?)( [a-z]+)?'+unitSuffixInFt+')', 'igu'),
+    unit: 'cm',
+    unit2: 'mm',
+    multiplier: 2.54,
+    multiplier2: 25.4,
+    multipliercu: 0.0163871,
+    forceround2: true
+};
+
+/** @type{ import("./types").Conversion } */
+const footConversion = {
+    // regex is set in setIncludeImproperSymbols
+    unit: 'm',
+    multiplier: 0.3048
+};
+
 /** @type{ import("./types").Conversion[] } */
 const conversions = [
+    fahrenheitConversion,
+    inchConversion,
+    footConversion,
     {
-        // regexUnit is set in replaceOtherUnits
-        unit: '°C',
-        multiplier: 1
-    },
-    {
-        //(?!in ) exclude... replaced with
-        // (?:in )?  to exclude converting "born in 1948 in"
-        //old regex: new RegExp('((?:in )?[a-z#$€£\(]?' + intOrFloatNoFrac + unitfrac + sqcu + '[-− \u00A0]?in(ches|ch|²|³)?' + unitSuffixIn + ')', 'ig'),
-        //added (?=[0-9]) otherwise it will match "it is in something"
-        //regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(?:in(ches|ch|²|³)?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
-        regex: new RegExp('((?:in)?[a-z#$€£\(]?(?=[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?([-− \u00A0]?(sq\.?|square|cu\.?|cubic))?[-− \u00A0]?(in(ches|ch|²|³)?[\)]?)( [a-z]+)?'+unitSuffixIn+')', 'ig'),
-        unit: 'cm',
-        unit2: 'mm',
-        multiplier: 2.54,
-        multiplier2: 25.4,
-        multipliercu: 0.0163871,
-        fullround: true
-    },
-    {
-        //([\(]?[°º]? ?([\.,0-9]+(?![\/⁄]))?[-− \u00A0]?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?[-− \u00A0]?(\'|′|’)(?![\'′’])(?! ?[\(-\− \u00A0]?[0-9]| \u3010)([^a-z]|$))
-        // regex is set in setIncludeImproperSymbols
-        unit: 'm',
-        multiplier: 0.3048
-    },
-    {
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sqcu + '[\-− \u00A0]?(feet|foot|ft)(²|³)?[\)]?' + unitSuffixft + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + sqcu + '[-− \u00A0]?(feet|foot|ft)(²|³)?[)]?' + unitSuffixInFt + ')', 'igu'),
         unit: 'm',
         multiplier: 0.3048,
         multipliercu: 28.31690879986443
     },
     {
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sq + '[ \u00A0]?(mi|miles?)(²|³)?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(miles?|mi)(²|³)?' + unitSuffix + ')', 'igu'),
         unit: 'km',
         multiplier: 1.60934,
-        fullround: true
+        forceround2: true
     },
     {
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + sq + '[ \u00A0]?(yards?|yd)(²|³)?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(yards?|yd)(²|³)?' + unitSuffix + ')', 'igu'),
         unit: 'm',
         multiplier: 0.9144
     },
     {
-        regex: new RegExp(regstart + intOrFloat + '[ \u00A0]?mph' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?mph' + unitSuffix + ')', 'igu'),
         unit: 'km\/h',
         multiplier: 1.60934,
-        fullround: true,
+        forceround2: true,
         forceround: true
     },
     {
         regexUnit: new RegExp(skipempty + '(pound|lb)s?' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[ \u00A0\n]?(pound|lb)s?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(pound|lb)s?' + unitSuffix + ')', 'igu'),
         unit: 'kg',
         unit2: 'g',
         multiplier: 0.453592,
         multiplier2: 453.592,
-        fullround: true
+        forceround2: true
     },
     {
         regexUnit: new RegExp(skipempty + '(ounces?|oz)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[ \u00A0\n]?(ounces?|oz)' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(ounces?|oz)' + unitSuffix + ')', 'igu'),
         unit: 'g',
         multiplier: 28.3495,
         forceround: true
     },
     {
         regexUnit: new RegExp(skipempty + 'fl(uid)? ?(ounces?|oz)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[ \u00A0\n]?fl(uid)? ?(ounces?|oz)' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?fl(uid)? ?(ounces?|oz)' + unitSuffix + ')', 'igu'),
         unit: 'mL',
         multiplier: 29.5735,
         forceround: true,
@@ -115,24 +128,24 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + 'gal(lons?)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[ \u00A0\n]?gal(lons?)?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?gal(lons?)?' + unitSuffix + ')', 'igu'),
         unit: 'L',
         multiplier: 3.78541,
         multiplierimp: 4.54609
     },
     {
         regexUnit: new RegExp(skipempty + '^pints?' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[ \u00A0\n]?pints?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?pints?' + unitSuffix + ')', 'igu'),
         unit: 'L',
         unit2: 'mL',
         multiplier: 0.473176,
         multiplier2: 473.176,
-        fullround: true,
+        forceround2: true,
         multiplierimp: 0.568261
     },
     {
         regexUnit: new RegExp(skipempty + 'cups?'+skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?cups?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?cups?' + unitSuffix + ')', 'igu'),
         unit: 'mL',
         multiplier: 236.59,
         forceround: true,
@@ -140,23 +153,23 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(qt|quarts?)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(qt|quarts?)' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(qt|quarts?)' + unitSuffix + ')', 'igu'),
         unit: 'L',
         multiplier: 0.946353,
         multiplierimp: 1.13652
     },
     {
-        regex: new RegExp(regstart + intOrFloat + '[ \u00A0]?stones?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?stones?' + unitSuffix + ')', 'igu'),
         unit: 'kg',
         multiplier: 6.35029
     },
     {
-        regex: new RegExp(regstart + intOrFloat + '[ \u00A0]?acres?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?acres?' + unitSuffix + ')', 'igu'),
         unit: 'ha',
         multiplier: 0.4046856422
     },
     {
-        regex: new RegExp(regstart + intOrFloat + '[ \u00A0]?horsepower?' + unitSuffix + ')', 'ig'),
+        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?horsepower?' + unitSuffix + ')', 'igu'),
         unit: 'kW',
         multiplier: 0.745699872
     },
@@ -165,7 +178,7 @@ const conversions = [
 /** @type{ import("./types").Conversion } */
 const unitsTablespoon = {
     regexUnit: new RegExp(skipempty + '(tbsp|tablespoons?)'+skipbrackets + regend, 'ig'),
-    regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tbsp|tablespoons?)' + unitSuffix + ')', 'ig'),
+    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(tbsp|tablespoons?)' + unitSuffix + ')', 'igu'),
     unit: 'mL',
     multiplier: 14.7868,
     forceround: true,
@@ -175,43 +188,19 @@ const unitsTablespoon = {
 /** @type{ import("./types").Conversion } */
 const unitsTeaspoon = {
     regexUnit: new RegExp(skipempty + '(tsp|teaspoons?)'+skipbrackets + regend, 'ig'),
-    regex: new RegExp(regstart + intOrFloatNoFrac + unitfrac + '[-− \u00A0\n]?(tsp|teaspoons?)' + unitSuffix + ')', 'ig'),
+    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(tsp|teaspoons?)' + unitSuffix + ')', 'igu'),
     unit: 'mL',
     multiplier: 4.92892,
     forceround: true,
     multiplierimp: 5.91939
 };
 
-/** Evaluate text that looks like a fraction
- *  @param {string} frac - The fraction-like text
- *  @return {number} - The value of the fraction (0 if evaluation fails)
-*/
-function evaluateFraction(frac) {
-    const value = fractions[frac];
-    if (value !== undefined) {
-        return value;
-    }
-    try {
-        if (/[a-zA-Z,\?\!]/.test(frac)) {
-            return 0;
-        }
-        let cleanedFrac = frac.replace(/[^\d\/⁄]/, '');
-        cleanedFrac = frac.replace(/[⁄]/, '\/');
-        if (cleanedFrac.length < 3) {
-            return 0;
-        }
-        return eval(cleanedFrac);
-    } catch (err) {
-        return 0;
-    }
-}
-
 /** If the value if smaller than 1, or larger than 10,000, use a more convenient SI prefix
  *  @param {number} met - The value
  *  @param {string} unit - The unit being used
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
- *  @return {import("./types").ValueWithUnit} - The scaled unit with the appropriate unit
+ *  @return {import("./types").ValueWithUnit} - The scaled value with the appropriate unit
  */
 function stepUpOrDown(met, unit, useMM, useGiga) {
     if (met < 1) {
@@ -362,24 +351,25 @@ function shouldConvert(text, convertBracketed) {
     }
     if (convertBracketed) {
         // if the value is followed by a parenthesis, it is probably already converted. ex: 1 in (2.54 cm)
-        return !/[\(]/.test(text.substring(1));
+        return !/[(]/.test(text.substring(1));
     } else {
         // if the text has parentheses, it is either within parentheses, or probably already converted
-        return !/[\(\)]/.test(text);
+        return !/[()]/.test(text);
     }
 }
 
-/** Convert a temperature from Fahrenheit to Celsius
+/** Convert a temperature from Fahrenheit to Celsius or Kelvin
  *  @param {number} f - A value in Fahrenheit
  *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
  *  @return {number} - The value in Celsius
 */
-function fahrenheitToCelsius(f, useKelvin) {
-    let met = (5 / 9) * (f - 32);
-    if (useKelvin)
-       return met;
-    else
-       return Math.round(met);
+function fahrenheitToMetric(f, useKelvin, useRounding) {
+    if (useKelvin) {
+        return roundNicely(273.15 + (5 / 9) * (f - 32), useRounding);
+    } else {
+        return Math.round((5 / 9) * (f - 32));
+    }
 }
 
 /** Round a number
@@ -419,14 +409,14 @@ function formatNumber(v, useCommaAsDecimalSeparator, useSpacesAsThousandSeparato
     if (useCommaAsDecimalSeparator) {
         const withThousandSeparator = v.toLocaleString('de-DE');
         if (useSpacesAsThousandSeparator) {
-            return withThousandSeparator.replace('.', '\u00A0');
+            return withThousandSeparator.replace(/\./g, '\u00A0');
         } else {
             return withThousandSeparator;
         }
     } else {
         const withThousandSeparator = v.toLocaleString('en-US');
         if (useSpacesAsThousandSeparator) {
-            return withThousandSeparator.replace(',', '\u00A0');
+            return withThousandSeparator.replace(/,/g, '\u00A0');
         } else {
             return withThousandSeparator;
         }
@@ -467,13 +457,13 @@ function bold(text) {
 
 /** Format a value with its unit for insertion in the text
  *  @param {string} number - The formatted value
- *  @param {string} rest - The unit of the value
+ *  @param {string} unit - The unit of the value
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - The formatted value along with its unit
 */
-function formatConvertedValue(number, rest, useBold, useBrackets) {
-    let fullstring = number + rest;
+function formatConvertedValue(number, unit, useBold, useBrackets) {
+    let fullstring = `${number} ${unit}`;
     if (useBrackets) {
         // \200B is ZERO WIDTH SPACE
         // \3010 is 【 (LEFT BLACK LENTICULAR BRACKET)
@@ -487,14 +477,6 @@ function formatConvertedValue(number, rest, useBold, useBrackets) {
         fullstring = bold(fullstring);
     }
     return fullstring;
-}
-
-/** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
- *  @param {string} s - The original text
- *  @return {number} - A new string with metric temperatures
-*/
-function parseNumber(s) {
-    return parseFloat(s.replace('−', '-'));
 }
 
 /** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
@@ -513,12 +495,12 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
+            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '([-−]?[0-9,\\.]+)', // digits, optionally prefixed with a minus sign
             // optionally, an additional number after a range marker
             '(?:',
-                '(?: to | and |[\-−]+)', // range marker
-                '([\-−]?[0-9,\.]+)', // digits, optionally prefixed with a minus sign
+                '(?: to | and |[-−]+)', // range marker
+                '([-−]?[0-9,\\.]+)', // digits, optionally prefixed with a minus sign
             ')?',
             '[ \u00A0]?', // space or no-break space
             // degree Fahrenheit marker
@@ -536,7 +518,7 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
             // check for already present conversion to Celsius
             '(?!', // negative look-ahead
                     ' ?', // optional space
-                    '[\(]',  // opening parenthesis
+                    '[(]',  // opening parenthesis
                     '[0-9]',  // some digit
                 '|',
                     ' ?', // optional space
@@ -561,24 +543,23 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
         const secondNumber = match[2];
 
         // upper-bound of the range, or single value
-        let met1 = fahrenheitToCelsius(parseNumber(firstNumber), useKelvin);
-        if (useKelvin) {
-            met1 += 273.15;
-            met1 = roundNicely(met1, useRounding);
+        const parsed1 = parseNumber(firstNumber);
+        if (parsed1 === null) {
+            continue;
         }
+        const met1 = fahrenheitToMetric(parsed1.value, useKelvin, useRounding);
         const formattedMet1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
         let met = formattedMet1;
 
         // lower-bound of the range
         if (secondNumber) {
-            let met2 = fahrenheitToCelsius(parseNumber(secondNumber), useKelvin);
-            if (useKelvin) {
-                met2 += 273.15;
-                met2 = roundNicely(met2, useRounding);
+            const parsed2 = parseNumber(secondNumber);
+            if (parsed2 === null) {
+                continue;
             }
+            const met2 = fahrenheitToMetric(parsed2.value, useKelvin, useRounding);
             const formattedMet2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-
             met += ' to ' + formattedMet2;
         }
 
@@ -588,21 +569,6 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
         text = insertAt(text, metStr, insertIndex);
     }
     return text;
-}
-
-/** Return a new string where match has been replaced with replacement in haystack
- *  @param {string} haystack - Where to search for the pattern
- *  @param {string} needle - The pattern to be replaced
- *  @param {string} replacement - The replacement
- *  @return {string} - Text, where needle has been replaced with replacement
-*/
-function replaceMaybeKeepLastChar(haystack, needle, replacement) {
-    const lastChar = needle[needle.length -1];
-    if (lastChar && /[^a-z"″”“’'′]/i.test(lastChar)) {
-        return haystack.replace(needle, replacement + lastChar);
-    } else {
-        return haystack.replace(needle, replacement);
-    }
 }
 
 /** Return a new string where all occurrences of volumes (“L×l×h in”) have been converted to metric
@@ -620,18 +586,18 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
-            '[x\*×]', // multiplication sign
+            '[x*×]', // multiplication sign
             '[ \u00A0]?', // space or no-break space
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
-            '[x\*×]', // multiplication sign
+            '[x*×]', // multiplication sign
             '[ \u00A0]?', // space or no-break space
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[ \u00A0]?', // space or no-break space
-            'in(ches|ch|.)?', // unit
+            'in(ches|ch|\\.)?', // unit
             // check for already present conversion to metric
             unitSuffix,
         ].join(''),
@@ -650,16 +616,29 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
             continue;
         }
         let scale = 2.54;
-        let unit = spc + "cm";
+        let unit = 'cm';
         if (useMM === true) {
             scale = 25.4;
-            unit = spc + "mm"
+            unit = 'mm';
         }
-        const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm3 = formatNumber(roundNicely(parseNumber(dim3) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const metStr = formatConvertedValue(`${cm1} × ${cm2} × ${cm3}`, ` ${unit}`, useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], metStr);
+        const parsed1 = parseNumber(dim1);
+        if (parsed1 === null) {
+            continue;
+        }
+        const parsed2 = parseNumber(dim2);
+        if (parsed2 === null) {
+            continue;
+        }
+        const parsed3 = parseNumber(dim3);
+        if (parsed3 === null) {
+            continue;
+        }
+        const cm1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm3 = formatNumber(roundNicely(parsed3.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(`${cm1} × ${cm2} × ${cm3}`, unit, useBold, useBrackets);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -679,14 +658,14 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[-− \u00A0]?', // space or no-break space
-            '[x\*×]',  // multiplication sign
+            '[x*×]',  // multiplication sign
             '[-− \u00A0]?', // space or no-break space
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[-− \u00A0]?', // space or no-break space
-            'in(ches|ch|\.)?',  // unit
+            'in(ches|ch|.)?',  // unit
             // check for already present conversion to metric
             unitSuffix,
         ].join(''),
@@ -695,7 +674,7 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        if (/[0-9][Xx\*×][ \u00A0][0-9]/.test(match[0])) {
+        if (/[0-9][Xx*×][ \u00A0][0-9]/.test(match[0])) {
             continue; //it is 2x 2in something so no conversion
         }
         if (!shouldConvert(match[0], convertBracketed)) {
@@ -709,15 +688,24 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
         }
 
         let scale = 2.54;
-        let unit = spc + "cm";
+        let unit = 'cm';
         if (useMM === true) {
             scale = 25.4;
-            unit = spc + "mm"
+            unit = 'mm';
         }
-        const cm1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const metStr = formatConvertedValue(`${cm1} × ${cm2}`, ` ${unit}`, useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], metStr);
+        const parsed1 = parseNumber(dim1);
+        if (parsed1 === null) {
+            continue;
+        }
+        const parsed2 = parseNumber(dim2);
+        if (parsed2 === null) {
+            continue;
+        }
+        const cm1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -737,13 +725,13 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
     const regex = new RegExp(
         [
-            '[\(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[\'′’]?',  // allow feet symbol on first number
             '[-− \u00A0]?', // space or no-break space
-            '[x\*×]', // multiplication sign
+            '[x*×]', // multiplication sign
             '[-− \u00A0]?', // space or no-break space
-            '([0-9]+(?:\.[0-9]+)?)', // number
+            '([0-9]+(?:\\.[0-9]+)?)', // number
             '[-− \u00A0]?', // space or no-break space
             '(feet|foot|ft|[\'′’])', // unit
             '(?![0-9])', // maybe to avoid matching feet2 for feet²?
@@ -755,7 +743,7 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        if (/[0-9][xX\*×][ \u00A0][0-9]/.test(match[0])) {
+        if (/[0-9][xX*×][ \u00A0][0-9]/.test(match[0])) {
             continue; //it is 2x 2ft something so no conversion
         }
         if (!shouldConvert(match[0], convertBracketed)) {
@@ -769,13 +757,22 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
         }
 
         let scale = 0.3048;
-        let unit = spc + "m";
+        let unit = 'm';
         // TODO: use useMM
 
-        const m1 = formatNumber(roundNicely(parseNumber(dim1) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const m2 = formatNumber(roundNicely(parseNumber(dim2) * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const metStr = formatConvertedValue(`${m1} × ${m2}`, ` ${unit}`, useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], metStr);
+        const parsed1 = parseNumber(dim1);
+        if (parsed1 === null) {
+            continue;
+        }
+        const parsed2 = parseNumber(dim2);
+        if (parsed2 === null) {
+            continue;
+        }
+        const m1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(`${m1} × ${m2}`, unit, useBold, useBrackets);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -799,7 +796,7 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
             '.?', // separator
             '(ft|yd|foot|feet)', // larger unit
             '.?', // separator
-            '([0-9]+(\.[0-9]+)?)', // number
+            '([0-9]+(\\.[0-9]+)?)', // number
             '.?', // separator
             'in(?:ches|ch)?', // smaller unit
         ].join(''),
@@ -822,8 +819,9 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
         const feet = is_yards.test(larger_unit) ? yards_or_feet * 3 : yards_or_feet;
         const total = feet * 12 + inches;
         const m = formatNumber(roundNicely(total * 0.0254, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const meter = formatConvertedValue(m, ' m', useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], meter);
+        const metStr = formatConvertedValue(m, 'm', useBold, useBrackets);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -850,13 +848,9 @@ function roundMaybeNicely(met, forceRounding, useRounding) {
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
- *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
- *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
- *  @return {string} - The converted and formatted value
+ *  @return {import("./types").ValueWithUnit} - The value with the appropriate unit
 */
-function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function applyConversion(imp, conversion, suffix, isUK, useMM, useGiga, useRounding) {
     let multiplier = conversion.multiplier;
     if (isUK === true && conversion.multiplierimp !== undefined) {
         multiplier = conversion.multiplierimp;
@@ -867,7 +861,7 @@ function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding,
         multiplier = conversion.multiplier2;
     }
     const forceRounding = (useRounding === false &&
-        ((useMM === true && conversion.multiplier2 !== undefined && conversion.fullround) || conversion.forceround === true));
+        ((useMM === true && conversion.multiplier2 !== undefined && conversion.forceround2) || conversion.forceround === true));
 
     let met;
     /*if (unitIndex < 2 ) {
@@ -882,7 +876,7 @@ function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding,
         met = roundMaybeNicely(imp * Math.pow(multiplier, 2), forceRounding, useRounding);
     else if (suffix === '³') {
         if (conversion.multipliercu === undefined) {
-            return ''; // TODO
+            return { met: 0, unit: '' }; // TODO
         }
         met = roundMaybeNicely(imp * conversion.multipliercu, forceRounding, useRounding);
         unit = 'L';
@@ -904,8 +898,7 @@ function convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding,
         unit = 'm';
     }
 
-    met = formatNumber(met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-    return formatConvertedValue(met, spc + unit + suffix, useBold, useBrackets);
+    return { met, unit: unit + suffix };
 }
 
 // TODO: remove global variable
@@ -921,31 +914,15 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                     '[°º]?', // optional degree marker, TODO: don't know why
                     // feet
                     '(?:',
-                        '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
-                        '([0-9]{1,3})',  // number
+                        '[ \u00A0]?', // optional separator
+                        numberPattern,
                         '[\'’′]', // feet marker (NOTE: with improper symbols)
-                        '[\-− \u00A0]?', // optional separator
+                        '[-− \u00A0]?', // optional separator
                     ')?',
-                    // mixed numeral
-                    '(?:',
-                        // integer
-                        '(?:',
-                            '([\.,0-9]+)', // number
-                            '(?!\/)', // check that this is not part of a fraction
-                            '(?:[\-− \u00A0]?)', // optional separator
-                        ')?',
-                        // proper fraction
-                        '(',
-                                '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
-                            '|',
-                            // fraction written more conventionally
-                                '[0-9]+', // number
-                                '[\/⁄]', // fraction bar
-                                '[0-9\.]+', // number, TODO: why allow decimal point here?
-                        ')?',
-                    ')?',
+                    // inches
+                    numberPattern,
                     '[ \u00A0]?', // optional separator
-                    '(?:\"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
+                    '(?:"|″|”|“|’’|\'\'|′′)', // inches marker (NOTE: with improper symbols)
                 ')',
                 // NOTE: since we include quotes as symbols for inches, we need
                 // to detect when they are used on their to open a quotation
@@ -954,7 +931,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                 // check for already present conversion to metric
                 '(?!', // negative look-ahead
                         ' ', // non-optional space
-                        '[\(]',  // opening parenthesis
+                        '[(]',  // opening parenthesis
                         '[0-9]',  // some digit
                     '|',
                         ' ?', // optional space
@@ -962,7 +939,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
                 ')',
             ].join(''),
-            'gi',
+            'giu',
         );
     } else {
         feetInchRegex = new RegExp(
@@ -971,29 +948,13 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                     '[°º]?', // optional degree marker, TODO: don't know why
                     // feet
                     '(?:',
-                        '[ \u00A0a-z]{0,1}', // optional space, no-break space, or lower-case Latin letter, TODO: don't know why letter
-                        '([0-9]{1,3})',  // number
+                        '[ \u00A0]?', // optional separator
+                        numberPattern,
                         '[′]', // feet marker (NOTE: without improper symbols)
-                        '[\-− \u00A0]?', // optional separator
+                        '[-− \u00A0]?', // optional separator
                     ')?',
-                    // mixed numeral
-                    '(?:',
-                        // integer
-                        '(?:',
-                            '([\.,0-9]+)', // number
-                            '(?!\/)', // check that this is not part of a fraction
-                            '(?:[\-− \u00A0]?)', // optional separator
-                        ')?',
-                        // proper fraction
-                        '(',
-                                '[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]', // fraction as Unicode code-point
-                            '|',
-                            // fraction written more conventionally
-                                '[0-9]+', // number
-                                '[\/⁄]', // fraction bar
-                                '[0-9\.]+', // number, TODO: why allow decimal point here?
-                        ')?',
-                    ')?',
+                    // inches
+                    numberPattern,
                     '[ \u00A0]?', // optional separator
                     '(?:″|′′)', // inches marker (NOTE: without improper symbols)
                 ')',
@@ -1004,7 +965,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                 // check for already present conversion to metric
                 '(?!', // negative look-ahead
                         ' ', // non-optional space
-                        '[\(]',  // opening parenthesis
+                        '[(]',  // opening parenthesis
                         '[0-9]',  // some digit
                     '|',
                         ' ?', // optional space
@@ -1012,16 +973,14 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
                 ')',
             ].join(''),
-            'gi',
+            'giu',
         );
     }
-    const feetConversion = conversions[2];
-    if (feetConversion !== undefined ){
-        if (includeImproperSymbols) {
-            feetConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixft + ')', 'g');
-        } else {
-            feetConversion.regex = new RegExp('([\(]?[°º]?[ \u00A0]?' + intOrFloatNoFrac + unitfrac + '[\-− \u00A0]?([′])(?![′])' + unitSuffixft + ')', 'g');
-        }
+
+    if (includeImproperSymbols) {
+        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixInFt + ')', 'gu');
+    } else {
+        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?([′])(?![′])' + unitSuffixInFt + ')', 'gu');
     }
 }
 
@@ -1058,7 +1017,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
                 lastQuoteOpen = false;
                 continue;
             }
-            if (match[4] === '\n') {
+            if (match[3] === '\n') {
                 lastQuoteOpen = false; //new line, ignore
                 continue;
             }
@@ -1080,44 +1039,32 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             continue;
         }
 
-        let feet = parseFloat(match[1] || '0');
-        if (isNaN(feet)) {
-            feet = 0;
-        }
-
-        let inchesStr = match[2] || '0';
-        if (inchesStr.length < 5) { // guess when comma use as decimal separator
-            inchesStr = inchesStr.replace(',', '.');
-        }
-        let inches = parseFloat(inchesStr);
-        if (isNaN(inches)) {
-            inches = 0;
-        }
-
-        if (match[3] !== undefined) {
-            inches += evaluateFraction(match[3]);
-        }
-
-        if (inches === 0 || isNaN(inches)) {
+        const feetStr = match[1];
+        const inchStr = match[2];
+        if (!feetStr && !inchStr) {
             continue;
         }
 
-        const total = feet + (inches / 12);
-
-        let metStr = '';
-        if (total > 3) {
-            const conversion = conversions[2];  // feet to m
-            if (!conversion) {
-                continue;
-            }
-            metStr = convAndForm(feet + inches / 12, conversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-        } else {
-            const conversion = conversions[1];  // inches to m
-            if (!conversion) {
-                continue;
-            }
-            metStr = convAndForm(feet * 12 + inches, conversion, '', isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+        const feet = parseNumber(feetStr || '0');
+        if (feet === null) {
+            continue;
         }
+
+        const inches = parseNumber(inchStr || '0');
+        if (inches === null) {
+            continue;
+        }
+
+        // convert to m when over 3 feet, to cm (or mm) otherwise
+        const ret = (
+            feet.value + inches.value / 12 > 3
+            ? applyConversion(feet.value + inches.value / 12, footConversion, '', isUK, useMM, useGiga, useRounding)
+            : applyConversion(feet.value * 12 + inches.value, inchConversion, '', isUK, useMM, useGiga, useRounding)
+        );
+
+        const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
+
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
     }
@@ -1142,7 +1089,7 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
             '.?', // separator
             '(?:lbs?)', // pounds unit
             '.?', // separator
-            '([0-9]+(\.[0-9]+)?)', // number
+            '([0-9]+(\\.[0-9]+)?)', // number
             '.?', // separator
             'oz', // ounces unit
         ].join(''),
@@ -1160,8 +1107,9 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
         const ounces = parseFloat(ouncesPart);
         const total = pounds * 16 + ounces;
         const formattedTotal = formatNumber(roundNicely(total * 0.0283495, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const kg = formatConvertedValue(formattedTotal, ' kg', useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], kg);
+        const metStr = formatConvertedValue(formattedTotal, 'kg', useBold, useBrackets);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
@@ -1177,7 +1125,7 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
  *  @return {string} - A new string with metric equivalent to mpg
 */
 function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp(regstart + intOrFloat + '[ \u00A0]?mpgs?' + unitSuffix + ')', 'ig');
+    const regex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix + ')', 'igu');
 
     let match;
     while ((match = regex.exec(text)) !== null) {
@@ -1197,7 +1145,7 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
         const formattedMet = formatNumber(met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
 
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
-        const metStr = formatConvertedValue(formattedMet, '\u00A0L\/100\u00A0km', useBold, useBrackets);
+        const metStr = formatConvertedValue(formattedMet, 'L/100 km', useBold, useBrackets);
         text = insertAt(text, metStr, insertIndex);
     }
     return text;
@@ -1221,75 +1169,58 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
             // check that this is not preceded by a fraction bar
             (
                 false
-                ? '(?<!\/)' // with look-behind
-                : '[\/]?' // manually, TODO: it looks like the check is not done at all
+                ? '(?<!/)' // with look-behind
+                : '/?' // manually, TODO: it looks like the check is not done at all
             ),
-            // mixed numeral
-            '(?:',
-                '([0-9]+(?!\/))', // integer that is not the numerator of a fraction
-                '[\-− \u00A0]', // separator
-                '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
-            ')',
+            numberPattern,
             ' ?', // optional space
-            '[x\*×]', // multiplication sign
+            '[x*×]', // multiplication sign
             ' ?', // optional space
-            // mixed numeral
-            '(?:',
-                '([0-9]+(?!\/))?', // integer that is not the numerator of a fraction
-                '[\-− \u00A0]', // separator
-                '([0-9]+[\/⁄][0-9\.]+)?', // optional fraction
-            ')?',
+            numberPattern,
             ' ?', // optional space
             '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
             '(?:[^a-z]|$)', // look for a separator
         ].join(''),
-        'ig',
+        'igu',
     );
 
     let match;
     while ((match = regex.exec(text)) !== null) {
-        let inches1 = parseFloat(match[1] || '0');
-        if (isNaN(inches1)) {
-            inches1 = 0;
-        }
-
-        const frac1 = evaluateFraction(match[2] || '0');
-        if (isNaN(frac1)) {
+        const number1 = match[1];
+        const number2 = match[2];
+        if (number1 === undefined || number2 === undefined) {
             continue;
         }
-        inches1 += frac1;
 
-        let inches2 = parseFloat(match[3] || '0');
-        if (isNaN(inches2)) {
-            inches2 = 0;
-        }
-
-        const frac2 = evaluateFraction(match[4] || '0');
-        if (isNaN(frac2)) {
+        let inches1 = parseNumber(number1);
+        if (inches1 === null) {
             continue;
         }
-        inches2 += frac2;
+
+        let inches2 = parseNumber(number2);
+        if (inches2 === null) {
+            continue;
+        }
 
         let scale = 2.54;
-        let unit = spc + "cm";
+        let unit = 'cm';
         if (useMM === true) {
             scale = 25.4;
-            unit = spc + "mm"
+            unit = 'mm';
         }
 
-        const cm1 = formatNumber(roundNicely(inches1 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(inches2 * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const metStr = formatConvertedValue(`${cm1} × ${cm2}`, ` ${unit}`, useBold, useBrackets);
-        text = replaceMaybeKeepLastChar(text, match[0], metStr);
+        const cm1 = formatNumber(roundNicely(inches1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm2 = formatNumber(roundNicely(inches2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
+        const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
+        text = insertAt(text, metStr, insertIndex);
     }
     return text;
 }
 
-// TODO: remove conversionIndex from the arguments
 /** Return a new string where all occurrences of a given non-metric unit have been converted to metric
  *  @param {string} text - The original text
  *  @param {import("./types").Conversion} conversion - The object describing the conversion
- *  @param {number} conversionIndex - The index of the conversion in the conversions array
  *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
@@ -1302,7 +1233,7 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric units
 */
-function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
     if (conversion.regex === undefined) {
         return text;
     }
@@ -1314,18 +1245,16 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
         }
 
         const firstPart = match[1];
-        let impStr = match[2];
-        let fraction = match[3];
-        const unit = match[5];
-        const additionalNumber = match[7];
-        const qualifier = match[8];
-
-        if (impStr !== undefined && !/(?:^|\s)([-−]?\d*\.?\d+|\d{1,3}(?:,\d{3})*(?:\.\d+)?)(?!\S)/g.test(impStr)) {
+        const impStr = match[2];
+        if (impStr === undefined) {
             continue;
         }
+        const unit = match[4];
+        const additionalNumber = match[6];
+        const qualifier = match[7];
 
         let subtract = 0;
-        if (conversionIndex == 1) { //in
+        if (conversion == inchConversion) {
             //if (/[a-z#$€£]/i.test(match[1].substring(0,1)))
             if (/^[a-z#$€£]/i.test(match[0]))
                 continue;
@@ -1348,40 +1277,20 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
                 subtract = qualifier.length;
             }
         }
-        if (conversionIndex == 2) { //ft
+        if (conversion == footConversion) {
             if (firstPart !== undefined && /[°º]/.test(firstPart)) continue;
             if (unit !== undefined && /\d/ig.test(unit)) continue; //avoid 3' 5"
         }
         let suffix = '';
 
-        let imp = 0;
-        if (impStr !== undefined) {
-            impStr = impStr.replace(',', '');
-
-            if (/[⁄]/.test(impStr)) { //improvisation, but otherwise 1⁄2 with register 1 as in
-                fraction = impStr;
-                imp = 0;
-            } else {
-                imp = parseFloat(impStr);
-                if (isNaN(imp)) {
-                    imp = 0;
-                }
-            }
-        }
-
-        if (conversionIndex == 1 && / in /i.test(match[0]) && imp > 1000) {
-            continue; //prevents 1960 in Germany
-        }
-
-        if (fraction === '/') {
-            continue; // 2,438/sqft
-        }
-        if (fraction !== undefined) {
-            imp += evaluateFraction(fraction);
-        }
-
-        if (imp === 0 || isNaN(imp)) {
+        const parsed = parseNumber(impStr);
+        if (parsed === null) {
             continue;
+        }
+        const imp = parsed.value;
+
+        if (conversion == inchConversion && / in /i.test(match[0]) && imp > 1000) {
+            continue; //prevents 1960 in Germany
         }
 
         if (firstPart !== undefined && /²/.test(firstPart)) {
@@ -1394,7 +1303,9 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
             suffix = '³';
         }
 
-        const metStr = convAndForm(imp, conversion, suffix, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+        const ret = applyConversion(imp, conversion, suffix, isUK, useMM, useGiga, useRounding);
+        const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
 
         let insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         insertIndex = insertIndex - subtract; //subtracts behind bracket
@@ -1421,20 +1332,15 @@ function replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBra
  *  @return {string} - A new string with metric units
 */
 function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const len = conversions.length;
-    for (let conversionIndex = 0; conversionIndex < len; conversionIndex++) {
-        const conversion = conversions[conversionIndex];
-        if (conversion === undefined) {
-            continue;
-        }
-        text = replaceOtherUnit(text, conversion, conversionIndex, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+    for (const conversion of conversions) {
+        text = replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     }
 
     if (convertTablespoon) {
-        text = replaceOtherUnit(text, unitsTablespoon, -1, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+        text = replaceOtherUnit(text, unitsTablespoon, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     }
     if (convertTeaspoon) {
-        text = replaceOtherUnit(text, unitsTeaspoon, -1, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+        text = replaceOtherUnit(text, unitsTeaspoon, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
     }
     return text;
 }
@@ -1475,9 +1381,19 @@ function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, 
 }
 
 /** @type{ number | undefined } */
-var lastquantity = 0;
+var lastquantity = undefined;
 var skips = 0;
 var foundDegreeSymbol = false;
+
+/** Reset the global state associated with block processing
+*/
+function resetBlockProcessing() {
+    lastquantity = undefined;
+    skips = 0;
+    foundDegreeSymbol = false;
+}
+
+
 /** Replace non-metric units with metric units and handle cross-node cases
  *  @param {string} text - The original text
  *  @param {boolean} convertTablespoon - Whether to convert tablespoons
@@ -1505,10 +1421,10 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
 
     // skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
 
-    if (lastquantity !== undefined && lastquantity !== 0 && skips < 2) {
+    if (lastquantity !== undefined && skips < 2) {
         text = parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
         if (/^[a-zA-Z°º]+$/g.test(text)) {
-            lastquantity = 0;
+            lastquantity = undefined;
         }
         else {
             skips++;
@@ -1518,57 +1434,19 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
                 foundDegreeSymbol=false;
             }
         }
+    } else if (text.length < 50) {
+        const parsed = parseNumber(text);
+        lastquantity = parsed  === null ? undefined : parsed.value;
+        skips = 0;
     } else {
-        lastquantity = 0;
-        if (text.length < 50) {
-            let quantity = parseNumberWithPadding(text);
-            lastquantity = quantity;
-            skips = 0;
-        }
+        lastquantity = undefined;
     }
-    if ((lastquantity !== undefined && lastquantity !== 0 && skips <= 2) || /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
+
+    if ((lastquantity !== undefined && skips <= 2) || /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
         text = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
     }
 
     return text;
-}
-
-/** Parse a number, allows white space before and after the pattern
- *  @param {string} text - The string containing the number
- *  @return {number | undefined} - The parsed number in case of success, or undefined otherwise
-*/
-function parseNumberWithPadding(text) {
-    let regex = new RegExp('^(?![a-z])(?:[ \n\t]+)?([\.,0-9]+(?![\/⁄]))?(?:[-\− \u00A0])?([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|[0-9]+[\/⁄][0-9]+)?(?:[ \n\t]+)?$', 'ig');
-
-    let match;
-    while ((match = regex.exec(text)) !== null) {
-        const decimal = match[1];
-        let properFraction = match[2];
-        if (decimal === undefined && properFraction === undefined) {
-            continue;
-        }
-        let value = 0; //.replace(',','');
-        if (decimal !== undefined) {
-            if (/[⁄]/.test(decimal)) { //improvisation, but otherwise 1⁄2 with register 1 as in
-                properFraction = decimal;
-            } else {
-                value += parseFloat(decimal.replace(',', ''));
-            }
-        }
-        if (isNaN(value)) {
-            value = 0;
-        }
-
-        if (properFraction !== undefined) {
-            value += evaluateFraction(properFraction);
-        }
-
-        if (value === 0 || isNaN(value)) {
-            continue;
-        }
-        return value;
-    }
-    return undefined;
 }
 
 /** Parse a non-metric unit, using lastquantity as the value
@@ -1590,14 +1468,10 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
         return text;
     }
 
-    // TODO: this is ugly
-    const fahrenheitConversion = conversions[0];
-    if (fahrenheitConversion !== undefined) {
-        if (degWithoutFahrenheit) {
-            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
-        } else {
-            fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
-        }
+    if (degWithoutFahrenheit) {
+        fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?(F(ahrenheits?)?)?|[\u2109])' + skipbrackets + regend, 'ig');
+    } else {
+        fahrenheitConversion.regexUnit = new RegExp(skipempty + '((°|º|deg(rees)?)[ \u00A0]?F(ahrenheits?)?|[\u2109])' + skipbrackets + regend, 'ig');
     }
 
     //console.log("now trying " + text);
@@ -1607,7 +1481,9 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
         }
         let match;
         while ((match = conversion.regexUnit.exec(text)) !== null) {
-            const metStr = convAndForm(lastquantity, conversion, "", isUK, useMM, useGiga, useRounding, useComma, useSpaces, useBold, useBrackets);
+            const ret = applyConversion(lastquantity, conversion, "", isUK, useMM, useGiga, useRounding);
+            const met = formatNumber(ret.met, useComma, useSpaces);
+            const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
             const fullMatch = match[0];
             const insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
             text = insertAt(text, metStr, insertIndex);
@@ -1624,7 +1500,7 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
             return text; //it has been already converted
         }
 
-        let met = fahrenheitToCelsius(lastquantity, useKelvin);
+        let met = fahrenheitToMetric(lastquantity, useKelvin, useRounding);
         let unit = '°C';
         if (useKelvin) {
             met += 273.15;
@@ -1639,4 +1515,138 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
     return text;
 }
 
-module.exports = { conversions, evaluateFraction, stepUpOrDown, insertAt, shouldConvert, fahrenheitToCelsius, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceMaybeKeepLastChar, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, convAndForm, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock };
+/** Returns a translation table for String.translate()
+ *
+ * Similar to Python's maketrans() https://docs.python.org/3/library/stdtypes.html#str.maketrans
+ *
+ *  @param {string} fromCharset - Whether to convert tablespoons
+ *  @param {string} toCharset - Whether to convert teaspoons
+ *  @param {string} [removeCharset] - Whether to convert teaspoons
+ *  @return { {[key: string]: string} } - The object to pass to String.translate
+*/
+function maketrans(fromCharset, toCharset, removeCharset) {
+    if (fromCharset.length != toCharset.length) {
+        throw Error('the first two maketrans arguments must have equal length');
+    }
+    /** @type{ { [key: string]: string } } */
+    const map = {};
+    // NOTE: there is no enumerate() equivalent for strings in JavaScript
+    for (let i = 0; i < fromCharset.length; i++) {
+        const f = fromCharset[i];
+        const t = toCharset[i];
+        if (f === undefined || t === undefined) {
+            continue;
+        }
+        map[f] = t;
+    }
+    if (removeCharset !== undefined) {
+        for (const r of removeCharset) {
+            map[r] = '';
+        }
+    }
+    return map;
+}
+
+/** Return a copy of the string in which each character has been mapped through the given translation table
+ *
+ *  @param { {[key: string]: string} } table - Object created by maketrans()
+ *  @return {string} toCharset - Whether to convert teaspoons
+*/
+String.prototype.translate = function(table) {
+    // NOTE: String.split() creates an intermediate array, so we do this by hand
+    const ret = [];
+    for (const c of this) {
+        const d = table[c];
+        ret.push(d !== undefined ? d : c);
+    }
+    return ret.join('');
+}
+
+const numberTranslation = maketrans(
+    '−÷∕⁄０１２３４５６７８９',
+    '-///0123456789',
+);
+
+const parseNumberRegex = new RegExp(
+    [
+        '^',
+        // main number
+        '([+\\-]?[0-9,  \\.e]+?)?',
+        '(?:\\s*|-)',
+        // fraction
+        '(?:',
+            // Unicode fraction
+                '([¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])',
+            '|',
+            // ASCII fraction
+                '([0-9]+\\s*/\\s*[0-9]+)',
+        ')?',
+        '$',
+    ].join(''),
+    'u',
+);
+
+/** Parse a number, and count the number of significant digits
+ *  @param {string} number - The number to parse as a string
+ *  @return {import("./types").ValueWithSignificantDigits | null} - The evaluated number, along with the number of significant digits
+*/
+function parseNumber(number) {
+    // check that the string contains at least one Number code-point (e.g. 1, １, ½)
+    if (!/\p{Number}/u.test(number)) {
+        return null;
+    }
+
+    // NOTE: ideally, we would want to use the Unicode numeric value associated
+    // with each character in number. But, of course, JavaScript does not
+    // expose this. So, instead, we just support a small character set by hand
+    const mostlyAsciiNumber = number.translate(numberTranslation);
+
+    const match = mostlyAsciiNumber.match(parseNumberRegex);
+    if (!match) {
+        return null;
+    }
+
+    let value = 0;
+    let significantFigures = 0;
+
+    // NOTE: parseFloat matches as many characters as possible, and ignore
+    // invalid ones, so it does not detect invalid numbers. We use Number().
+
+    const simpleNumber = match[1];
+    if (simpleNumber !== undefined) {
+        const withoutGroups = simpleNumber.replace(/[,  ]/g, '');
+        const partialValue = Number(withoutGroups);
+        if (!isFinite(partialValue)) {
+            return null;
+        }
+        value += partialValue;
+        significantFigures = partialValue.toExponential().replace(/^-?0*|\.|0*e.*/g, '').length;
+    }
+
+    // Note: NFKD normalization would allow us to expand Unicode fractions,
+    // but '3½' would end up as “31/2”, so we're doing it manually
+    const unicodeFraction = match[2];
+    if (unicodeFraction !== undefined) {
+        const partialValue = fractions[unicodeFraction];
+        if (partialValue === undefined || !isFinite(partialValue)) {
+            return null;
+        }
+        value += partialValue;
+        significantFigures = 0;
+    }
+
+    const asciiFraction = match[3];
+    if (asciiFraction !== undefined) {
+        const [numerator, denominator] = asciiFraction.replace(' ', '').split('/');
+        const partialValue = Number(numerator) / Number(denominator);
+        if (!isFinite(partialValue)) {
+            return null;
+        }
+        value += partialValue;
+        significantFigures = 0;
+    }
+
+    return { value, significantFigures };
+}
+
+module.exports = { fahrenheitConversion, inchConversion, conversions, stepUpOrDown, insertAt, shouldConvert, fahrenheitToMetric, roundNicely, formatNumber, convertedValueInsertionOffset, bold, formatConvertedValue, parseNumber, replaceFahrenheit, replaceVolume, replaceSurfaceInInches, replaceSurfaceInFeet, replaceFeetAndInches, applyConversion, setIncludeImproperSymbols, replaceFeetAndInchesSymbol, replacePoundsAndOunces, replaceMilesPerGallon, replaceIkeaSurface, replaceOtherUnits, replaceAll, processTextBlock, maketrans, resetBlockProcessing };
