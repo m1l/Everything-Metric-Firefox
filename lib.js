@@ -1548,14 +1548,15 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
  *  @param {string} fromCharset - Whether to convert tablespoons
  *  @param {string} toCharset - Whether to convert teaspoons
  *  @param {string} [removeCharset] - Whether to convert teaspoons
- *  @return { {[key: string]: string} } - The object to pass to String.translate
+ *  @return {import("./types").TranslationTable} - The object to pass to String.translate
 */
 function maketrans(fromCharset, toCharset, removeCharset) {
     if (fromCharset.length != toCharset.length) {
         throw Error('the first two maketrans arguments must have equal length');
     }
+
     /** @type{ { [key: string]: string } } */
-    const map = {};
+    const characterMap = {};
     // NOTE: there is no enumerate() equivalent for strings in JavaScript
     for (let i = 0; i < fromCharset.length; i++) {
         const f = fromCharset[i];
@@ -1563,29 +1564,21 @@ function maketrans(fromCharset, toCharset, removeCharset) {
         if (f === undefined || t === undefined) {
             continue;
         }
-        map[f] = t;
+        characterMap[f] = t;
     }
-    if (removeCharset !== undefined) {
-        for (const r of removeCharset) {
-            map[r] = '';
-        }
-    }
-    return map;
+    const charactersToMatch = removeCharset ? fromCharset + removeCharset : fromCharset;
+    const pattern = new RegExp('[' + charactersToMatch.replace('\\', '\\\\').replace('-', '\\-').replace(']', '\\]') + ']', 'g');
+    return { pattern, characterMap };
 }
 
 /** Return a copy of the string in which each character has been mapped through the given translation table
  *
- *  @param { {[key: string]: string} } table - Object created by maketrans()
+ *  @param {import("./types").TranslationTable} table - Object created by maketrans()
  *  @return {string} toCharset - Whether to convert teaspoons
 */
 String.prototype.translate = function(table) {
-    // NOTE: String.split() creates an intermediate array, so we do this by hand
-    const ret = [];
-    for (const c of this) {
-        const d = table[c];
-        ret.push(d !== undefined ? d : c);
-    }
-    return ret.join('');
+    const { pattern, characterMap } = table;
+    return this.replace(pattern, c => characterMap[c] || '');
 }
 
 const numberTranslation = maketrans(

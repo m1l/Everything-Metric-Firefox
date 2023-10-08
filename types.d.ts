@@ -16,9 +16,14 @@ export type ValueWithUnit = {
     unit: string,
 };
 
+export type TranslationTable = {
+    pattern: RegExp,
+    characterMap: {[key: string]: string},
+};
+
 declare global {
     interface String {
-        translate(table : { [key: string]: string }) : string;
+        translate(table : TranslationTable) : string;
     }
 }
 
