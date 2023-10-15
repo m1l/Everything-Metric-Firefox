@@ -1,26 +1,38 @@
-const regstart = '([(]?';
+const regstart = '[(]?';
 const regend = '([^a-z]|$)';
 const skipbrackets = '(?! [(][0-9]|\u200B\u3010)';
-const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)([^a-z]|$)';
-const unitSuffixInFt = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)([^a-z²³\u3010\u200B)]|$)';
-const sqcu = '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
-const sq = '([-− \u00A0]?(square|sq\\.?))?';
+const unitSuffix = '(?! [(][0-9]| ?\u200B\u3010)(?:[^a-z]|$)';
+const unitSuffixInFt = '(?! ?[(-−\u00A0]?[0-9]| ?\u200B\u3010)(?:[^a-z²³\u3010\u200B)]|$)';
+const notInPlusQualifier = '(?!in\\s*(?:a|an|the|my|his|her|hers|their|theirs|our|ours|your|yours)\\b)';
+const sqcu = '(?:[-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?';
 const skipempty = '^(?:\\s+)?';
 
 const numberPattern = [
     '(',
-        // main number
-        '(?:[+\\-−]?[\\p{Nd},  \\.]+?(?:e[+\-]?[0-9]+)?)?',
-        '(?:\\s*|-)',
-        // fraction
-        '(?:',
-            // Unicode fraction
-                '(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])',
-            '|',
-            // ASCII fraction
-                '(?:\\p{Nd}+\\s*[/÷∕⁄]\\s*\\p{Nd}+)',
-        ')?',
-    ')',
+            // main number
+            '(?:[+\\-−\\d,\\.][\\d,  \\.]*(?:e[+\-]?[0-9]+)?)',
+        '|',
+            // fraction
+            '(?:',
+                // Unicode fraction
+                    '(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])',
+                '|',
+                // ASCII fraction
+                    '(?:\\d+\\s*[/÷∕⁄]\\s*\\d+)',
+            ')',
+        '|',
+            // main number
+            '(?:[+\\-−\\d,\\.][\\d,  \\.]*(?:e[+\-]?[0-9]+)?)',
+            '(?:\\s*|-)',
+            // fraction
+            '(?:',
+                // Unicode fraction
+                    '(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])',
+                '|',
+                // ASCII fraction
+                    '(?:\\d+\\s*[/÷∕⁄]\\s*\\d+)',
+            ')',
+    ')(?<!\\s)',
 ].join('');
 
 /** @type{ RegExp } */
@@ -48,16 +60,44 @@ const fractions = {
     '⅞': 7 / 8
 };
 
+/** @type{string[]} */
+const units = [];
+
+/** @type{RegExp?} */
+let otherUnitsRegex = null;
+
+/** Register a pattern for a US customary or imperial unit marker
+ *  @param {string} pattern - The pattern for the unit
+ *  @return {RegExp} - A regex matching the unit as a full string, case-insensitive
+ */
+function unitPattern(pattern) {
+    if (otherUnitsRegex !== null) {
+        throw Error('unitPattern must not be called after getOtherUnitsRegex');
+    }
+    units.push(pattern);
+    return RegExp('^(?:' + pattern + ')$', 'i');
+}
+
+/** Regex for matching all the other values in US customary or imperial units
+ *  @return {RegExp} - The regex
+ */
+function getOtherUnitsRegex() {
+    if (otherUnitsRegex === null) {
+        otherUnitsRegex = new RegExp(regstart + '(?:in)?(?:[a-z#$€£(](?!\\s))?' + numberPattern + sqcu + '[-−\\s]*' + notInPlusQualifier + '(' + units.join('|') + ')(?:²|³)?[)]?' + unitSuffixInFt, 'ig');
+    }
+    return otherUnitsRegex;
+}
+
 /** @type{ import("./types").Conversion } */
 const fahrenheitConversion = {
-    // regexUnit is set in replaceOtherUnits
+    // regexUnit is set in parseUnitOnly
     unit: '°C',
     multiplier: 1
 };
 
 /** @type{ import("./types").Conversion } */
 const inchConversion = {
-    regex: new RegExp('((?:in)?' + numberPattern + '([-− \u00A0]?(square|sq\\.?|cubic|cu\\.?))?[-− \u00A0]?(in(ches|ch|²|³)?[)]?)( [a-z]+)?'+unitSuffixInFt+')', 'igu'),
+    regex: unitPattern('inches|inch|in'),
     unit: 'cm',
     unit2: 'mm',
     multiplier: 2.54,
@@ -73,30 +113,33 @@ const footConversion = {
     multiplier: 0.3048
 };
 
+const footRegexWithImproperSymbols = unitPattern('[\'′’](?![\'′’])');
+const footRegexWithoutImproperSymbols = unitPattern('[′](?![′])');
+
 /** @type{ import("./types").Conversion[] } */
 const conversions = [
     fahrenheitConversion,
     inchConversion,
     footConversion,
     {
-        regex: new RegExp(regstart + numberPattern + sqcu + '[-− \u00A0]?(feet|foot|ft)(²|³)?[)]?' + unitSuffixInFt + ')', 'igu'),
+        regex: unitPattern('feet|foot|ft'),
         unit: 'm',
         multiplier: 0.3048,
         multipliercu: 28.31690879986443
     },
     {
-        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(miles?|mi)(²|³)?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('miles?|mi'),
         unit: 'km',
         multiplier: 1.60934,
         forceround2: true
     },
     {
-        regex: new RegExp(regstart + numberPattern + sq + '[ \u00A0]?(yards?|yd)(²|³)?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('yards?|yd'),
         unit: 'm',
         multiplier: 0.9144
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?mph' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('mph'),
         unit: 'km\/h',
         multiplier: 1.60934,
         forceround2: true,
@@ -104,7 +147,7 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(pound|lb)s?' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(pound|lb)s?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('(?:pound|lb)s?'),
         unit: 'kg',
         unit2: 'g',
         multiplier: 0.453592,
@@ -113,14 +156,14 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(ounces?|oz)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?(ounces?|oz)' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('ounces?|oz'),
         unit: 'g',
         multiplier: 28.3495,
         forceround: true
     },
     {
         regexUnit: new RegExp(skipempty + 'fl(uid)? ?(ounces?|oz)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?fl(uid)? ?(ounces?|oz)' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('fl(?:uid)? ?(?:ounces?|oz)'),
         unit: 'mL',
         multiplier: 29.5735,
         forceround: true,
@@ -128,14 +171,14 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + 'gal(lons?)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?gal(lons?)?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('gal(?:lons?)?'),
         unit: 'L',
         multiplier: 3.78541,
         multiplierimp: 4.54609
     },
     {
         regexUnit: new RegExp(skipempty + '^pints?' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0\n]?pints?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('pints?'),
         unit: 'L',
         unit2: 'mL',
         multiplier: 0.473176,
@@ -145,7 +188,7 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + 'cups?'+skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?cups?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('cups?'),
         unit: 'mL',
         multiplier: 236.59,
         forceround: true,
@@ -153,23 +196,23 @@ const conversions = [
     },
     {
         regexUnit: new RegExp(skipempty + '(qt|quarts?)' + skipbrackets + regend, 'ig'),
-        regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(qt|quarts?)' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('qt|quarts?'),
         unit: 'L',
         multiplier: 0.946353,
         multiplierimp: 1.13652
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?stones?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('stones?'),
         unit: 'kg',
         multiplier: 6.35029
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?acres?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('acres?'),
         unit: 'ha',
         multiplier: 0.4046856422
     },
     {
-        regex: new RegExp(regstart + numberPattern + '[ \u00A0]?horsepower?' + unitSuffix + ')', 'igu'),
+        regex: unitPattern('horsepower?'),
         unit: 'kW',
         multiplier: 0.745699872
     },
@@ -178,7 +221,7 @@ const conversions = [
 /** @type{ import("./types").Conversion } */
 const unitsTablespoon = {
     regexUnit: new RegExp(skipempty + '(tbsp|tablespoons?)'+skipbrackets + regend, 'ig'),
-    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(tbsp|tablespoons?)' + unitSuffix + ')', 'igu'),
+    regex: unitPattern('tbsp|tablespoons?'),
     unit: 'mL',
     multiplier: 14.7868,
     forceround: true,
@@ -188,7 +231,7 @@ const unitsTablespoon = {
 /** @type{ import("./types").Conversion } */
 const unitsTeaspoon = {
     regexUnit: new RegExp(skipempty + '(tsp|teaspoons?)'+skipbrackets + regend, 'ig'),
-    regex: new RegExp(regstart + numberPattern + '[-− \u00A0\n]?(tsp|teaspoons?)' + unitSuffix + ')', 'igu'),
+    regex: unitPattern('tsp|teaspoons?'),
     unit: 'mL',
     multiplier: 4.92892,
     forceround: true,
@@ -479,21 +522,13 @@ function formatConvertedValue(number, unit, useBold, useBrackets) {
     return fullstring;
 }
 
-/** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
- *  @param {string} text - The original text
+/** Generate the RegExp sued by replaceFahrenheit
  *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
- *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
- *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
- *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
- *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
- *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
- *  @return {string} - A new string with metric temperatures
+ *  @return {RegExp} - The appropriate RegExp
 */
-function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function makeFahrenheitRegex(degWithoutFahrenheit) {
     // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
+    return new RegExp(
         [
             '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
             '([-−]?[0-9,\\.]+)', // digits, optionally prefixed with a minus sign
@@ -529,6 +564,25 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
         ].join(''),
         'ig'
     );
+}
+
+const replaceFahrenheitRegexWithSymbol = makeFahrenheitRegex(false);
+const replaceFahrenheitRegexWithoutSymbol = makeFahrenheitRegex(true);
+
+/** Return a new string where all occurrences of values in Fahrenheit have been converted to metric
+ *  @param {string} text - The original text
+ *  @param {boolean} degWithoutFahrenheit - Whether to assume that ° means °F, not °C
+ *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
+ *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
+ *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
+ *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
+ *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
+ *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
+ *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
+ *  @return {string} - A new string with metric temperatures
+*/
+function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+    const regex = degWithoutFahrenheit ? replaceFahrenheitRegexWithoutSymbol : replaceFahrenheitRegexWithSymbol;
 
     let match;
     while ((match = regex.exec(text)) !== null) {
@@ -571,6 +625,27 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceVolumeRegex = new RegExp(
+    [
+        '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[ \u00A0]?', // space or no-break space
+        '[x*×]', // multiplication sign
+        '[ \u00A0]?', // space or no-break space
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[ \u00A0]?', // space or no-break space
+        '[x*×]', // multiplication sign
+        '[ \u00A0]?', // space or no-break space
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[ \u00A0]?', // space or no-break space
+        'in(ches|ch|\\.)?', // unit
+        // check for already present conversion to metric
+        unitSuffix,
+    ].join(''),
+    'ig',
+);
+
 /** Return a new string where all occurrences of volumes (“L×l×h in”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -583,29 +658,8 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
  *  @return {string} - A new string with metric volumes
 */
 function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[ \u00A0]?', // space or no-break space
-            '[x*×]', // multiplication sign
-            '[ \u00A0]?', // space or no-break space
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[ \u00A0]?', // space or no-break space
-            '[x*×]', // multiplication sign
-            '[ \u00A0]?', // space or no-break space
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[ \u00A0]?', // space or no-break space
-            'in(ches|ch|\\.)?', // unit
-            // check for already present conversion to metric
-            unitSuffix,
-        ].join(''),
-        'ig',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceVolumeRegex.exec(text)) !== null) {
         if (!shouldConvert(match[0], convertBracketed)) {
             continue;
         }
@@ -643,6 +697,23 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceSurfaceInInchesRegex = new RegExp(
+    [
+        '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[-− \u00A0]?', // space or no-break space
+        '[x*×]',  // multiplication sign
+        '[-− \u00A0]?', // space or no-break space
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[-− \u00A0]?', // space or no-break space
+        'in(ches|ch|.)?',  // unit
+        // check for already present conversion to metric
+        unitSuffix,
+    ].join(''),
+    'ig',
+);
+
 /** Return a new string where all occurrences of surfaces in inches (“L×l in”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -655,25 +726,8 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
  *  @return {string} - A new string with metric surfaces
 */
 function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[-− \u00A0]?', // space or no-break space
-            '[x*×]',  // multiplication sign
-            '[-− \u00A0]?', // space or no-break space
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[-− \u00A0]?', // space or no-break space
-            'in(ches|ch|.)?',  // unit
-            // check for already present conversion to metric
-            unitSuffix,
-        ].join(''),
-        'ig',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceSurfaceInInchesRegex.exec(text)) !== null) {
         if (/[0-9][Xx*×][ \u00A0][0-9]/.test(match[0])) {
             continue; //it is 2x 2in something so no conversion
         }
@@ -710,6 +764,26 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceSurfaceInFeetRegex = new RegExp(
+    [
+        '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[\'′’]?',  // allow feet symbol on first number
+        '[-− \u00A0]?', // space or no-break space
+        '[x*×]', // multiplication sign
+        '[-− \u00A0]?', // space or no-break space
+        '([0-9]+(?:\\.[0-9]+)?)', // number
+        '[-− \u00A0]?', // space or no-break space
+        '(feet|foot|ft|[\'′’])', // unit
+        '(?![0-9])', // maybe to avoid matching feet2 for feet²?
+        // check for already present conversion to metric
+        unitSuffix
+    ].join(''),
+    'ig',
+);
+
+
 /** Return a new string where all occurrences of surfaces in feet (“L×l ft”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -722,27 +796,8 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
  *  @return {string} - A new string with metric surfaces
 */
 function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '[(]?', // include previous parenthesis to be able to check whether we are in a parenthesis (see shouldConvert())
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[\'′’]?',  // allow feet symbol on first number
-            '[-− \u00A0]?', // space or no-break space
-            '[x*×]', // multiplication sign
-            '[-− \u00A0]?', // space or no-break space
-            '([0-9]+(?:\\.[0-9]+)?)', // number
-            '[-− \u00A0]?', // space or no-break space
-            '(feet|foot|ft|[\'′’])', // unit
-            '(?![0-9])', // maybe to avoid matching feet2 for feet²?
-            // check for already present conversion to metric
-            unitSuffix
-        ].join(''),
-        'ig',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceSurfaceInFeetRegex.exec(text)) !== null) {
         if (/[0-9][xX*×][ \u00A0][0-9]/.test(match[0])) {
             continue; //it is 2x 2ft something so no conversion
         }
@@ -777,6 +832,20 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceFeetAndInchesRegex = new RegExp(
+    [
+        '([0-9]{0,3})', // number
+        '.?', // separator
+        '(ft|yd|foot|feet)', // larger unit
+        '.?', // separator
+        '([0-9]+(\\.[0-9]+)?)', // number
+        '.?', // separator
+        'in(?:ches|ch)?', // smaller unit
+    ].join(''),
+    'g',
+);
+
 /** Return a new string where all occurrences of lengths in feet and inches (“1 ft 2 in”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -789,22 +858,8 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
  *  @return {string} - A new string with metric lengths
 */
 function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '([0-9]{0,3})', // number
-            '.?', // separator
-            '(ft|yd|foot|feet)', // larger unit
-            '.?', // separator
-            '([0-9]+(\\.[0-9]+)?)', // number
-            '.?', // separator
-            'in(?:ches|ch)?', // smaller unit
-        ].join(''),
-        'g',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceFeetAndInchesRegex.exec(text)) !== null) {
         const dim1 = match[1];
         const larger_unit = match[2];
         const dim2 = match[3];
@@ -939,7 +994,7 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
                 ')',
             ].join(''),
-            'giu',
+            'gi',
         );
     } else {
         feetInchRegex = new RegExp(
@@ -973,14 +1028,14 @@ function setIncludeImproperSymbols(includeImproperSymbols) {
                         '\u3010', // 【 (LEFT BLACK LENTICULAR BRACKET)
                 ')',
             ].join(''),
-            'giu',
+            'gi',
         );
     }
 
     if (includeImproperSymbols) {
-        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?(\'|′|’)(?![\'′’])' + unitSuffixInFt + ')', 'gu');
+        footConversion.regex = footRegexWithImproperSymbols;
     } else {
-        footConversion.regex = new RegExp('([(]?[°º]?[ \u00A0]?' + numberPattern + '[-− \u00A0]?([′])(?![′])' + unitSuffixInFt + ')', 'gu');
+        footConversion.regex = footRegexWithoutImproperSymbols;
     }
 }
 
@@ -1071,6 +1126,20 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replacePoundsAndOuncesRegex = new RegExp(
+    [
+        '([0-9]{0,3})', // number
+        '.?', // separator
+        '(?:lbs?)', // pounds unit
+        '.?', // separator
+        '([0-9]+(\\.[0-9]+)?)', // number
+        '.?', // separator
+        'oz', // ounces unit
+    ].join(''),
+    'g',
+);
+
 /** Return a new string where all occurrences of weights (“1 lb 2 oz”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -1082,22 +1151,8 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
  *  @return {string} - A new string with metric weights
 */
 function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            '([0-9]{0,3})', // number
-            '.?', // separator
-            '(?:lbs?)', // pounds unit
-            '.?', // separator
-            '([0-9]+(\\.[0-9]+)?)', // number
-            '.?', // separator
-            'oz', // ounces unit
-        ].join(''),
-        'g',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replacePoundsAndOuncesRegex.exec(text)) !== null) {
         const poundsPart = match[1];
         const ouncesPart = match[2];
         if (!poundsPart || !ouncesPart) {
@@ -1114,6 +1169,8 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
     return text;
 }
 
+const replaceMilesPerGallonRegex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix, 'ig');
+
 /** Return a new string where all occurrences of miles-per-gallon (“12 mpg”) have been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
@@ -1125,15 +1182,13 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
  *  @return {string} - A new string with metric equivalent to mpg
 */
 function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    const regex = new RegExp(regstart + numberPattern + '[ \u00A0]?mpgs?' + unitSuffix + ')', 'igu');
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceMilesPerGallonRegex.exec(text)) !== null) {
         if (!shouldConvert(match[0], convertBracketed)) {
             continue;
         }
 
-        let impPart = match[2];
+        let impPart = match[1];
         if (!impPart) {
             continue;
         }
@@ -1151,6 +1206,28 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
     return text;
 }
 
+// NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
+const replaceIkeaSurfaceRegex = new RegExp(
+    [
+        // NOTE: Firefox now supports negative look-behinds, so this version might be usable
+        // check that this is not preceded by a fraction bar
+        (
+            false
+            ? '(?<!/)' // with look-behind
+            : '/?' // manually, TODO: it looks like the check is not done at all
+        ),
+        numberPattern,
+        ' ?', // optional space
+        '[x*×]', // multiplication sign
+        ' ?', // optional space
+        numberPattern,
+        ' ?', // optional space
+        '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
+        '(?:[^a-z]|$)', // look for a separator
+    ].join(''),
+    'ig',
+);
+
 /** Return a new string where all occurrences of surfaces in the US Ikea format has been converted to metric
  *  @param {string} text - The original text
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
@@ -1162,30 +1239,8 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
  *  @return {string} - A new string with metric surfaces
 */
 function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    // NOTE: JavaScript does not have free-spacing mode, so we make do with what we have
-    const regex = new RegExp(
-        [
-            // NOTE: Firefox now supports negative look-behinds, so this version might be usable
-            // check that this is not preceded by a fraction bar
-            (
-                false
-                ? '(?<!/)' // with look-behind
-                : '/?' // manually, TODO: it looks like the check is not done at all
-            ),
-            numberPattern,
-            ' ?', // optional space
-            '[x*×]', // multiplication sign
-            ' ?', // optional space
-            numberPattern,
-            ' ?', // optional space
-            '(?:"|″|”|“|’’|\'\'|′′)', // inches marker
-            '(?:[^a-z]|$)', // look for a separator
-        ].join(''),
-        'igu',
-    );
-
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = replaceIkeaSurfaceRegex.exec(text)) !== null) {
         const number1 = match[1];
         const number2 = match[2];
         if (number1 === undefined || number2 === undefined) {
@@ -1218,11 +1273,11 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
     return text;
 }
 
-/** Return a new string where all occurrences of a given non-metric unit have been converted to metric
+/** Apply the transformation in a text for a given match
  *  @param {string} text - The original text
+ *  @param {RegExpMatchArray} match - The match
  *  @param {import("./types").Conversion} conversion - The object describing the conversion
  *  @param {boolean} matchIn - Whether expressions of the form /\d+ in/ should be converted, e.g. "born in 1948 in…"
- *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} isUK - Whether to use imperial units instead of US customary units
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
@@ -1233,85 +1288,51 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric units
 */
-function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    if (conversion.regex === undefined) {
+function replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+    const fullmatch = match[0];
+
+    const impStr = match[1];
+    if (impStr === undefined) {
         return text;
     }
 
-    let match;
-    while ((match = conversion.regex.exec(text)) !== null) {
-        if (!shouldConvert(match[0], convertBracketed)) {
-            continue;
+    if (conversion == inchConversion) {
+        if (/^[a-z#$€£]/i.test(fullmatch)) {
+            return text;
         }
-
-        const firstPart = match[1];
-        const impStr = match[2];
-        if (impStr === undefined) {
-            continue;
+        if (!matchIn && / in /i.test(fullmatch))  { // “born in 1948 in …”
+            return text;
         }
-        const unit = match[4];
-        const additionalNumber = match[6];
-        const qualifier = match[7];
-
-        let subtract = 0;
-        if (conversion == inchConversion) {
-            //if (/[a-z#$€£]/i.test(match[1].substring(0,1)))
-            if (/^[a-z#$€£]/i.test(match[0]))
-                continue;
-            if (/^in /i.test(match[0])) //born in 1948 in ...
-                continue;
-            if (!matchIn && / in /i.test(match[0])) //born in 1948 in ...
-                continue;
-            if (qualifier !== undefined) {
-                if (additionalNumber !== undefined && hasNumber(additionalNumber)) continue; //for 1 in 2 somethings
-                if (qualifier == ' a') continue;
-                if (qualifier == ' an') continue;
-                if (qualifier == ' the') continue;
-                if (qualifier == ' my') continue;
-                if (qualifier == ' his') continue;
-                if (qualifier == '-') continue;
-                if (/ her/.test(qualifier)) continue;
-                if (/ their/.test(qualifier)) continue;
-                if (/ our/.test(qualifier)) continue;
-                if (/ your/.test(qualifier)) continue;
-                subtract = qualifier.length;
-            }
-        }
-        if (conversion == footConversion) {
-            if (firstPart !== undefined && /[°º]/.test(firstPart)) continue;
-            if (unit !== undefined && /\d/ig.test(unit)) continue; //avoid 3' 5"
-        }
-        let suffix = '';
-
-        const parsed = parseNumber(impStr);
-        if (parsed === null) {
-            continue;
-        }
-        const imp = parsed.value;
-
-        if (conversion == inchConversion && / in /i.test(match[0]) && imp > 1000) {
-            continue; //prevents 1960 in Germany
-        }
-
-        if (firstPart !== undefined && /²/.test(firstPart)) {
-            suffix = '²';
-        } else if (firstPart !== undefined && /³/.test(firstPart)) {
-            suffix = '³';
-        } else if (unit !== undefined && unit.toLowerCase().indexOf('sq') !== -1) {
-            suffix = '²';
-        } else if (unit !== undefined && unit.toLowerCase().indexOf('cu') !== -1) {
-            suffix = '³';
-        }
-
-        const ret = applyConversion(imp, conversion, suffix, isUK, useMM, useGiga, useRounding);
-        const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
-
-        let insertIndex = match.index + convertedValueInsertionOffset(match[0]);
-        insertIndex = insertIndex - subtract; //subtracts behind bracket
-        text = insertAt(text, metStr, insertIndex);
     }
-    return text;
+
+    const parsed = parseNumber(impStr);
+    if (parsed === null) {
+        return text;
+    }
+    const imp = parsed.value;
+
+    if (conversion == inchConversion && / in /i.test(fullmatch) && imp > 1000) {
+        return text; // prevents converting “1960 in Germany”
+    }
+
+    const squareCubePrefix = match[2];
+    let suffix = '';
+    if (/²/.test(fullmatch)) {
+        suffix = '²';
+    } else if (/³/.test(fullmatch)) {
+        suffix = '³';
+    } else  if (squareCubePrefix !== undefined && /sq/i.test(squareCubePrefix)) {
+        suffix = '²';
+    } else if (squareCubePrefix !== undefined && /cu/i.test(squareCubePrefix)) {
+        suffix = '³';
+    }
+
+    const ret = applyConversion(imp, conversion, suffix, isUK, useMM, useGiga, useRounding);
+    const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+    const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
+
+    const insertIndex = (match.index || 0) + convertedValueInsertionOffset(fullmatch);
+    return insertAt(text, metStr, insertIndex);
 }
 
 /** Return a new string where all occurrences of other non-metric units have been converted to metric
@@ -1332,16 +1353,33 @@ function replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, use
  *  @return {string} - A new string with metric units
 */
 function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
-    for (const conversion of conversions) {
-        text = replaceOtherUnit(text, conversion, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+    let match;
+    while ((match = getOtherUnitsRegex().exec(text)) !== null) {
+        const fullmatch = match[0];
+        if (!shouldConvert(fullmatch, convertBracketed)) {
+            continue;
+        }
+
+        const unit = match[3];
+        if (unit === undefined) {
+            continue;
+        }
+        if (convertTablespoon && unitsTablespoon.regex !== undefined && unitsTablespoon.regex.test(unit)) {
+            text = replaceOtherUnit(text, match, unitsTablespoon, matchIn, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            continue;
+        }
+        if (convertTeaspoon && unitsTeaspoon.regex !== undefined && unitsTeaspoon.regex.test(unit)) {
+            text = replaceOtherUnit(text, match, unitsTeaspoon, matchIn, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            continue;
+        }
+        for (const conversion of conversions) {
+            if (conversion.regex !== undefined && conversion.regex.test(unit)) {
+                text = replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+                break;
+            }
+        }
     }
 
-    if (convertTablespoon) {
-        text = replaceOtherUnit(text, unitsTablespoon, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    }
-    if (convertTeaspoon) {
-        text = replaceOtherUnit(text, unitsTeaspoon, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    }
     return text;
 }
 
@@ -1522,14 +1560,15 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
  *  @param {string} fromCharset - Whether to convert tablespoons
  *  @param {string} toCharset - Whether to convert teaspoons
  *  @param {string} [removeCharset] - Whether to convert teaspoons
- *  @return { {[key: string]: string} } - The object to pass to String.translate
+ *  @return {import("./types").TranslationTable} - The object to pass to String.translate
 */
 function maketrans(fromCharset, toCharset, removeCharset) {
     if (fromCharset.length != toCharset.length) {
         throw Error('the first two maketrans arguments must have equal length');
     }
+
     /** @type{ { [key: string]: string } } */
-    const map = {};
+    const characterMap = {};
     // NOTE: there is no enumerate() equivalent for strings in JavaScript
     for (let i = 0; i < fromCharset.length; i++) {
         const f = fromCharset[i];
@@ -1537,34 +1576,26 @@ function maketrans(fromCharset, toCharset, removeCharset) {
         if (f === undefined || t === undefined) {
             continue;
         }
-        map[f] = t;
+        characterMap[f] = t;
     }
-    if (removeCharset !== undefined) {
-        for (const r of removeCharset) {
-            map[r] = '';
-        }
-    }
-    return map;
+    const charactersToMatch = removeCharset ? fromCharset + removeCharset : fromCharset;
+    const pattern = new RegExp('[' + charactersToMatch.replace('\\', '\\\\').replace('-', '\\-').replace(']', '\\]') + ']', 'g');
+    return { pattern, characterMap };
 }
 
 /** Return a copy of the string in which each character has been mapped through the given translation table
  *
- *  @param { {[key: string]: string} } table - Object created by maketrans()
+ *  @param {import("./types").TranslationTable} table - Object created by maketrans()
  *  @return {string} toCharset - Whether to convert teaspoons
 */
 String.prototype.translate = function(table) {
-    // NOTE: String.split() creates an intermediate array, so we do this by hand
-    const ret = [];
-    for (const c of this) {
-        const d = table[c];
-        ret.push(d !== undefined ? d : c);
-    }
-    return ret.join('');
+    const { pattern, characterMap } = table;
+    return this.replace(pattern, c => characterMap[c] || '');
 }
 
 const numberTranslation = maketrans(
-    '−÷∕⁄０１２３４５６７８９',
-    '-///0123456789',
+    '−÷∕⁄',
+    '-///',
 );
 
 const parseNumberRegex = new RegExp(
@@ -1583,7 +1614,6 @@ const parseNumberRegex = new RegExp(
         ')?',
         '$',
     ].join(''),
-    'u',
 );
 
 /** Parse a number, and count the number of significant digits

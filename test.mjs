@@ -296,7 +296,7 @@ function testReplaceAll() {
     // TODO: useBold have no effect without useBrackets
     fs.writeFileSync('oracles/useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false));
     fs.writeFileSync('oracles/useBrackets+useBold.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false));
-    fs.writeFileSync('oracles/useKelving.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false));
+    fs.writeFileSync('oracles/useKelvin.html', replaceAll(html, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false));
     fs.writeFileSync('oracles/useGiga.html', replaceAll(html, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false));
     fs.writeFileSync('oracles/useMM.html', replaceAll(html, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false));
     fs.writeFileSync('oracles/isUK.html', replaceAll(html, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false));
