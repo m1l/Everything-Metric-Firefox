@@ -20,27 +20,31 @@ var includeQuotes;
 var isparsing=false;
 var includeImproperSymbols;
 
-const excludedNodesSelectors = [
-    '[contenteditable]',
-    '[translate=no]',
-    '[role=textbox]',
-    '.notranslate',
+const excludedTextNodesXPathSelectors = [
+    '*[@contenteditable]',
+    '*[@translate="no"]',
+    '*[@role="textbox"]',
+    '*[contains(concat(" ", @class, " "), " notranslate ")]',
     'code',
     'style',
     'script',
     'textarea',
 ];
-
-// produce a single CSS selector that matches all the node corresponding to the
-// filters above, as well as their descendants (not text nodes themselves)
-const excludedNodesSelector = excludedNodesSelectors.map(selector => selector + ',' + selector + ' *').join(',');
+const excludedTextNodesXPathString = excludedTextNodesXPathSelectors.map(selector => '//' + selector + '//text()').join('|');
+const excludedTextNodesXPath = new XPathEvaluator().createExpression(excludedTextNodesXPathString);
 
 function walk(root) {
-    const exludedNodes = Array.from(document.querySelectorAll(excludedNodesSelector));
+    const xPathResult = excludedTextNodesXPath.evaluate(document);
+    const excludedNodes = [];
+    let node;
+    while (node = xPathResult.iterateNext()) {
+        excludedNodes.push(node);
+    }
+
     const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     while (treeWalker.nextNode()) {
         const node = treeWalker.currentNode;
-        if (exludedNodes.indexOf(node.parentNode) != -1) {
+        if (excludedNodes.indexOf(node) != -1) {
             continue;
         }
         node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
