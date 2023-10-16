@@ -151,35 +151,6 @@ browser.runtime.onMessage.addListener(
     }
 });
 
-function hasParentEditableNode(el) {
-    if (hasEditableNode(el)) return true;
-    while (el.parentNode) {
-        el = el.parentNode;
-
-        if (hasEditableNode(el))
-            return true;
-    }
-    return false;
-}
-
-function hasEditableNode(el) {
-    if (el.classList !== undefined && el.classList.contains('notranslate')) {
-        return true;
-    }
-    if (el.isContentEditable) {
-        return true;
-    }
-    if (el.getAttribute !== undefined) {
-        if (el.getAttribute('translate') === 'no') {
-            return true;
-        }
-        if (el.getAttribute('role') === 'textbox') {
-            return true;
-        }
-    }
-    return false;
-}
-
 function initMO(root) {
 
     MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
@@ -192,8 +163,7 @@ function initMO(root) {
             for (var j = 0; j < mutations[i].addedNodes.length; j++) {
                 //checkNode(mutations[i].addedNodes[j]);
                 //console.log(mutations[i].addedNodes[j]);
-                if (!hasParentEditableNode(mutations[i].addedNodes[j]))
-                    walk(mutations[i].addedNodes[j]);
+                walk(mutations[i].addedNodes[j]);
 
                 //var t1 = performance.now();
                 //nmut++;
