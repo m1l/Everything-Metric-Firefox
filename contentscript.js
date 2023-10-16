@@ -32,22 +32,28 @@ const excludedTextNodesXPathSelectors = [
 ];
 const excludedTextNodesXPathString = excludedTextNodesXPathSelectors.map(selector => '//' + selector + '//text()').join('|');
 const excludedTextNodesXPath = new XPathEvaluator().createExpression(excludedTextNodesXPathString);
+const excludedNodes = [];
 
-function walk(root) {
+function updateExcludedNodes() {
     const xPathResult = excludedTextNodesXPath.evaluate(document);
-    const excludedNodes = [];
+    excludedNodes.length = 0;
     let node;
     while (node = xPathResult.iterateNext()) {
         excludedNodes.push(node);
     }
+}
 
+function processTextNode(node) {
+    if (excludedNodes.indexOf(node) != -1) {
+        return;
+    }
+    node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+}
+
+function walkTree(root) {
     const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     while (treeWalker.nextNode()) {
-        const node = treeWalker.currentNode;
-        if (excludedNodes.indexOf(node) != -1) {
-            continue;
-        }
-        node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+        processTextNode(treeWalker.currentNode);
     }
 }
 
@@ -114,7 +120,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.body.appendChild(div);
                 }
                 isparsing = true;
-                walk(document.body);
+                updateExcludedNodes();
+                walkTree(document.body);
                 isparsing = false;
                 if (useMO || isamazon) {
                     initMO(document.body);
@@ -129,7 +136,8 @@ browser.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.command == "parse_page_now" && !isParsing) {
         isparsing = true;
-        walk(document.body);
+        updateExcludedNodes();
+        walkTree(document.body);
         isparsing = false;
         FlashMessage();
     }
@@ -138,9 +146,14 @@ browser.runtime.onMessage.addListener(
 function initMO(root) {
     MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
     const observer = new MutationObserver(function(mutations, observer) {
+        updateExcludedNodes();
         for (const mutation of mutations) {
             for (const addedNode of mutation.addedNodes) {
-                walk(addedNode);
+                if (addedNode.nodeType == 3) { // text node
+                    processTextNode(addedNode);
+                } else {
+                    walkTree(addedNode);
+                }
             }
         }
     });
