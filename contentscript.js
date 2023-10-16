@@ -152,10 +152,10 @@ function hasEditableNode(el) {
     if (el.classList !== undefined && el.classList.contains('notranslate')) {
         return true;
     }
+    if (el.isContentEditable) {
+        return true;
+    }
     if (el.getAttribute !== undefined) {
-        if (el.getAttribute('contenteditable')) {
-            return true;
-        }
         if (el.getAttribute('translate') === 'no') {
             return true;
         }
