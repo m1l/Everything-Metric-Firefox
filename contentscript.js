@@ -20,30 +20,20 @@ var includeQuotes;
 var isparsing=false;
 var includeImproperSymbols;
 
-function walk(node) {
-    if (hasEditableNode(node)) return;
+const excludedTagsRegex = /^(?:SCRIPT|STYLE|IMG|NOSCRIPT|TEXTAREA|CODE)$/ig;
 
-    let child;
-    let next;
-
-    switch (node.nodeType) {
-        case 1: // Element
-        case 9: // Document
-        case 11: // Document fragment
-            child = node.firstChild;
-            while (child) {
-                next = child.nextSibling;
-                if (/SCRIPT|STYLE|IMG|NOSCRIPT|TEXTAREA|CODE/ig.test(child.nodeName) === false) {
-                    walk(child);
-                }
-                child = next;
-            }
-            break;
-        case 3: // Text node
-            node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
-            break;
-        default:
-            break;
+function walk(root) {
+    const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (treeWalker.nextNode()) {
+        const node = treeWalker.currentNode;
+        const parentNode = node.parentNode;
+        if (hasEditableNode(parentNode)) {
+            continue;
+        }
+        if (excludedTagsRegex.test(parentNode.nodeName)) {
+            continue;
+        }
+        node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
     }
 }
 
