@@ -20,17 +20,27 @@ var includeQuotes;
 var isparsing=false;
 var includeImproperSymbols;
 
-const excludedTagsRegex = /^(?:SCRIPT|STYLE|IMG|NOSCRIPT|TEXTAREA|CODE)$/ig;
+const excludedNodesSelectors = [
+    '[contenteditable]',
+    '[translate=no]',
+    '[role=textbox]',
+    '.notranslate',
+    'code',
+    'style',
+    'script',
+    'textarea',
+];
+
+// produce a single CSS selector that matches all the node corresponding to the
+// filters above, as well as their descendants (not text nodes themselves)
+const excludedNodesSelector = excludedNodesSelectors.map(selector => selector + ',' + selector + ' *').join(',');
 
 function walk(root) {
+    const exludedNodes = Array.from(document.querySelectorAll(excludedNodesSelector));
     const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     while (treeWalker.nextNode()) {
         const node = treeWalker.currentNode;
-        const parentNode = node.parentNode;
-        if (hasEditableNode(parentNode)) {
-            continue;
-        }
-        if (excludedTagsRegex.test(parentNode.nodeName)) {
+        if (exludedNodes.indexOf(node.parentNode) != -1) {
             continue;
         }
         node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
