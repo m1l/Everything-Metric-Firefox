@@ -32,19 +32,19 @@ const excludedTextNodesXPathSelectors = [
 ];
 const excludedTextNodesXPathString = excludedTextNodesXPathSelectors.map(selector => '//' + selector + '//text()').join('|');
 const excludedTextNodesXPath = new XPathEvaluator().createExpression(excludedTextNodesXPathString);
-const excludedNodes = [];
+const excludedNodes = new Set();
 
 function updateExcludedNodes() {
     const xPathResult = excludedTextNodesXPath.evaluate(document);
-    excludedNodes.length = 0;
+    excludedNodes.clear();
     let node;
     while (node = xPathResult.iterateNext()) {
-        excludedNodes.push(node);
+        excludedNodes.add(node);
     }
 }
 
 function processTextNode(node) {
-    if (excludedNodes.indexOf(node) != -1) {
+    if (excludedNodes.has(node)) {
         return;
     }
     node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
