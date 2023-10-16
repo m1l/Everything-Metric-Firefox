@@ -1,4 +1,4 @@
-//Author: Milos Paripovic
+// Author: Milos Paripovic
 
 var useComma;
 var useMM;
@@ -14,10 +14,10 @@ var useBrackets;
 var useMetricOnly;
 var convertBracketed;
 var matchIn;
-var convertTablespoon=false;
-var convertTeaspoon=false;
+var convertTablespoon = false;
+var convertTeaspoon = false;
 var includeQuotes;
-var isparsing=false;
+var isparsing = false;
 var includeImproperSymbols;
 
 const excludedTextNodesXPathSelectors = [
@@ -52,20 +52,15 @@ function walk(root) {
 }
 
 function FlashMessage() {
-    var div  = document.getElementById("EverythingMetricExtension");
-    if (div===null)
-        div = document.createElement('div');
+    const div = document.getElementById("EverythingMetricExtension") || document.createElement('div');
     div.setAttribute("id", "EverythingMetricExtension");
     div.textContent = 'Converted to Metric!';
-
+    div.classList.add('show');
     document.body.appendChild(div);
-    var x = document.getElementById("EverythingMetricExtension");
-    x.className = "show";
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 1500);
+    setTimeout(function(){ div.classList.remove('show'); }, 1500);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-
     if (/docs\.google\./.test(window.location.toString()) ||
         /drive\.google\./.test(window.location.toString()) ||
         /mail\.google\./.test(window.location.toString())) {
@@ -101,84 +96,58 @@ document.addEventListener('DOMContentLoaded', function() {
             includeImproperSymbols = response.includeImproperSymbols;
             setIncludeImproperSymbols(response.includeImproperSymbols);
 
-            if (response.metricIsEnabled === true) {
-
+            if (response.metricIsEnabled) {
                 let isamazon = false;
-                if (/\.amazon\./.test(window.location.toString())) isamazon = true;
-                if (/\.uk\//.test(window.location.toString())) isUK = true;
+                if (/\.amazon\./.test(window.location.toString())) {
+                    isamazon = true;
+                }
+                if (/\.uk\//.test(window.location.toString())) {
+                    isUK = true;
+                }
                 if (isamazon) {
-                    var div = document.getElementById("AmazonMetricHelper");
-                    if (div===null)
-                        div = document.createElement('div');
-                    else
+                    if (document.getElementById("AmazonMetricHelper")) {
                         return;
+                    }
+                    const div = document.createElement('div');
                     div.setAttribute("id", "EverythingMetricExtension");
                     div.textContent = 'Converted to Metric!';
                     document.body.appendChild(div);
                 }
-                isparsing=true;
+                isparsing = true;
                 walk(document.body);
-                isparsing=false;
-                if (useMO === true || isamazon === true)
+                isparsing = false;
+                if (useMO || isamazon) {
                     initMO(document.body);
+                }
             }
         })
     ;
 }, false);
-/*
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.args === "parse_page_now") {
-        alert('asdf');
-        walk(document.body);
-        FlashMessage();
-    }
-    sendResponse();
-});
-
-*/
 
 
 browser.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-
-    if (request.command == "parse_page_now") {
-        if (isparsing===true)
-            return;
-        isparsing=true;
+    if (request.command == "parse_page_now" && !isParsing) {
+        isparsing = true;
         walk(document.body);
-        isparsing=false;
+        isparsing = false;
         FlashMessage();
     }
 });
 
 function initMO(root) {
-
     MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-
-    var observer = new MutationObserver(function(mutations, observer) {
-        //fired when a mutation occurs
-        //console.log(mutations);
-        //var t0 = performance.now();
-        for (var i = 0; i < mutations.length; i++) {
-            for (var j = 0; j < mutations[i].addedNodes.length; j++) {
-                //checkNode(mutations[i].addedNodes[j]);
-                //console.log(mutations[i].addedNodes[j]);
-                walk(mutations[i].addedNodes[j]);
-
-                //var t1 = performance.now();
-                //nmut++;
-                //console.log(nmut + " Call to mutations took " + (t1 - t0) + " milliseconds.")
+    const observer = new MutationObserver(function(mutations, observer) {
+        for (const mutation of mutations) {
+            for (const addedNode of mutation.addedNodes) {
+                walk(addedNode);
             }
         }
     });
-    var opts = {
+    observer.takeRecords();
+    observer.observe(root, {
         characterData: false,
         childList: true,
         subtree: true
-    };
-    var observe = function() {
-        observer.takeRecords();
-        observer.observe(root, opts);
-    };
-    observe();
+    });
 }
