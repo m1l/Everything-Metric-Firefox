@@ -1,10 +1,27 @@
 <meta charset="utf-8">
 <h1>EverythingMetric test page</h1>
 <h2>DOM tests</h2>
-<h3>This one should be converted</h3>
+<h3>All these should be converted</h3>
 <div>
     div: 3 miles
 </div>
+<div id="textAdded">
+    text added:
+</div>
+<div id="spanAdded">
+    span added:
+</div>
+<script>
+setTimeout(function() {
+    // textNode
+    const textNode = document.createTextNode('delayed: 3 miles');
+    document.getElementById('textAdded').appendChild(textNode);
+    // span
+    const span = document.createElement('SPAN');
+    span.innerText = 'delayed: 3 miles';
+    document.getElementById('spanAdded').appendChild(span);
+}, 100);
+</script>
 <h3>None of these should be converted</h3>
 <div contenteditable>
     contenteditable: 3 miles
@@ -51,10 +68,10 @@
         </div>
     </div>
 </code>
-<script>
+<script id="selfCheckScript">
 const X = '3 miles';
 setTimeout(function() {
-    const scriptNode = document.querySelector('script');
+    const scriptNode = document.getElementById('selfCheckScript');
     const scriptText = scriptNode.childNodes[0].textContent;
     // NOTE: the character is in the script, since we are passing it as an
     // argument. But it should not be in the first few characters. That would
