@@ -1,4 +1,4 @@
-//Author: Milos Paripovic
+// Author: Milos Paripovic
 
 var useComma;
 var useMM;
@@ -14,54 +14,59 @@ var useBrackets;
 var useMetricOnly;
 var convertBracketed;
 var matchIn;
-var convertTablespoon=false;
-var convertTeaspoon=false;
+var convertTablespoon = false;
+var convertTeaspoon = false;
 var includeQuotes;
-var isparsing=false;
+var isparsing = false;
 var includeImproperSymbols;
 
-function walk(node) {
-    if (hasEditableNode(node)) return;
+const excludedTextNodesXPathSelectors = [
+    '*[@contenteditable]',
+    '*[@translate="no"]',
+    '*[@role="textbox"]',
+    '*[contains(concat(" ", @class, " "), " notranslate ")]',
+    'code',
+    'style',
+    'script',
+    'textarea',
+];
+const excludedTextNodesXPathString = excludedTextNodesXPathSelectors.map(selector => '//' + selector + '//text()').join('|');
+const excludedTextNodesXPath = new XPathEvaluator().createExpression(excludedTextNodesXPathString);
+const excludedNodes = new Set();
 
-    let child;
-    let next;
+function updateExcludedNodes() {
+    const xPathResult = excludedTextNodesXPath.evaluate(document);
+    excludedNodes.clear();
+    let node;
+    while (node = xPathResult.iterateNext()) {
+        excludedNodes.add(node);
+    }
+}
 
-    switch (node.nodeType) {
-        case 1: // Element
-        case 9: // Document
-        case 11: // Document fragment
-            child = node.firstChild;
-            while (child) {
-                next = child.nextSibling;
-                if (/SCRIPT|STYLE|IMG|NOSCRIPT|TEXTAREA|CODE/ig.test(child.nodeName) === false) {
-                    walk(child);
-                }
-                child = next;
-            }
-            break;
-        case 3: // Text node
-            node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
-            break;
-        default:
-            break;
+function processTextNode(node) {
+    if (excludedNodes.has(node)) {
+        return;
+    }
+    node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+}
+
+function walkTree(root) {
+    const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (treeWalker.nextNode()) {
+        processTextNode(treeWalker.currentNode);
     }
 }
 
 function FlashMessage() {
-    var div  = document.getElementById("EverythingMetricExtension");
-    if (div===null)
-        div = document.createElement('div');
+    const div = document.getElementById("EverythingMetricExtension") || document.createElement('div');
     div.setAttribute("id", "EverythingMetricExtension");
     div.textContent = 'Converted to Metric!';
-
+    div.classList.add('show');
     document.body.appendChild(div);
-    var x = document.getElementById("EverythingMetricExtension");
-    x.className = "show";
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 1500);
+    setTimeout(function(){ div.classList.remove('show'); }, 1500);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-
     if (/docs\.google\./.test(window.location.toString()) ||
         /drive\.google\./.test(window.location.toString()) ||
         /mail\.google\./.test(window.location.toString())) {
@@ -97,114 +102,65 @@ document.addEventListener('DOMContentLoaded', function() {
             includeImproperSymbols = response.includeImproperSymbols;
             setIncludeImproperSymbols(response.includeImproperSymbols);
 
-            if (response.metricIsEnabled === true) {
-
+            if (response.metricIsEnabled) {
                 let isamazon = false;
-                if (/\.amazon\./.test(window.location.toString())) isamazon = true;
-                if (/\.uk\//.test(window.location.toString())) isUK = true;
+                if (/\.amazon\./.test(window.location.toString())) {
+                    isamazon = true;
+                }
+                if (/\.uk\//.test(window.location.toString())) {
+                    isUK = true;
+                }
                 if (isamazon) {
-                    var div = document.getElementById("AmazonMetricHelper");
-                    if (div===null)
-                        div = document.createElement('div');
-                    else
+                    if (document.getElementById("AmazonMetricHelper")) {
                         return;
+                    }
+                    const div = document.createElement('div');
                     div.setAttribute("id", "EverythingMetricExtension");
                     div.textContent = 'Converted to Metric!';
                     document.body.appendChild(div);
                 }
-                isparsing=true;
-                walk(document.body);
-                isparsing=false;
-                if (useMO === true || isamazon === true)
+                isparsing = true;
+                updateExcludedNodes();
+                walkTree(document.body);
+                isparsing = false;
+                if (useMO || isamazon) {
                     initMO(document.body);
+                }
             }
         })
     ;
 }, false);
-/*
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.args === "parse_page_now") {
-        alert('asdf');
-        walk(document.body);
-        FlashMessage();
-    }
-    sendResponse();
-});
-
-*/
 
 
 browser.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-
-    if (request.command == "parse_page_now") {
-        if (isparsing===true)
-            return;
-        isparsing=true;
-        walk(document.body);
-        isparsing=false;
+    if (request.command == "parse_page_now" && !isParsing) {
+        isparsing = true;
+        updateExcludedNodes();
+        walkTree(document.body);
+        isparsing = false;
         FlashMessage();
     }
 });
 
-function hasParentEditableNode(el) {
-    if (hasEditableNode(el)) return true;
-    while (el.parentNode) {
-        el = el.parentNode;
-
-        if (hasEditableNode(el))
-            return true;
-    }
-    return false;
-}
-
-function hasEditableNode(el) {
-    if (el.classList !== undefined && el.classList.contains('notranslate')) {
-        return true;
-    }
-    if (el.getAttribute !== undefined) {
-        if (el.getAttribute('contenteditable')) {
-            return true;
-        }
-        if (el.getAttribute('translate') === 'no') {
-            return true;
-        }
-        if (el.getAttribute('role') === 'textbox') {
-            return true;
-        }
-    }
-    return false;
-}
-
 function initMO(root) {
-
     MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-
-    var observer = new MutationObserver(function(mutations, observer) {
-        //fired when a mutation occurs
-        //console.log(mutations);
-        //var t0 = performance.now();
-        for (var i = 0; i < mutations.length; i++) {
-            for (var j = 0; j < mutations[i].addedNodes.length; j++) {
-                //checkNode(mutations[i].addedNodes[j]);
-                //console.log(mutations[i].addedNodes[j]);
-                if (!hasParentEditableNode(mutations[i].addedNodes[j]))
-                    walk(mutations[i].addedNodes[j]);
-
-                //var t1 = performance.now();
-                //nmut++;
-                //console.log(nmut + " Call to mutations took " + (t1 - t0) + " milliseconds.")
+    const observer = new MutationObserver(function(mutations, observer) {
+        updateExcludedNodes();
+        for (const mutation of mutations) {
+            for (const addedNode of mutation.addedNodes) {
+                if (addedNode.nodeType == 3) { // text node
+                    processTextNode(addedNode);
+                } else {
+                    walkTree(addedNode);
+                }
             }
         }
     });
-    var opts = {
+    observer.takeRecords();
+    observer.observe(root, {
         characterData: false,
         childList: true,
         subtree: true
-    };
-    var observe = function() {
-        observer.takeRecords();
-        observer.observe(root, opts);
-    };
-    observe();
+    });
 }

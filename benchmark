@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+xdotool click 1
+sleep 1
+for _ in $(seq 1 10)
+do
+    xdotool key F5
+    sleep 1
+done
+xdotool click 1

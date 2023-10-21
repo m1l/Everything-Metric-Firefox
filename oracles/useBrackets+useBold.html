@@ -1,7 +1,99 @@
 <meta charset="utf-8">
+<h1>EverythingMetric test page</h1>
+<h2>DOM tests</h2>
+<h3>All these should be converted</h3>
+<div>
+    div: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+</div>
+<div id="textAdded">
+    text added:
+</div>
+<div id="spanAdded">
+    span added:
+</div>
+<script>
+setTimeout(function() {
+    // textNode
+    const textNode = document.createTextNode('delayed: 3 miles'​【𝟰.𝟴𝟯 𝗸𝗺】);
+    document.getElementById('textAdded').appendChild(textNode);
+    // span
+    const span = document.createElement('SPAN');
+    span.innerText = 'delayed: 3 miles'​【𝟰.𝟴𝟯 𝗸𝗺】;
+    document.getElementById('spanAdded').appendChild(span);
+}, 100);
+</script>
+<h3>None of these should be converted</h3>
+<div contenteditable>
+    contenteditable: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+    <div>
+        contenteditable child: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        <div>
+            contenteditable grandchild: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        </div>
+    </div>
+</div>
+<div translate="no">
+    translate=no: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+    <div>
+        translate child=no: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        <div>
+            translate grandchild=no: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        </div>
+    </div>
+</div>
+<div role="textbox">
+    role=textbox: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+    <div>
+        role=textbox child=no: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        <div>
+            role=textbox grandchild=no: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        </div>
+    </div>
+</div>
+<div class="notranslate someotherclass">
+    class=notranslate: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+    <div>
+        class=notranslate child: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        <div>
+            class=notranslate grandchild: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        </div>
+    </div>
+</div>
+<code>
+    code: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+    <div>
+        code child: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        <div>
+            code grandchild: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+        </div>
+    </div>
+</code>
+<script id="selfCheckScript">
+const X = '3 miles'​【𝟰.𝟴𝟯 𝗸𝗺】;
+setTimeout(function() {
+    const scriptNode = document.getElementById('selfCheckScript');
+    const scriptText = scriptNode.childNodes[0].textContent;
+    // NOTE: the character is in the script, since we are passing it as an
+    // argument. But it should not be in the first few characters. That would
+    // happen if the values of the X variable was converted.
+    if (scriptText.indexOf('【') < 30) {
+        alert('The contents of the <script> tag were modified!');
+    }
+}, 1000);
+</script>
+<div id="styleTest">
+    style:
+</div>
+<style>
+#styleTest::after {
+    content: '3 miles​【𝟰.𝟴𝟯 𝗸𝗺】 is a long distance';
+}
+</style>
+<textarea>
+    textarea: 3 miles​【𝟰.𝟴𝟯 𝗸𝗺】
+</textarea>
+<h2>Conversion tests</h2>
 <pre>
-This page is for tesing if the extension is working correctly.
-
 All of these should show 1 m
 
 39.37 inch​【𝟭 𝗺】
