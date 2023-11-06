@@ -1,11 +1,9 @@
 function save_options() {
 
-    var useComma = document.getElementById('useComma').checked;
     var useMM = document.getElementById('useMM').checked;
     var useRounding = document.getElementById('useRounding').checked;
     var useMO = document.getElementById('useMO').checked;
     var useGiga = document.getElementById('useGiga').checked;
-    var useSpaces = document.getElementById('useSpaces').checked;
     var useKelvin = document.getElementById('useKelvin').checked;
     var degWithoutFahrenheit = document.getElementById('degWithoutFahrenheit').checked;
     var useBold = document.getElementById('useBold').checked;
@@ -19,13 +17,11 @@ function save_options() {
     var includeImproperSymbols = document.getElementById('includeImproperSymbols').checked;
 
     browser.storage.sync.set({
-        useComma: useComma,
         useMM: useMM,
         useRounding: useRounding,
         isFirstRun: false,
         useMO: useMO,
         useGiga: useGiga,
-        useSpaces: useSpaces,
         useKelvin: useKelvin,
         degWithoutFahrenheit: degWithoutFahrenheit,
         useBold: useBold,
@@ -60,13 +56,11 @@ function save_options() {
 function restore_options() {
     try {
         browser.storage.sync.get({
-            useComma: true,
             useMM: false,
             useRounding: true,
             isFirstRun: false,
             useMO: false,
             useGiga: false,
-            useSpaces: true,
             useKelvin: false,
             degWithoutFahrenheit: false,
             useBold: false,
@@ -79,12 +73,10 @@ function restore_options() {
             includeQuotes: true,
             includeImproperSymbols: true
         }, function(items) {
-            document.getElementById('useComma').checked = items.useComma;
             document.getElementById('useMM').checked = items.useMM;
             document.getElementById('useRounding').checked = items.useRounding;
             document.getElementById('useMO').checked = items.useMO;
             document.getElementById('useGiga').checked = items.useGiga;
-            document.getElementById('useSpaces').checked = items.useSpaces;
             document.getElementById('useKelvin').checked = items.useKelvin;
             document.getElementById('degWithoutFahrenheit').checked = items.degWithoutFahrenheit;
             document.getElementById('useBold').checked = items.useBold;
@@ -104,11 +96,9 @@ function restore_options() {
 restore_options();
 document.addEventListener("DOMContentLoaded", restore_options);
 document.getElementById('save').addEventListener('click', save_options);
-document.getElementById('useComma').addEventListener('click', save_options);
 document.getElementById('useMM').addEventListener('click', save_options);
 document.getElementById('useRounding').addEventListener('click', save_options);
 document.getElementById('useGiga').addEventListener('click', save_options);
-document.getElementById('useSpaces').addEventListener('click', save_options);
 document.getElementById('useKelvin').addEventListener('click', save_options);
 document.getElementById('degWithoutFahrenheit').addEventListener('click', save_options);
 document.getElementById('useBold').addEventListener('click', save_options);

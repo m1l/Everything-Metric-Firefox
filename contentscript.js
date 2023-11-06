@@ -1,11 +1,9 @@
 // Author: Milos Paripovic
 
-var useComma;
 var useMM;
 var useRounding;
 var useMO;
 var useGiga;
-var useSpaces;
 var useKelvin;
 var degWithoutFahrenheit;
 var isUK = false;
@@ -47,7 +45,7 @@ function processTextNode(node) {
     if (excludedNodes.has(node)) {
         return;
     }
-    node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+    node.nodeValue = processTextBlock(node.nodeValue, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding);
 }
 
 function walkTree(root) {
@@ -83,12 +81,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .sendMessage({ message: "Is metric enabled" })
         .then(function(response) {
             metricIsEnabled = response.metricIsEnabled;
-            useComma = response.useComma;
             useMM = response.useMM;
             useRounding = response.useRounding;
             useMO = response.useMO;
             useGiga = response.useGiga;
-            useSpaces = response.useSpaces;
             useKelvin = response.useKelvin;
             degWithoutFahrenheit = response.degWithoutFahrenheit;
             useBold = response.useBold;

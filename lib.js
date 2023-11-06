@@ -444,26 +444,10 @@ function roundNicely(v, useRounding) {
 
 /** Format a number using user preferences for thousand separator and decimal separator
  *  @param {number} v - The number to format
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @return {string} - The formatted number
 */
-function formatNumber(v, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator) {
-    if (useCommaAsDecimalSeparator) {
-        const withThousandSeparator = v.toLocaleString('de-DE');
-        if (useSpacesAsThousandSeparator) {
-            return withThousandSeparator.replace(/\./g, '\u00A0');
-        } else {
-            return withThousandSeparator;
-        }
-    } else {
-        const withThousandSeparator = v.toLocaleString('en-US');
-        if (useSpacesAsThousandSeparator) {
-            return withThousandSeparator.replace(/,/g, '\u00A0');
-        } else {
-            return withThousandSeparator;
-        }
-    }
+function formatNumber(v) {
+    return v.toLocaleString();
 }
 
 /** Decide exactly where the metric-converted value should be inserted in fullMatch
@@ -575,13 +559,11 @@ const replaceFahrenheitRegexWithoutSymbol = makeFahrenheitRegex(true);
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric temperatures
 */
-function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useBold, useBrackets) {
     const regex = degWithoutFahrenheit ? replaceFahrenheitRegexWithoutSymbol : replaceFahrenheitRegexWithSymbol;
 
     let match;
@@ -602,7 +584,7 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
             continue;
         }
         const met1 = fahrenheitToMetric(parsed1.value, useKelvin, useRounding);
-        const formattedMet1 = formatNumber(met1, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const formattedMet1 = formatNumber(met1);
 
         let met = formattedMet1;
 
@@ -613,7 +595,7 @@ function replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelv
                 continue;
             }
             const met2 = fahrenheitToMetric(parsed2.value, useKelvin, useRounding);
-            const formattedMet2 = formatNumber(met2, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+            const formattedMet2 = formatNumber(met2);
             met += ' to ' + formattedMet2;
         }
 
@@ -651,13 +633,11 @@ const replaceVolumeRegex = new RegExp(
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric volumes
 */
-function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceVolume(text, convertBracketed, useMM, useRounding, useBold, useBrackets) {
     let match;
     while ((match = replaceVolumeRegex.exec(text)) !== null) {
         if (!shouldConvert(match[0], convertBracketed)) {
@@ -687,9 +667,9 @@ function replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDec
         if (parsed3 === null) {
             continue;
         }
-        const cm1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm3 = formatNumber(roundNicely(parsed3.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm1 = formatNumber(roundNicely(parsed1.value * scale, useRounding));
+        const cm2 = formatNumber(roundNicely(parsed2.value * scale, useRounding));
+        const cm3 = formatNumber(roundNicely(parsed3.value * scale, useRounding));
         const metStr = formatConvertedValue(`${cm1} × ${cm2} × ${cm3}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -719,13 +699,11 @@ const replaceSurfaceInInchesRegex = new RegExp(
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric surfaces
 */
-function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useBold, useBrackets) {
     let match;
     while ((match = replaceSurfaceInInchesRegex.exec(text)) !== null) {
         if (/[0-9][Xx*×][ \u00A0][0-9]/.test(match[0])) {
@@ -755,8 +733,8 @@ function replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useC
         if (parsed2 === null) {
             continue;
         }
-        const cm1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm1 = formatNumber(roundNicely(parsed1.value * scale, useRounding));
+        const cm2 = formatNumber(roundNicely(parsed2.value * scale, useRounding));
         const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -789,13 +767,11 @@ const replaceSurfaceInFeetRegex = new RegExp(
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric surfaces
 */
-function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useBold, useBrackets) {
     let match;
     while ((match = replaceSurfaceInFeetRegex.exec(text)) !== null) {
         if (/[0-9][xX*×][ \u00A0][0-9]/.test(match[0])) {
@@ -823,8 +799,8 @@ function replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCom
         if (parsed2 === null) {
             continue;
         }
-        const m1 = formatNumber(roundNicely(parsed1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const m2 = formatNumber(roundNicely(parsed2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m1 = formatNumber(roundNicely(parsed1.value * scale, useRounding));
+        const m2 = formatNumber(roundNicely(parsed2.value * scale, useRounding));
         const metStr = formatConvertedValue(`${m1} × ${m2}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -851,13 +827,11 @@ const replaceFeetAndInchesRegex = new RegExp(
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric lengths
 */
-function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useBold, useBrackets) {
     let match;
     while ((match = replaceFeetAndInchesRegex.exec(text)) !== null) {
         const dim1 = match[1];
@@ -873,7 +847,7 @@ function replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCom
         const is_yards = new RegExp('yd', 'i');
         const feet = is_yards.test(larger_unit) ? yards_or_feet * 3 : yards_or_feet;
         const total = feet * 12 + inches;
-        const m = formatNumber(roundNicely(total * 0.0254, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const m = formatNumber(roundNicely(total * 0.0254, useRounding));
         const metStr = formatConvertedValue(m, 'm', useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -1055,13 +1029,11 @@ function hasNumber(myString) {
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric lengths
 */
-function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useBold, useBrackets) {
     // NOTE: part of the logic is dedicated to detecting things of the form
     // '"they were 3"' to avoid parsing '3"' as 3 inches
     let lastQuoteOpen = false;
@@ -1117,7 +1089,7 @@ function replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracket
             : applyConversion(feet.value * 12 + inches.value, inchConversion, '', isUK, useMM, useGiga, useRounding)
         );
 
-        const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const met = formatNumber(ret.met);
         const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
 
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
@@ -1144,13 +1116,11 @@ const replacePoundsAndOuncesRegex = new RegExp(
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric weights
 */
-function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replacePoundsAndOunces(text, convertBracketed, useRounding, useBold, useBrackets) {
     let match;
     while ((match = replacePoundsAndOuncesRegex.exec(text)) !== null) {
         const poundsPart = match[1];
@@ -1161,7 +1131,7 @@ function replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsD
         const pounds = parseFloat(poundsPart);
         const ounces = parseFloat(ouncesPart);
         const total = pounds * 16 + ounces;
-        const formattedTotal = formatNumber(roundNicely(total * 0.0283495, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const formattedTotal = formatNumber(roundNicely(total * 0.0283495, useRounding));
         const metStr = formatConvertedValue(formattedTotal, 'kg', useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -1175,13 +1145,11 @@ const replaceMilesPerGallonRegex = new RegExp(regstart + numberPattern + '[ \u00
  *  @param {string} text - The original text
  *  @param {boolean} convertBracketed - Whether values that are in brackets should still be converted
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric equivalent to mpg
 */
-function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceMilesPerGallon(text, convertBracketed, useRounding, useBold, useBrackets) {
     let match;
     while ((match = replaceMilesPerGallonRegex.exec(text)) !== null) {
         if (!shouldConvert(match[0], convertBracketed)) {
@@ -1197,7 +1165,7 @@ function replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDe
         const imp = parseFloat(impPart);
         const l = 235.214583 / imp; // 100 * 3.785411784 / 1.609344 * imp;
         const met = roundNicely(l, useRounding);
-        const formattedMet = formatNumber(met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const formattedMet = formatNumber(met);
 
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         const metStr = formatConvertedValue(formattedMet, 'L/100 km', useBold, useBrackets);
@@ -1232,13 +1200,11 @@ const replaceIkeaSurfaceRegex = new RegExp(
  *  @param {string} text - The original text
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric surfaces
 */
-function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceIkeaSurface(text, useMM, useRounding, useBold, useBrackets) {
     let match;
     while ((match = replaceIkeaSurfaceRegex.exec(text)) !== null) {
         const number1 = match[1];
@@ -1264,8 +1230,8 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
             unit = 'mm';
         }
 
-        const cm1 = formatNumber(roundNicely(inches1.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
-        const cm2 = formatNumber(roundNicely(inches2.value * scale, useRounding), useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+        const cm1 = formatNumber(roundNicely(inches1.value * scale, useRounding));
+        const cm2 = formatNumber(roundNicely(inches2.value * scale, useRounding));
         const metStr = formatConvertedValue(`${cm1} × ${cm2}`, unit, useBold, useBrackets);
         const insertIndex = match.index + convertedValueInsertionOffset(match[0]);
         text = insertAt(text, metStr, insertIndex);
@@ -1282,13 +1248,11 @@ function replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric units
 */
-function replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga, useRounding, useBold, useBrackets) {
     const fullmatch = match[0];
 
     const impStr = match[1];
@@ -1328,7 +1292,7 @@ function replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga
     }
 
     const ret = applyConversion(imp, conversion, suffix, isUK, useMM, useGiga, useRounding);
-    const met = formatNumber(ret.met, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator);
+    const met = formatNumber(ret.met);
     const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
 
     const insertIndex = (match.index || 0) + convertedValueInsertionOffset(fullmatch);
@@ -1346,13 +1310,11 @@ function replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga
  *  @param {boolean} useMM - Whether millimeters should be preferred over centimeters
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string with metric units
 */
-function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets) {
+function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useBold, useBrackets) {
     let match;
     while ((match = getOtherUnitsRegex().exec(text)) !== null) {
         const fullmatch = match[0];
@@ -1365,16 +1327,16 @@ function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutF
             continue;
         }
         if (convertTablespoon && unitsTablespoon.regex !== undefined && unitsTablespoon.regex.test(unit)) {
-            text = replaceOtherUnit(text, match, unitsTablespoon, matchIn, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            text = replaceOtherUnit(text, match, unitsTablespoon, matchIn, isUK, useMM, useGiga, useRounding, useBold, useBrackets);
             continue;
         }
         if (convertTeaspoon && unitsTeaspoon.regex !== undefined && unitsTeaspoon.regex.test(unit)) {
-            text = replaceOtherUnit(text, match, unitsTeaspoon, matchIn, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+            text = replaceOtherUnit(text, match, unitsTeaspoon, matchIn, isUK, useMM, useGiga, useRounding, useBold, useBrackets);
             continue;
         }
         for (const conversion of conversions) {
             if (conversion.regex !== undefined && conversion.regex.test(unit)) {
-                text = replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+                text = replaceOtherUnit(text, match, conversion, matchIn, isUK, useMM, useGiga, useRounding, useBold, useBrackets);
                 break;
             }
         }
@@ -1399,22 +1361,20 @@ function replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutF
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useCommaAsDecimalSeparator - Whether to use a comma as decimal separator
- *  @param {boolean} useSpacesAsThousandSeparator - Whether to use spaces as thousand separator
  *  @return {string} - A new string with metric units
 */
-function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator) {
-    text = replaceIkeaSurface(text, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+function replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding) {
+    text = replaceIkeaSurface(text, useMM, useRounding, useBold, useBrackets);
     if (includeQuotes)
-        text = replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceVolume(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replacePoundsAndOunces(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceMilesPerGallon(text, convertBracketed, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
-    text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useCommaAsDecimalSeparator, useSpacesAsThousandSeparator, useBold, useBrackets);
+        text = replaceFeetAndInchesSymbol(text, includeImproperSymbols, convertBracketed, isUK, useMM, useGiga, useRounding, useBold, useBrackets);
+    text = replaceVolume(text, convertBracketed, useMM, useRounding, useBold, useBrackets);
+    text = replaceSurfaceInInches(text, convertBracketed, useMM, useRounding, useBold, useBrackets);
+    text = replaceSurfaceInFeet(text, convertBracketed, useMM, useRounding, useBold, useBrackets);
+    text = replaceFeetAndInches(text, convertBracketed, useMM, useRounding, useBold, useBrackets);
+    text = replacePoundsAndOunces(text, convertBracketed, useRounding, useBold, useBrackets);
+    text = replaceOtherUnits(text, convertTablespoon, convertTeaspoon, degWithoutFahrenheit, matchIn, convertBracketed, isUK, useMM, useGiga, useRounding, useBold, useBrackets);
+    text = replaceMilesPerGallon(text, convertBracketed, useRounding, useBold, useBrackets);
+    text = replaceFahrenheit(text, degWithoutFahrenheit, convertBracketed, useKelvin, useRounding, useBold, useBrackets);
     return text;
 }
 
@@ -1448,11 +1408,9 @@ function resetBlockProcessing() {
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useComma - Whether to use a comma as decimal separator
- *  @param {boolean} useSpaces - Whether to use spaces as thousand separator
  *  @return {string} - A new string with metric units
 */
-function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces) {
+function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding) {
     if (text.startsWith('{') || text.length < 1) {
         return text;
     }
@@ -1460,7 +1418,7 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
     // skipping added for quantity and unit in separate blocks - after the number is found, sometimes next node is just a bunch of whitespace, like in cooking.nytimes, so we try again on the next node
 
     if (lastquantity !== undefined && skips < 2) {
-        text = parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets);
+        text = parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useBold, useBrackets);
         if (/^[a-zA-Z°º]+$/g.test(text)) {
             lastquantity = undefined;
         }
@@ -1481,7 +1439,7 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
     }
 
     if ((lastquantity !== undefined && skips <= 2) || /[1-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g.test(text)) {
-        text = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding, useComma, useSpaces);
+        text = replaceAll(text, convertTablespoon, convertTeaspoon, convertBracketed, degWithoutFahrenheit, includeImproperSymbols, matchIn, includeQuotes, isUK, useMM, useGiga, useKelvin, useBold, useBrackets, useRounding);
     }
 
     return text;
@@ -1495,13 +1453,11 @@ function processTextBlock(text, convertTablespoon, convertTeaspoon, convertBrack
  *  @param {boolean} useGiga - Whether the giga SI prefix should be used when it makes sense
  *  @param {boolean} useKelvin - Whether the returned value will then be converted to Kelvin
  *  @param {boolean} useRounding - When true, accept up to 3 % error when rounding; when false, round to 2 decimal places
- *  @param {boolean} useComma - Whether to use a comma as decimal separator
- *  @param {boolean} useSpaces - Whether to use spaces as thousand separator
  *  @param {boolean} useBold - Whether the text should use bold Unicode code-points
  *  @param {boolean} useBrackets - Whether to use lenticular brackets instead of parentheses
  *  @return {string} - A new string where the unit has been converted to metric
 */
-function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useComma, useSpaces, useBold, useBrackets) {
+function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelvin, useRounding, useBold, useBrackets) {
     if (lastquantity === undefined) {
         return text;
     }
@@ -1520,7 +1476,7 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
         let match;
         while ((match = conversion.regexUnit.exec(text)) !== null) {
             const ret = applyConversion(lastquantity, conversion, "", isUK, useMM, useGiga, useRounding);
-            const met = formatNumber(ret.met, useComma, useSpaces);
+            const met = formatNumber(ret.met);
             const metStr = formatConvertedValue(met, ret.unit, useBold, useBrackets);
             const fullMatch = match[0];
             const insertIndex = match.index + convertedValueInsertionOffset(fullMatch);
@@ -1546,7 +1502,7 @@ function parseUnitOnly(text, degWithoutFahrenheit, isUK, useMM, useGiga, useKelv
             met = roundNicely(met, useRounding);
         }
 
-        const formatted = formatNumber(met, useComma, useSpaces);
+        const formatted = formatNumber(met);
         const metStr = formatConvertedValue(formatted, unit, useBold, useBrackets);
         text = insertAt(text, metStr, 1);
     }
