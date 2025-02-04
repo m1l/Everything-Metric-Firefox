@@ -70,6 +70,7 @@
     "gecko": {
       "id": "{ffd50a6d-1702-4d87-83c3-ec468f67de6a}",
       "strict_min_version": "57.0"
-    }
+    },
+    "gecko_android": {}
   }
 }
